@@ -1,0 +1,88 @@
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C/DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xlmns="http://www.w3.org/1999/xhtml">
+<head>
+
+<title>Build instructions for ManyMouse</title>
+
+<p>
+These are the build instructions for the ManyMouse project.<br/>
+<br/>
+You will need a C++ compiler, Allegro 5.1.10 or a later version, and Windows XP or a later version Windows OS to build ManyMouse. Versions of Windows prior to XP do not have support for the RawInput API, which is needed for most of ManyMouse's functionality.<br/>
+<br/>
+ManyMouse has been successfully built on Windows Vista using MinGW 4.8.1 and Allegro 5.1.10. Any modern C++ compiler should do.
+</p>
+
+</head>
+
+<body>
+
+
+<div style="width : 800px; float: left;margin-bottom : 200px">
+<h3><u>Libraries necessary to build ManyMouse</u></h3>
+<p>
+ManyMouse depends on the Allegro 5 Library for windowing, graphics, and some input. Allegro 5 in turn depends on several optional libraries. One of them is FreeType. Allegro uses FreeType to render ttf fonts, which we use in our application, so Allegro needs to be built with FreeType support.<br/>
+<br/>
+You can find binaries for Allegro 5 at allegro.cc, on the files page :<br/>
+<a href="https://www.allegro.cc/files/">
+https://www.allegro.cc/files/
+</a><br/>
+<br/>
+Instructions for using the Allegro 5 binaries with MSVC 2010 can be found here :<br/>
+<a href="https://wiki.allegro.cc/index.php?title=Windows,_Visual_Studio_2010_and_Allegro_5">
+https://wiki.allegro.cc/index.php?title=Windows,_Visual_Studio_2010_and_Allegro_5
+</a><br/>
+<br/>
+Alternatively you can build using MinGW. I provide an unofficial binary distribution of MinGW 4.8.1 on my Sourceforge account. Since Allegro does not yet have binaries for the MinGW 4.8.1 compiler, you will either need to build it yourself, or else you can use binaries for Allegro 5.1.10 for MinGW 4.8.1 which I provide as well.<br/>
+<br/>
+The latest downloads for my Unofficial MinGW and Allegro 5 distributions can be found here :<br/>
+<a href="http://sourceforge.net/projects/unofficialmingw/files/latest/download">
+http://sourceforge.net/projects/unofficialmingw/files/latest/download
+</a><br/>
+<a href="http://sourceforge.net/projects/unofficialallegro5distribution/files/latest/download">
+http://sourceforge.net/projects/unofficialallegro5distribution/files/latest/download
+</a><br/>
+<br/>
+
+The distros are in .7z format, which means you need 7-zip to decompress them. You can download 7-zip for free at their website :<br/>
+<a href="http://www.7-zip.org/download.html">
+http://www.7-zip.org/download.html
+</a><br/>
+<br/>
+<h3><u>Installing MinGW</u></h3>
+To install mingw all you need to do is extract the contents of the mingw_4_8_1-4.tar.7z file twice. This will create a mingw_4_8_1-4 directory, which you can rename as you like.<br/>
+<br/>
+I use CodeBlocks with MinGW so the installation directions that follow are for CB and MinGW. To configure CodeBlocks to use the new compiler go to Menu->Settings->Compiler and select the Toolchain Executables tab. Click on the ... button next to the auto-detect button and navigate to your new mingw folder. Select it and say okay. CB should detect everything okay at which point you can compile with MinGW.<br/>
+<br/>
+Alternatively you can compile with MinGW from the command line. To do this you need to add the mingw\bin folder to your PATH environment variable. You can either add it to your global environment variables using the advanced system settings under the system control panel (which is not recommended), or by manually setting it from the command line. The correct command to add MinGW to your path is :<br/>
+<br/>
+set PATH=$MINGDIR$\bin;%PATH%<br/>
+<br/>
+where $MINGDIR$ is the full path to your base mingw folder. If you do this from the command line, any changes to the path you make will be discarded once you exit the terminal, as they are local to the terminal instance. For this reason, many prefer to create a batch file to open a new terminal and add mingw to the path. Please note the semicolon between the mingw directory and the reference to the PATH environment variable. This is necessary to separate the search directories on the path.<br/>
+<br/>
+<h3><u>Installing Allegro 5</u></h3>
+Next we need to extract the Allegro 5 binary package. As before, extract twice to your target directory and it will create a new folder named A5110distro with several sub folders. The important ones for us are the include, lib, and bin directories.<br/>
+<br/>
+ManyMouse comes with a CB project already set up, but it requires you to copy the A5110distro folder to the ManyMouse root folder. Otherwise you can set up your own project to build ManyMouse. The following instructions detail how to accomplish this.<br/>
+<br/>
+<h4><u>Creating a new CB project to build ManyMouse.</u></h4>
+First set up a new CodeBlocks project. Goto Menu->File->New->Project and create a new Empty Project in the ManyMouse root folder. Once the project is created, go to Project->Add Files and add all the files in the src folder to the project. Once you have it set up the way you want we can configure the project to include and link to the Allegro libraries.<br/>
+<br/>
+The next step is to setup your project's compiler and linker search directories to include A5110distro\include and A5110distro\lib respectively. These can both be accessed from Menu->Project->Build Options under the Search directories tab.<br/>
+<br/>
+Once that is complete you need to add the desired allegro libraries to your linker commands. Go to Menu->Project->Build Options and select the Linker Settings tab. For now, link to liballegro_monolith-debug.dll.a or liballegro_monolith.dll.a by adding the appropriate one to either 'Additional Link Libraries' on the left, or linker options on the right. The correct linker options for MinGW and the allegro libraries are '-lallegro_monolith.dll' or '-lallegro_monolith-debug.dll'. The -l tells the compiler to link to the library specified right after it. The format is -lNAME where the library's full name is libNAME.a. -l is simply a shortcut.
+
+
+</p>
+</div>
+
+
+</body>
+
+
+
+</html>
+
+
+
