@@ -15,13 +15,30 @@ Instructions for building ManyMouse are in the <a href="BuildInstructions.html">
 </head>
 
 <body>
-<div style="width : 800px;float: left;bottom-margin:200px">
+<div style="width : 800px;float: left;margin-bottom: 200px">
 
-<h3>Required APIs</h3>
+<h3><u>Required APIs</u></h3>
 ManyMouse depends on the <a href="https://msdn.microsoft.com/en-us/library/ms645543%28VS.85%29.aspx">RawInput API for Windows</a> as well as the <a href="http://alleg.sourceforge.net">Allegro 5 graphics library</a>. The RawInput API allows an application to receive raw input from hid compliant devices such as keyboards and mice. Allegro 5 allows you to create and draw to a window as well as load images and draw graphics and more.<br/>
 <br/>
 
-
+<h3><u>Working with Git and the Bitbucket repository</u></h3>
+ManyMouse is hosted on BitBucket inside a private git repository. Common commands for working with the repo are as follows :<br/>
+<br/>
+git clone is used to create a local copy of the remote repository.<br/>
+<br/>
+git pull allows you to pull down the most recent changes from the remote repository to your local one.<br/>
+<br/>
+git add is used to track changes to files.<br/>
+<br/>
+git status notifies you of all staged and unstaged changes to the local repository. Check this first before committing.<br/>
+<br/>
+git commit allows you to store all your newly tracked changes and commit them to your local repository.<br/>
+<br/>
+git push allows you to push your local changes to the remote repository. Make sure you've staged your new changes using git add and git commit first. git status will let you know which changes have been staged.<br/>
+<br/>
+Those are the main commands for working with Git. Help on individual commands can be found by typing 'git help command'. <br/>
+<br/>
+If you prefer using a graphical interface, TortoiseGit provides just that, a GUI interface for working with Git. You can <a href="https://download.tortoisegit.org/tgit/">download TortoiseGit from here</a> and you can find <a href="http://tortoisegit.org/docs/tortoisegit/">documentation for using TortoiseGit here</a>.
 
 
 
