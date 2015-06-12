@@ -8,10 +8,11 @@
 
 
 #include "AllegroAndWindows.hpp"
-
 #include "Mouse.hpp"
-
+#include "String.hpp"
 #include "VisualLogger.hpp"
+#include "WindowInfo.hpp"
+
 
 #include <vector>
 using std::vector;
@@ -31,88 +32,73 @@ using std::deque;
 
 BOOL CALLBACK EnumerationProcess(HWND hwindow , LPARAM lp);
 
-class WindowInfo {
 
-public :
-   HWND hwnd;
-   DWORD pid;
-   WNDPROC window_process;
-
-   string window_title;
-   string class_name;
-
-//   WindowInfo();
-   WindowInfo() :
-         hwnd(0),
-         pid(-1),
-         window_process((WNDPROC)0),
-         window_title("Unknown window title"),
-         class_name("Unknown class name")
-   {
-      
-   }
-
-
-/*
-   void SetWindowHandle(HWND window);
-   void SetWindowHandle(HWND window) {
-      hwnd = window;
-      RefreshInfo();
-   }
-   void RefreshWindowTitle();
-   void RefreshWindowTitle() {
-      window_title = "";
-      if (hwnd) {
-         const unsigned int BUFSIZE = 512;
-         TCHAR buf[BUFSIZE];
-         memset(buf , 0 , sizeof(TCHAR)*BUFSIZE);
-         SendMessage(hwnd , WM_GETTEXT , (WPARAM)BUFSIZE , (LPARAM)buf);
-         
-      }
-   }
-   
-   void RefreshClassName();
-   void RefreshClassName() {
-      
-   }
-   
-   void RefreshInfo();
-   void RefreshInfo() {
-      if (hwnd) {
-         (void)GetWindowThreadProcessId(hwnd , &pid);
-         window_process = GetWindowLong(hwnd , GWL_WNDPROC);
-         RefreshWindowTitle();
-         RefreshClassName();
-      }
-   }
-*/   
-};
-
-/*
-LRESULT WINAPI SendMessage(
-  _In_ HWND   hWnd,
-  _In_ UINT   Msg,
-  _In_ WPARAM wParam,
-  _In_ LPARAM lParam
-);
-*/
 
 class WindowHandler {
    
-   vector<HWND> desktop_windows;
-   vector<HWND> mice_windows;
-   vector<HWND> other_windows;
-   HWND program_window;
+   map<HWND , WindowInfo*> window_info_map;
+   deque<HWND> hwnds_zorder;// front is front - ie on top of everything else
+
    HWND desktop_window;
-   
-   HWND taskbar_window;
    HWND shell_window;
+   HWND taskbar_window;
    
-   deque<WindowInfo> all_window_info;// All current windows, sorted in z-order, first on bottom, last on top
+   HWND program_window;
+   HWND test_window;
    
    MouseController* mc;
    
+   vector<HWND> mice_windows;
+
+
+
+
+
 public :
+
+//   WindowHandler(MouseController* mouse_controller);
+   WindowHandler(MouseController* mouse_controller) :
+         window_info_map(),
+         hwnds_zorder(),
+         desktop_window(0),
+         shell_window(0),
+         taskbar_window(0),
+         program_window(0),
+         test_window(0),
+         mc(mouse_controller),
+         mice_windows()
+   {
+      assert(mouse_controller);
+   }
+
+   ~WindowHandler();
+
+   void GetMiceWindows();
+   void EnumerateWindows();
+
+   void ClearWindowInfo();
+   void RefreshWindowInfo();
+   void SetOurWindows(HWND program_window_handle , HWND test_window_handle);
+   void PrintWindowInfo();
+
+   bool IsMouseWindow(HWND hwnd);
+/*
+   HWND GetWindowFromPos(int xpos , int ypos);
+HWND GetWindowFromPos(int xpos , int ypos) {
+   
+}
+*/
+
+
+
+
+
+
+
+
+/**
+
+
    WindowHandler(MouseController* mscontroller);
    
    void SetController(MouseController* mscontroller);
@@ -168,10 +154,21 @@ public :
       log.Log("Find all windows found %u windows\n" , all_window_info.size());
       
    }
-
+//*/
 
    
 };
+
+
+
+/*
+LRESULT WINAPI SendMessage(
+  _In_ HWND   hWnd,
+  _In_ UINT   Msg,
+  _In_ WPARAM wParam,
+  _In_ LPARAM lParam
+);
+*/
 
 
 

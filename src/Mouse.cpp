@@ -500,8 +500,15 @@ void MouseController::HandleRawInput(RAWINPUT rawinput) {
    
    RAWINPUTHEADER hdr = rawinput.header;
    
-   /// hdr.hDevice may be NULL, which means it is data inserted by SendInput
-   /// In the future, try to do something useful with it
+   /** hdr.hDevice may be NULL, which means it is data inserted by SendInput
+       In the future, try to do something useful with it.
+       The MMB on my mouse uses SendInput, but it's not useful because we don't know
+       which mouse it is coming from due to the NULL hDevice it reports. :P
+   //*/
+   if (hdr.hDevice == (HANDLE)0) {
+      log.Log("Ignoring input from SendInput.\n");
+      return;
+   }
    
    map<HANDLE , Mouse*>::iterator it = dev_map.find(hdr.hDevice);
    

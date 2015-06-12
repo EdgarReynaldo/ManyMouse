@@ -16,15 +16,12 @@ using std::deque;
 using std::string;
 
 
-extern int STRINGPRINTF_BUFFER_SIZE;
-
-string StringPrintF(const char* format_str , ...);
 
 
 
 class VisualLogger {
    
-   Mutex mutex;
+   Mutex mutex;/// A log may be shared between threads, so it needs to be synchronized if you don't want crazy output
    
    FILE* logfile;
    int numlines;
@@ -47,9 +44,9 @@ public :
    void Log(string s);
    void Log(const char* format_str , ...);
 
-   void Activate(bool activate) {
-      active = activate;
-   }
+   void Activate(bool activate);
+   
+   void Clear();
 };
 
 

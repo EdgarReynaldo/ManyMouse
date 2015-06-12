@@ -66,10 +66,14 @@
 		<Unit filename="src/RawInputMain.cpp" />
 		<Unit filename="src/String.cpp" />
 		<Unit filename="src/String.hpp" />
+		<Unit filename="src/TestWindow.cpp" />
+		<Unit filename="src/TestWindow.hpp" />
 		<Unit filename="src/VisualLogger.cpp" />
 		<Unit filename="src/VisualLogger.hpp" />
 		<Unit filename="src/WindowHandler.cpp" />
 		<Unit filename="src/WindowHandler.hpp" />
+		<Unit filename="src/WindowInfo.cpp" />
+		<Unit filename="src/WindowInfo.hpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

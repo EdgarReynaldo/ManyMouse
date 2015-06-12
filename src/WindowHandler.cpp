@@ -11,14 +11,177 @@
 
 
 BOOL CALLBACK EnumerationProcess(HWND hwindow , LPARAM lp) {
-   vector<HWND>* pwinvec = (vector<HWND>*)lp;
+   deque<HWND>* pwin = (deque<HWND>*)lp;
    if (IsWindowVisible(hwindow)) {
-      pwinvec->push_back(hwindow);
+      pwin->push_back(hwindow);
    }
    return true;
 }
 
 
+
+
+void WindowHandler::GetMiceWindows() {
+   if (mc) {
+      mice_windows.clear();
+      mc->GetMiceWindows(&mice_windows);
+   }
+}
+
+
+
+void WindowHandler::EnumerateWindows() {
+   
+   ClearWindowInfo();
+   
+   GetMiceWindows();
+   
+   EnumWindows(EnumerationProcess , (LPARAM)(&hwnds_zorder));
+   desktop_window = GetDesktopWindow();
+   shell_window = GetShellWindow();
+   taskbar_window = FindWindow("Shell_TrayWnd" , NULL);
+   
+   log.Log("Desktop window handle = %p\n" , desktop_window);
+   log.Log("Shell   window handle = %p\n" , shell_window);
+   log.Log("Taskbar window handle = %p\n" , taskbar_window);
+   
+   deque<HWND>::iterator dit = hwnds_zorder.begin();
+   while (dit != hwnds_zorder.end()) {
+      HWND hwnd = *dit;
+   
+      WindowInfo* pwi = new WindowInfo();
+      
+      pwi->SetWindowHandle(hwnd);
+      if (hwnd == desktop_window) {
+         pwi->SetWindowTypeString("The desktop window");
+      }
+      else if (hwnd == shell_window) {
+         pwi->SetWindowTypeString("The shell window");
+      }
+      else if (hwnd == taskbar_window) {
+         pwi->SetWindowTypeString("The taskbar window");
+      }
+      else if (hwnd == program_window) {
+         pwi->SetWindowTypeString("Our program window");
+      }
+      else if (hwnd == test_window) {
+         pwi->SetWindowTypeString("Our test window");
+      }
+      else if (IsMouseWindow(hwnd)) {
+         for (unsigned int i = 0 ; i < mice_windows.size() ; ++i) {
+            HWND hwndmouse = mice_windows[i];
+            if (hwnd == hwndmouse) {
+               pwi->SetWindowTypeString(StringPrintF("Our mouse window #%u" , i));
+            }
+         }
+      }
+      else {
+         pwi->SetWindowTypeString("A user window");
+      }
+      
+      window_info_map[hwnd] = pwi;
+   
+      ++dit;
+   }
+   
+}
+
+
+
+
+WindowHandler::~WindowHandler() {
+   ClearWindowInfo();
+}
+
+
+
+void WindowHandler::ClearWindowInfo() {
+   map<HWND , WindowInfo*>::iterator it = window_info_map.begin();
+   while (it != window_info_map.end()) {
+      WindowInfo* pwi = it->second;
+      delete pwi;
+      ++it;
+   }
+   window_info_map.clear();
+   hwnds_zorder.clear();
+   desktop_window = 0;
+   shell_window = 0;
+   taskbar_window = 0;
+//      program_window = 0;
+//      test_window = 0;
+}
+
+
+
+void WindowHandler::RefreshWindowInfo() {
+   ClearWindowInfo();
+   EnumerateWindows();
+   SetOurWindows(program_window , test_window);
+}
+
+
+
+void WindowHandler::SetOurWindows(HWND program_window_handle , HWND test_window_handle) {
+   program_window = program_window_handle;
+   test_window = test_window_handle;
+   
+   map<HWND , WindowInfo*>::iterator it;
+   
+   if (program_window) {
+      it = window_info_map.find(program_window);
+      if (it != window_info_map.end()) {
+         WindowInfo* pwi = it->second;
+         pwi->SetWindowTypeString("Our program window : ");
+      }
+   }
+   if (test_window) {
+      it = window_info_map.find(test_window);
+      if (it != window_info_map.end()) {
+         WindowInfo* pwi = it->second;
+         pwi->SetWindowTypeString("The test window    : ");
+      }
+   }
+}
+
+
+
+void WindowHandler::PrintWindowInfo() {
+   
+   deque<HWND>::iterator itwin = hwnds_zorder.begin();
+   while (itwin != hwnds_zorder.end()) {
+      
+      HWND hwnd = *itwin;
+      
+      map<HWND , WindowInfo*>::iterator itinfo = window_info_map.find(hwnd);
+      if (itinfo != window_info_map.end()) {
+         WindowInfo* pwi = itinfo->second;
+         log.Log(pwi->GetWindowInfoString());
+         log.Log("\n");
+      }
+      
+      ++itwin;
+   }
+}
+
+
+
+bool WindowHandler::IsMouseWindow(HWND hwnd) {
+   for (unsigned int i = 0 ; i < mice_windows.size() ; ++i) {
+      HWND hwndmouse = mice_windows[i];
+      if (hwnd == hwndmouse) {
+         return true;
+      }
+   }
+   return false;
+}
+
+
+
+
+
+
+
+/*
 
 WindowHandler::WindowHandler(MouseController* mscontroller) :
       desktop_windows(),
@@ -41,19 +204,16 @@ void WindowHandler::SetController(MouseController* mscontroller) {
 
 
 void WindowHandler::EnumerateDesktopWindows() {
-   desktop_windows.clear();
-   EnumWindows(EnumerationProcess , (LPARAM)(&desktop_windows));
+   FreeWindowInfo();
+   hwnds_zorder.clear();
+   EnumWindows(EnumerationProcess , (LPARAM)(&hwnds_zorder));
    desktop_window = GetDesktopWindow();
+   shell_window = GetShellWindow();
+   taskbar_window = FindWindow("Shell_TrayWnd" , NULL);
 }
 
 
 
-void WindowHandler::GetMiceWindows() {
-   if (mc) {
-      mice_windows.clear();
-      mc->GetMiceWindows(&mice_windows);
-   }
-}
 
 
 // if( (IsWindowVisible(hwnd) || IsIconic(hwnd)) &&
@@ -136,3 +296,4 @@ void WindowHandler::PrintWindows() {
       }
    }
 }
+*/

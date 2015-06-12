@@ -107,7 +107,7 @@ UINT WINAPI GetRawInputDeviceInfo(HANDLE hDevice , UINT uiCommand , LPVOID pData
          }
          else {
             s = buf;
-            dev_name = ToStlString(s);
+            dev_name = GetStlString(s);
          }
          free(buf);
       }
@@ -263,7 +263,7 @@ int RawInputHandler::SetupAllegro() {
 //HWND al_get_win_window_handle(ALLEGRO_DISPLAY *display)
    winhandle = al_get_win_window_handle(display);
    
-   window_handler.SetProgramWindow(winhandle);
+   window_handler.SetOurWindows(winhandle , 0);
    
 /*
 al_win_add_window_callback
@@ -319,7 +319,7 @@ void RawInputHandler::ShutdownAllegro() {
       display = 0;
    }
    
-   window_handler.SetProgramWindow(0);
+   window_handler.SetOurWindows(0 , 0);
 }
 
 
@@ -367,6 +367,17 @@ void RawInputHandler::InputLoop() {
             mouse_controller.ToggleMiceEnabled();
             printf("Mice image toggled.\n");
          }  
+         
+         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_W) {
+            window_handler.EnumerateWindows();
+            log.Log("\n");
+            window_handler.PrintWindowInfo();
+         }
+         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_D) {
+            PrintDeviceInfo();
+         }
+         
+/*         
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_P) {
             window_handler.PrintWindows();
          }  
@@ -374,10 +385,7 @@ void RawInputHandler::InputLoop() {
             window_handler.FindAllWindowsZOrder();
             window_handler.PrintAllWindows();
          }  
-         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_D) {
-            PrintDeviceInfo();
-         }
-         
+*/         
       } while (!al_is_event_queue_empty(queue));
       
       

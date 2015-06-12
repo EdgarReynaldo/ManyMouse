@@ -8,7 +8,7 @@
 #include "AllegroAndWindows.hpp"
 
 #include <string>
-
+#include <vector>
 
 /*
 
@@ -60,7 +60,13 @@ std::wstring utf8_decode(const std::string &str);
 
 #endif // #ifdef UNICODE
 
-std::string ToStlString(const String& s);
+std::string GetStlString(const String& s);
+
+extern int STRINGPRINTF_BUFFER_SIZE;
+
+std::string StringPrintF(const char* format_str , ...);
+
+std::vector<std::string> SplitByNewlines(std::string s);
 
 
 

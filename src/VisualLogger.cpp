@@ -5,8 +5,9 @@
 
 #include <cstdio>
 
-int STRINGPRINTF_BUFFER_SIZE = 4096;
 
+#include "String.hpp"
+using std::vector;
 
 
 VisualLogger log;
@@ -107,11 +108,17 @@ void VisualLogger::Log(string s) {
 
       fflush(logfile);
       
+      vector<string> lines = SplitByNewlines(s);
+      
       /// CRITICAL SECTION
       mutex.Lock();
       
-      log.push_front(s);
+      // Add new lines to log
+      for (unsigned int i = 0 ; i < lines.size() ; ++i) {
+         log.push_front(lines[i]);
+      }
       
+      // Remove excess lines from log
       if (numlines > 0) {
          int nlines = (int)log.size();
          while (numlines < nlines--) {
@@ -120,7 +127,8 @@ void VisualLogger::Log(string s) {
       }
 
       mutex.Unlock();
-
+      /// END CRITICAL SECTION
+      
    }
 }
    
@@ -139,14 +147,17 @@ void VisualLogger::Log(const char* format_str , ...) {
 
 
 
-
-string StringPrintF(const char* format_str , ...) {
-   char buffer[STRINGPRINTF_BUFFER_SIZE];
-   va_list args;
-   va_start(args , format_str);
-///int vsnprintf (char * s, size_t n, const char * format, va_list arg );
-   vsnprintf(buffer , STRINGPRINTF_BUFFER_SIZE , format_str , args);
-   va_end(args);
-   return std::string(buffer);
+void VisualLogger::Activate(bool activate) {
+   active = activate;
 }
+
+
+
+void VisualLogger::Clear() {
+   mutex.Lock();
+   log.clear();
+   mutex.Unlock();
+}
+
+
 
