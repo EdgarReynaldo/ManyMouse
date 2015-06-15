@@ -2,6 +2,7 @@
 
 #include "Mouse.hpp"
 
+#include "WindowHandler.hpp"
 
 #include "VisualLogger.hpp"
 
@@ -338,7 +339,10 @@ void Mouse::MoveBy(int dx , int dy) {
    
 void Mouse::Draw() {
    
-   if (!dib_buffer.Ready()) {return;}
+   if (!dib_buffer.Ready()) {
+      log.Log("Mouse::Draw - DIB buffer not ready.\n");
+      return;
+   }
 ///   dib_buffer.DrawBufferToWindowDC();
    QueuePaintMessage();
 }
@@ -360,21 +364,20 @@ void Mouse::HandleRawInput(RAWINPUT rawinput) {
       return;
    }
    
-///   log.Log("Mouse::HandleRawInput :\n");
+   /// RAWMOUSE::usFlags is always 0 so far, which means MOUSE_MOVE_RELATIVE
+   /// Their flags could use a better configuration
    
-   /// RAWMOUSE::usFlags is always 0 for some reason
-   
-   if (rms.lLastX || rms.lLastY) {
-      MoveBy(rms.lLastX , rms.lLastY);
-   }
-/*
-   if (rms.usFlags & MOUSE_MOVE_RELATIVE) {
-      log.Log("Mouse::HandleRawInput : MOUSE_MOVE_RELATIVE\n");
+   if (rms.usFlags == MOUSE_MOVE_RELATIVE) {
+//      log.Log("Mouse::HandleRawInput : MOUSE_MOVE_RELATIVE\n");
       MoveBy(rms.lLastX , rms.lLastY);
    }
    else if (rms.usFlags & MOUSE_MOVE_ABSOLUTE) {
-      log.Log("Mouse::HandleRawInput : MOUSE_MOVE_ABSOLUTE\n");
+//      log.Log("Mouse::HandleRawInput : MOUSE_MOVE_ABSOLUTE\n");
       SetPos(rms.lLastX , rms.lLastY);
+   }
+/*
+   else if (rms.lLastX || rms.lLastY) {
+      MoveBy(rms.lLastX , rms.lLastY);
    }
 */   
    USHORT flags = rms.usButtonFlags;
@@ -401,26 +404,184 @@ void Mouse::HandleRawInput(RAWINPUT rawinput) {
 
 
 
-/// -----------------------------------------------------------------------------------
+
+/// ------------------ MouseTracker class -----------------------------------------
 
 
 
-void MouseController::DestroyMouse(HANDLE hDevice) {
-   map<HANDLE , Mouse*>::iterator it = dev_map.find(hDevice);
-   if (it != dev_map.end()) {
-      delete it->second;
-      it->second = 0;
-      dev_map.erase(it);
+
+
+MouseTracker::MouseTracker() :
+      mtinfo()
+{
+   
+}
+
+
+
+unsigned int MouseTracker::TrackNewMouse(Mouse* mouse , HANDLE hdev) {
+   unsigned int new_id = 0;
+   bool found_spot = false;
+   for (new_id = 0 ; new_id < mtinfo.size() ; ++new_id) {
+      bool used = mtinfo[new_id].used;
+      if (!used) {
+         found_spot = true;
+         break;
+      }
+   }
+   if (!found_spot) {
+      mtinfo.resize(mtinfo.size() + 1);
+   }
+   mtinfo[new_id].used = true;
+   mtinfo[new_id].id = new_id;
+   mtinfo[new_id].hdev = hdev;
+   mtinfo[new_id].mouse = mouse;
+   return new_id;
+}
+
+
+
+void MouseTracker::StopTrackingMouse(HANDLE hdev) {
+   for (unsigned int new_id = 0 ; new_id < mtinfo.size() ; ++new_id) {
+      HANDLE hdev2 = mtinfo[new_id].hdev;
+      if (hdev == hdev2) {
+         Mouse* m = mtinfo[new_id].mouse;
+         if (m) {
+            delete m;
+            mtinfo[new_id] = MouseTrackingInfo();// use default constructor to clear values
+         }
+      }
    }
 }
 
 
 
+MouseTracker::~MouseTracker() {
+   CleanUp();
+}
+
+
+
+void MouseTracker::CleanUp() {
+   for (unsigned int i = 0 ; i < mtinfo.size() ; ++i) {
+      Mouse* m = mtinfo[i].mouse;
+      if (m) {
+         delete m;
+      }
+      mtinfo[i] = MouseTrackingInfo();// clear to default constructor
+   }
+   mtinfo.clear();
+}
+
+
+
+vector<unsigned int> MouseTracker::GetIdsInUse() {
+   vector<unsigned int> ids_in_use;
+   for (unsigned int i = 0 ; i < mtinfo.size() ; ++i) {
+      bool in_use = mtinfo[i].used;
+      if (in_use) {
+         ids_in_use.push_back(i);
+      }
+   }
+   return ids_in_use;
+}
+
+
+
+Mouse* MouseTracker::GetMouseFromHandle(HANDLE hdev) {
+   // linear search, so what there will probably never be more than 10 devices attached anyway
+   for (unsigned int i = 0 ; i < mtinfo.size() ; ++i) {
+      if (mtinfo[i].hdev == hdev) {
+         return mtinfo[i].mouse;
+      }
+   }
+   return (Mouse*)0;
+}
+
+
+
+unsigned int MouseTracker::NMice() {
+   unsigned int nmice = 0;
+   for (unsigned int i = 0 ; i < mtinfo.size() ; ++i) {
+      Mouse* m = mtinfo[i].mouse;
+      if (m) {
+         ++nmice;
+      }
+   }
+   return nmice;
+}
+
+
+
+Mouse* MouseTracker::GetMouseByIndex(unsigned int index) {
+   unsigned int idx = 0;
+   for (unsigned int i = 0 ; i < mtinfo.size() ; ++i) {
+      Mouse* m = mtinfo[i].mouse;
+      if (m) {
+         if (idx == index) {
+            return m;
+         }
+         ++idx;
+      }
+   }
+   return (Mouse*)0;
+}
+
+
+
+vector<Mouse*> MouseTracker::GetMouseVector() {
+   vector<Mouse*> micevec;
+   for (unsigned int i = 0 ; i < mtinfo.size() ; ++i) {
+      Mouse* m = mtinfo[i].mouse;
+      if (m) {
+         micevec.push_back(m);
+      }
+   }
+   return micevec;
+}
+
+
+
+/// ------------------ MouseController class --------------------------------------
+
+
+
+void MouseController::DestroyMouse(HANDLE hDevice) {
+   
+   mouse_tracker.StopTrackingMouse(hDevice);
+   
+   
+/*   
+   map<HANDLE , Mouse*>::iterator it = dev_map.find(hDevice);
+   if (it != dev_map.end()) {
+      Mouse* m = it->second;
+
+//      map<unsigned int , Mouse*>::iterator iit = mouse_id_map.find();
+//      if (iit != mice_id_map.end()) {
+//         mice_id_map.erase(iit);
+//      }
+      delete m;
+      it->second = 0;
+      dev_map.erase(it);
+   }
+*/
+}
+
+
+
 bool MouseController::CreateMouse(HANDLE hDevice) {
+   
+   if (mouse_tracker.GetMouseFromHandle(hDevice)) {
+      mouse_tracker.StopTrackingMouse(hDevice);
+   }
+/*   
    map<HANDLE , Mouse*>::iterator it = dev_map.find(hDevice);
    if (it != dev_map.end()) {
       DestroyMouse(hDevice);
    }
+*/
+
+
    Mouse* newmouse = new Mouse();
 ///   (void)newmouse;
    
@@ -437,8 +598,8 @@ bool MouseController::CreateMouse(HANDLE hDevice) {
    }
    newmouse->SetHandle(hDevice);
    
-   
-   dev_map[hDevice] = newmouse;
+   mouse_tracker.TrackNewMouse(newmouse , hDevice);
+///   dev_map[hDevice] = newmouse;
    
    return true;
 }
@@ -446,21 +607,61 @@ bool MouseController::CreateMouse(HANDLE hDevice) {
 
 
 void MouseController::DestroyMice() {
+
+   mouse_tracker.CleanUp();
+/*
    map<HANDLE , Mouse*>::iterator it = dev_map.begin();
    while (it != dev_map.end()) {
       delete it->second;
       ++it;
    }
    dev_map.clear();
+*/
+}
+
+
+
+int MouseController::FlagsToButtonIndex(USHORT flags , bool* down) {
+   assert(down);
+   int btn = 0;
+   if (flags & RI_MOUSE_LEFT_BUTTON_DOWN) {
+      btn = 1;
+      *down = true;
+   }
+   if (flags & RI_MOUSE_MIDDLE_BUTTON_DOWN) {
+      btn = 2;
+      *down = true;
+   }
+   if (flags & RI_MOUSE_RIGHT_BUTTON_DOWN) {
+      btn = 3;
+      *down = true;
+   }
+   if (flags & RI_MOUSE_LEFT_BUTTON_UP) {
+      btn = 1;
+      *down = false;
+   }
+   if (flags & RI_MOUSE_MIDDLE_BUTTON_UP) {
+      btn = 2;
+      *down = false;
+   }
+   if (flags & RI_MOUSE_RIGHT_BUTTON_UP) {
+      btn = 3;
+      *down = false;
+   }
+   return btn;
 }
 
 
 
 MouseController::MouseController() :
-      dev_map(),
+///      dev_map(),
+///      mouse_id_map(),
+///      id_helper(),
+      mouse_tracker(),
       ms_enabled_image(0),
       ms_disabled_image(0),
-      enabled(true)
+      enabled(true),
+      window_handler(0)
 {
    
 }
@@ -500,16 +701,33 @@ void MouseController::HandleRawInput(RAWINPUT rawinput) {
    
    RAWINPUTHEADER hdr = rawinput.header;
    
-   /** hdr.hDevice may be NULL, which means it is data inserted by SendInput
-       In the future, try to do something useful with it.
-       The MMB on my mouse uses SendInput, but it's not useful because we don't know
-       which mouse it is coming from due to the NULL hDevice it reports. :P
-   //*/
-   if (hdr.hDevice == (HANDLE)0) {
-      log.Log("Ignoring input from SendInput.\n");
-      return;
-   }
+   /// If hDevice is NULL, this is from SendInput. ( These messages are currently filtered by
+   /// RawInputHandler::HandleRawInput )
+   if (!hdr.hDevice) {return;}
    
+   Mouse* mouse = mouse_tracker.GetMouseFromHandle(hdr.hDevice);
+   if (!mouse) {
+      log.Log("Creating new mouse. hDevice = %p\n" , hdr.hDevice);
+      if (!CreateMouse(hdr.hDevice)) {
+         log.Log("MouseController::HandleRawInput - Could not create mouse.\n");
+      }
+      mouse = mouse_tracker.GetMouseFromHandle(hdr.hDevice);
+   }
+
+   if (mouse) {
+      mouse->HandleRawInput(rawinput);
+      if (window_handler && hdr.dwType == RIM_TYPEMOUSE) {
+         RAWMOUSE rms = rawinput.data.mouse;
+         
+         USHORT flags = rms.usButtonFlags;
+         bool down = false;
+         int button = FlagsToButtonIndex(flags , &down);
+         if (button) {
+            window_handler->HandleButton(button , down , mouse->X() , mouse->Y());
+         }
+      }
+   }
+/*
    map<HANDLE , Mouse*>::iterator it = dev_map.find(hdr.hDevice);
    
    if (it == dev_map.end()) {
@@ -521,24 +739,46 @@ void MouseController::HandleRawInput(RAWINPUT rawinput) {
          }
       }
    }
-   
-   // We are now tracking this device - send it the message
+
+   // We are now tracking this device - send it the message and notify the window handler if necessary
    it = dev_map.find(hdr.hDevice);
+   assert(it != dev_map.end());
    if (it != dev_map.end()) {
-      it->second->HandleRawInput(rawinput);
+      Mouse* m = it->second;
+      m->HandleRawInput(rawinput);
+      if (window_handler && hdr.dwType == RIM_TYPEMOUSE) {
+         RAWMOUSE rms = rawinput.data.mouse;
+         
+         USHORT flags = rms.usButtonFlags;
+         bool down = false;
+         int button = FlagsToButtonIndex(flags , &down);
+         if (button) {
+            window_handler->HandleButton(button , down , m->X() , m->Y());
+         }
+      }
    }
+   
+*/   
    
 }
 
 
 
 void MouseController::Draw() {
+
+   vector<Mouse*> micevec = mouse_tracker.GetMouseVector();
+
+   for (unsigned int i = 0 ; i < micevec.size() ; ++i) {
+      micevec[i]->Draw();
+   }
+/*
    map<HANDLE , Mouse*>::iterator it = dev_map.begin();
    while (it != dev_map.end()) {
 ///      it->second->Draw();
       it->second->Draw();
       ++it;
    }
+*/
 }
 
 
@@ -554,6 +794,19 @@ void MouseController::ToggleMiceEnabled() {
    else {
       ms_image = ms_disabled_image;
    }
+
+
+   vector<Mouse*> micevec = mouse_tracker.GetMouseVector();
+
+   for (unsigned int i = 0 ; i < micevec.size() ; ++i) {
+      if (!micevec[i]->SetImage(ms_image)) {
+         log.Log("Failed to set mouse image for mouse %p and image %p\n" , micevec[i] , ms_image);
+      }
+   }
+/*
+
+
+
    map<HANDLE , Mouse*>::iterator it = dev_map.begin();
    
    while (it != dev_map.end()) {
@@ -563,12 +816,24 @@ void MouseController::ToggleMiceEnabled() {
       
       ++it;
    }
+*/
    
 }
 
 
 
-void MouseController::GetMiceWindows(vector<HWND>* micevec) {
+void MouseController::GetMiceWindows(vector<HWND>* winvec) {
+
+   vector<Mouse*> micevec = mouse_tracker.GetMouseVector();
+
+   for (unsigned int i = 0 ; i < micevec.size() ; ++i) {
+      Mouse* m = micevec[i];
+      winvec->push_back(m->window);
+   }
+
+
+
+/*
    if (!micevec) {return;}
    
    map<HANDLE , Mouse*>::iterator it = dev_map.begin();
@@ -577,6 +842,19 @@ void MouseController::GetMiceWindows(vector<HWND>* micevec) {
       micevec->push_back(m->window);
       ++it;
    }
+*/
+}
+
+
+
+vector<Mouse*> MouseController::GetMice() {
+   return mouse_tracker.GetMouseVector();
+}
+
+
+
+void MouseController::SetWindowHandler(WindowHandler* handler) {
+   window_handler = handler;
 }
 
 

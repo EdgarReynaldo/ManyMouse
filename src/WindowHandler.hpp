@@ -8,7 +8,9 @@
 
 
 #include "AllegroAndWindows.hpp"
-#include "Mouse.hpp"
+///#include "Mouse.hpp"
+class MouseController;
+
 #include "String.hpp"
 #include "VisualLogger.hpp"
 #include "WindowInfo.hpp"
@@ -82,17 +84,63 @@ public :
    void PrintWindowInfo();
 
    bool IsMouseWindow(HWND hwnd);
+
+   HWND GetWindowAtPos(int xpos , int ypos);
+
+   WindowInfo GetWindowInfoFromHandle(HWND hwnd);
+
+
+   /// btn field : LMB = 1 , MMB = 2 , RMB = 3
+//   void HandleButton(int btn , bool down , int bx , int by);
+   void HandleButton(int btn , bool down , int bx , int by) {
+      if (down && btn != 0) {
+         HWND hwnd = GetWindowAtPos(bx , by);
+         /*      
+         typedef struct {
+           UINT  cbSize;
+           HWND  hwnd;
+           DWORD dwFlags;
+           UINT  uCount;
+           DWORD dwTimeout;
+         } FLASHWINFO, *PFLASHWINFO;
+         */
+         FLASHWINFO flash_info;
+         flash_info.cbSize = sizeof(FLASHWINFO);
+         flash_info.hwnd = hwnd;
+         flash_info.dwFlags = FLASHW_ALL;
+         flash_info.uCount = 3;
+         flash_info.dwTimeout = 500;
+         
+         FlashWindowEx(&flash_info);
+      }
+   }
+
 /*
-   HWND GetWindowFromPos(int xpos , int ypos);
-HWND GetWindowFromPos(int xpos , int ypos) {
-   
-}
+   void HandleLeftButtonDown(int cx , int cy);
+   void HandleLeftButtonDown(int cx , int cy) {
+      
+   }
+   void HandleMiddleButtonDown(int cx , int cy);
+   void HandleMiddleButtonDown(int cx , int cy) {
+      
+   }
+   void HandleRightButtonDown(int cx , int cy);
+   void HandleRightButtonDown(int cx , int cy) {
+      
+   }
+   void HandleLeftButtonUp(int cx , int cy);
+   void HandleLeftButtonUp(int cx , int cy) {
+      
+   }
+   void HandleMiddleButtonUp(int cx , int cy);
+   void HandleMiddleButtonUp(int cx , int cy) {
+      
+   }
+   void HandleRightButtonUp(int cx , int cy);
+   void HandleRightButtonUp(int cx , int cy) {
+      
+   }
 */
-
-
-
-
-
 
 
 

@@ -124,8 +124,9 @@ public :
          mouse_controller(),
          window_handler(&mouse_controller)
    {
-      
+      mouse_controller.SetWindowHandler(&window_handler);
    }
+
    ~RawInputHandler() {
       ShutdownAllegro();
    }

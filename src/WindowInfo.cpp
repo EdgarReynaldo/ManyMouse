@@ -6,6 +6,12 @@
 
 
 
+bool RectContains(RECT r , int xpos , int ypos) {
+   return ((xpos >= r.left) && (ypos >= r.top) && (xpos < r.right) && (ypos < r.bottom));
+}
+
+
+
 void WindowInfo::InitRects() {
    window_rect.left = -1;
    window_rect.right = -1;
@@ -90,6 +96,24 @@ string WindowInfo::GetWindowInfoString() {
    int h = b - t;
    return StringPrintF("%-20s : HWND = %p , PID = %i\nPOS = %i,%i,%i,%i , DIM = %i x %i\nTitle = '%s' , Class = '%s'\n",
                        window_type.c_str() , hwnd , pid , l,t,r,b , w,h , window_title.c_str() , window_class.c_str());
+}
+
+
+
+void WindowInfo::RefreshAreas() {
+   RefreshRects();
+}
+
+
+
+bool WindowInfo::WindowContains(int xpos , int ypos) {
+   return RectContains(window_rect , xpos , ypos);
+}
+
+
+
+bool WindowInfo::ClientContains(int xpos , int ypos) {
+   return RectContains(client_rect , xpos , ypos);
 }
 
 

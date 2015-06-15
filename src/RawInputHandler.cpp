@@ -333,14 +333,34 @@ void RawInputHandler::InputLoop() {
    al_start_timer(timer);
    while (!quit) {
       
+      string infostr;
+      
       if (redraw) {
-         
          
          al_set_target_backbuffer(display);
          al_clear_to_color(al_map_rgb(0,0,0));
-//         printf("Before DrawLog()\n");
+
+         vector<Mouse*> micevec = mouse_controller.GetMice();
+//         printf("Mouse vec size = %u\n" , micevec.size());
+         int y = 10;
+         for (unsigned int i = 0 ; i < micevec.size() ; ++i) {
+            Mouse* m = micevec[i];
+            int mx = m->X();
+            int my = m->Y();
+            HWND hwnd = window_handler.GetWindowAtPos(mx,my);
+//void al_draw_textf(const ALLEGRO_FONT *font, ALLEGRO_COLOR color,
+//   float x, float y, int flags,
+//   const char *format, ...)
+
+            al_draw_textf(font , al_map_rgb(255,255,0) , sw - 10 , y , ALLEGRO_ALIGN_RIGHT , "HWND = %p" , hwnd);
+            y += 16;
+            if (hwnd) {
+               WindowInfo winfo = window_handler.GetWindowInfoFromHandle(hwnd);
+            }
+         }
+         
          log.DrawLog(font , al_map_rgb(255,255,255) , 10 , sh);
-//         printf("After DrawLog()\n");
+         
          al_flip_display();
          
          mouse_controller.Draw();
@@ -376,7 +396,29 @@ void RawInputHandler::InputLoop() {
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_D) {
             PrintDeviceInfo();
          }
-         
+         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_C) {
+            system("cls");
+            log.Clear();
+         }
+         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_F) {
+            /*      
+            typedef struct {
+              UINT  cbSize;
+              HWND  hwnd;
+              DWORD dwFlags;
+              UINT  uCount;
+              DWORD dwTimeout;
+            } FLASHWINFO, *PFLASHWINFO;
+            */
+            FLASHWINFO flash_info;
+            flash_info.cbSize = sizeof(FLASHWINFO);
+            flash_info.hwnd = winhandle;
+            flash_info.dwFlags = FLASHW_ALL;
+            flash_info.uCount = 3;
+            flash_info.dwTimeout = 500;
+            
+            FlashWindowEx(&flash_info);
+         }
 /*         
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_P) {
             window_handler.PrintWindows();
@@ -896,6 +938,19 @@ typedef struct tagRAWHID {
 void RawInputHandler::HandleRawInput(RAWINPUT rinput) {
 
    HANDLE hdev = rinput.header.hDevice;
+   
+   /** TODO
+      hdr.hDevice may be NULL, which means it is data inserted by SendInput
+      In the future, try to do something useful with it.
+      The driver for my ZoneTouch400 mouse uses SendInput to emulate the MMB, but it's
+      not useful because we don't know which mouse it is coming from due to the
+      NULL hDevice it reports. :P
+   //*/
+   if (hdev == (HANDLE)0) {
+      log.Log("Ignoring input from SendInput.\n");
+      return;
+   }
+   
    map<HANDLE , RawInputDevice>::iterator it = dev_info_map.find(hdev);
    if (it == dev_info_map.end()) {
       RawInputDevice rid;

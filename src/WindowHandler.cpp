@@ -1,6 +1,7 @@
 
 
 
+#include "Mouse.hpp"
 
 #include "WindowHandler.hpp"
 
@@ -177,7 +178,38 @@ bool WindowHandler::IsMouseWindow(HWND hwnd) {
 
 
 
+HWND WindowHandler::GetWindowAtPos(int xpos , int ypos) {
 
+   deque<HWND>::iterator it = hwnds_zorder.begin();
+   while (it != hwnds_zorder.end()) {
+      
+      HWND hwnd = *it;
+      
+      RECT r;
+      if (!GetWindowRect(hwnd , &r)) {
+         log.Log("Failed to get window rect for hwnd %p\n" , hwnd);
+      }
+      
+      if (RectContains(r , xpos , ypos)) {
+         return hwnd;
+      }
+//      WindowInfo* pwi = 
+      
+      ++it;
+   }
+   
+   return (HWND)0;
+}
+
+
+
+
+WindowInfo WindowHandler::GetWindowInfoFromHandle(HWND hwnd) {
+   if (window_info_map.find(hwnd) != window_info_map.end()) {
+      return *(window_info_map[hwnd]);
+   }
+   return WindowInfo();
+}
 
 
 

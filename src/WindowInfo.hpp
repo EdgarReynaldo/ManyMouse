@@ -10,6 +10,11 @@
 #include <string>
 using std::string;
 
+
+
+bool RectContains(RECT r , int xpos , int ypos);
+
+
 class WindowInfo {
 
 private :
@@ -51,8 +56,17 @@ public :
 
    string GetWindowInfoString();
 
+   void RefreshAreas();
+
+   bool WindowContains(int xpos , int ypos);
+   bool ClientContains(int xpos , int ypos);
+
 
 };
+
+
+
+
 
 
 #endif // WindowInfo_HPP
