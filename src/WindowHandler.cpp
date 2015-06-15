@@ -185,6 +185,19 @@ HWND WindowHandler::GetWindowAtPos(int xpos , int ypos) {
       
       HWND hwnd = *it;
       
+      /// Need to ignore mouse windows here
+      for (unsigned int i = 0 ; i < mice_windows.size() ; ++i) {
+         if (hwnd == mice_windows[i])
+         ++it;
+         continue;
+      }
+      
+      if (hwnd == program_window) {
+         ++it;
+         continue;
+      }
+      
+      
       RECT r;
       if (!GetWindowRect(hwnd , &r)) {
          log.Log("Failed to get window rect for hwnd %p\n" , hwnd);

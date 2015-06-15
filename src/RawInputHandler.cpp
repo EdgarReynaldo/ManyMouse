@@ -337,6 +337,7 @@ void RawInputHandler::InputLoop() {
       
       if (redraw) {
          
+//*
          al_set_target_backbuffer(display);
          al_clear_to_color(al_map_rgb(0,0,0));
 
@@ -352,11 +353,21 @@ void RawInputHandler::InputLoop() {
 //   float x, float y, int flags,
 //   const char *format, ...)
 
-            al_draw_textf(font , al_map_rgb(255,255,0) , sw - 10 , y , ALLEGRO_ALIGN_RIGHT , "HWND = %p" , hwnd);
+            al_draw_textf(font , al_map_rgb(255,255,0) , sw - 10 , y , ALLEGRO_ALIGN_RIGHT , "HWND = %p , mouse # %u at %i , %i" , hwnd , i , mx , my);
             y += 16;
+            WindowInfo winfo;
             if (hwnd) {
-               WindowInfo winfo = window_handler.GetWindowInfoFromHandle(hwnd);
+               winfo = window_handler.GetWindowInfoFromHandle(hwnd);
             }
+            al_draw_textf(font , al_map_rgb(255,255,0) , sw - 10 , y , ALLEGRO_ALIGN_RIGHT ,
+                          "Title = '%s'" , winfo.window_title.c_str());
+            y += 16;
+            al_draw_textf(font , al_map_rgb(255,255,0) , sw - 10 , y , ALLEGRO_ALIGN_RIGHT ,
+                          "Class = '%s'" , winfo.window_class.c_str());
+            y += 16;
+            al_draw_textf(font , al_map_rgb(255,255,0) , sw - 10 , y , ALLEGRO_ALIGN_RIGHT ,
+                          "Type = '%s'" , winfo.window_type.c_str());
+            y += 16;
          }
          
          log.DrawLog(font , al_map_rgb(255,255,255) , 10 , sh);
@@ -364,7 +375,7 @@ void RawInputHandler::InputLoop() {
          al_flip_display();
          
          mouse_controller.Draw();
-         
+//*/         
       }
       
       do {

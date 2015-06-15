@@ -17,7 +17,7 @@ bool RectContains(RECT r , int xpos , int ypos);
 
 class WindowInfo {
 
-private :
+public :
    HWND hwnd;
    DWORD pid;
    WNDPROC window_process;
