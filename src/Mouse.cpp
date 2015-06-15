@@ -550,21 +550,6 @@ void MouseController::DestroyMouse(HANDLE hDevice) {
    
    mouse_tracker.StopTrackingMouse(hDevice);
    
-   
-/*   
-   map<HANDLE , Mouse*>::iterator it = dev_map.find(hDevice);
-   if (it != dev_map.end()) {
-      Mouse* m = it->second;
-
-//      map<unsigned int , Mouse*>::iterator iit = mouse_id_map.find();
-//      if (iit != mice_id_map.end()) {
-//         mice_id_map.erase(iit);
-//      }
-      delete m;
-      it->second = 0;
-      dev_map.erase(it);
-   }
-*/
 }
 
 
@@ -574,16 +559,8 @@ bool MouseController::CreateMouse(HANDLE hDevice) {
    if (mouse_tracker.GetMouseFromHandle(hDevice)) {
       mouse_tracker.StopTrackingMouse(hDevice);
    }
-/*   
-   map<HANDLE , Mouse*>::iterator it = dev_map.find(hDevice);
-   if (it != dev_map.end()) {
-      DestroyMouse(hDevice);
-   }
-*/
-
 
    Mouse* newmouse = new Mouse();
-///   (void)newmouse;
    
    POINT p;
    GetCursorPos(&p);
@@ -599,7 +576,6 @@ bool MouseController::CreateMouse(HANDLE hDevice) {
    newmouse->SetHandle(hDevice);
    
    mouse_tracker.TrackNewMouse(newmouse , hDevice);
-///   dev_map[hDevice] = newmouse;
    
    return true;
 }
@@ -609,14 +585,7 @@ bool MouseController::CreateMouse(HANDLE hDevice) {
 void MouseController::DestroyMice() {
 
    mouse_tracker.CleanUp();
-/*
-   map<HANDLE , Mouse*>::iterator it = dev_map.begin();
-   while (it != dev_map.end()) {
-      delete it->second;
-      ++it;
-   }
-   dev_map.clear();
-*/
+
 }
 
 
@@ -654,9 +623,6 @@ int MouseController::FlagsToButtonIndex(USHORT flags , bool* down) {
 
 
 MouseController::MouseController() :
-///      dev_map(),
-///      mouse_id_map(),
-///      id_helper(),
       mouse_tracker(),
       ms_enabled_image(0),
       ms_disabled_image(0),
@@ -727,39 +693,6 @@ void MouseController::HandleRawInput(RAWINPUT rawinput) {
          }
       }
    }
-/*
-   map<HANDLE , Mouse*>::iterator it = dev_map.find(hdr.hDevice);
-   
-   if (it == dev_map.end()) {
-      // Need to create a new mouse if it is a new mouse handle
-      if (hdr.dwType == RIM_TYPEMOUSE) {
-         log.Log("Creating new mouse. hDevice = %p\n" , hdr.hDevice);
-         if (!CreateMouse(hdr.hDevice)) {
-            log.Log("MouseController::HandleRawInput - Could not create mouse.\n");
-         }
-      }
-   }
-
-   // We are now tracking this device - send it the message and notify the window handler if necessary
-   it = dev_map.find(hdr.hDevice);
-   assert(it != dev_map.end());
-   if (it != dev_map.end()) {
-      Mouse* m = it->second;
-      m->HandleRawInput(rawinput);
-      if (window_handler && hdr.dwType == RIM_TYPEMOUSE) {
-         RAWMOUSE rms = rawinput.data.mouse;
-         
-         USHORT flags = rms.usButtonFlags;
-         bool down = false;
-         int button = FlagsToButtonIndex(flags , &down);
-         if (button) {
-            window_handler->HandleButton(button , down , m->X() , m->Y());
-         }
-      }
-   }
-   
-*/   
-   
 }
 
 
@@ -771,14 +704,7 @@ void MouseController::Draw() {
    for (unsigned int i = 0 ; i < micevec.size() ; ++i) {
       micevec[i]->Draw();
    }
-/*
-   map<HANDLE , Mouse*>::iterator it = dev_map.begin();
-   while (it != dev_map.end()) {
-///      it->second->Draw();
-      it->second->Draw();
-      ++it;
-   }
-*/
+
 }
 
 
@@ -803,21 +729,7 @@ void MouseController::ToggleMiceEnabled() {
          log.Log("Failed to set mouse image for mouse %p and image %p\n" , micevec[i] , ms_image);
       }
    }
-/*
 
-
-
-   map<HANDLE , Mouse*>::iterator it = dev_map.begin();
-   
-   while (it != dev_map.end()) {
-      if (!it->second->SetImage(ms_image)) {
-         log.Log("Failed to set mouse image for mouse %p and image %p\n" , it->second , ms_image);
-      }
-      
-      ++it;
-   }
-*/
-   
 }
 
 
@@ -831,18 +743,6 @@ void MouseController::GetMiceWindows(vector<HWND>* winvec) {
       winvec->push_back(m->window);
    }
 
-
-
-/*
-   if (!micevec) {return;}
-   
-   map<HANDLE , Mouse*>::iterator it = dev_map.begin();
-   while (it != dev_map.end()) {
-      Mouse* m = it->second;
-      micevec->push_back(m->window);
-      ++it;
-   }
-*/
 }
 
 
