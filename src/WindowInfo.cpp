@@ -12,6 +12,18 @@ bool RectContains(RECT r , int xpos , int ypos) {
 
 
 
+string RectString(RECT rect) {
+   int l = rect.left;
+   int r = rect.right;
+   int t = rect.top;
+   int b = rect.bottom;
+   int w = r - l;
+   int h = b - t;
+   return StringPrintF("%d,%d : %d x %d" , l , r , w , h);
+}
+
+
+
 void WindowInfo::InitRects() {
    window_rect.left = -1;
    window_rect.right = -1;

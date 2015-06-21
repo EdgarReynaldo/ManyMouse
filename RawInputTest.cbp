@@ -46,11 +46,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add directory="A5110distro/include" />
 		</Compiler>
-		<Linker>
-			<Add directory="A5110distro/lib" />
-		</Linker>
 		<Unit filename=".gitignore" />
 		<Unit filename="docs/BuildInstructions.html" />
 		<Unit filename="docs/ReadMe.html" />
@@ -68,6 +64,8 @@
 		<Unit filename="src/String.hpp" />
 		<Unit filename="src/TestWindow.cpp" />
 		<Unit filename="src/TestWindow.hpp" />
+		<Unit filename="src/TransparentWindow.cpp" />
+		<Unit filename="src/TransparentWindow.hpp" />
 		<Unit filename="src/VisualLogger.cpp" />
 		<Unit filename="src/VisualLogger.hpp" />
 		<Unit filename="src/WindowHandler.cpp" />

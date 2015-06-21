@@ -8,6 +8,7 @@
 #include "AllegroAndWindows.hpp"
 #include "Mouse.hpp"
 #include "WindowHandler.hpp"
+#include "TransparentWindow.hpp"
 
 
 #include <string>
@@ -60,8 +61,8 @@ class RawInputHandler {
 
 protected :
 public:   
-   int sw;
-   int sh;
+   int tww;// transparent window width
+   int twh;// transparent window height
    
    ALLEGRO_DISPLAY* display;
    ALLEGRO_TIMER* timer;
@@ -70,15 +71,16 @@ public:
    ALLEGRO_MUTEX* mutex;
    HWND winhandle;
    
+   ALLEGRO_BITMAP* allegro_buffer;
+   DIBbuffer dib_buffer;
+   
+   ALLEGRO_DISPLAY* log_display;
+   int lww;// log window width
+   int lwh;// log window height
+   
    map<HANDLE , RawInputDevice> dev_info_map;
-///   PRAWINPUTDEVICELIST ridlist;
-///   RID_DEVICE_INFO* ridinfo;
-///   std::string* ridnames;
 
    UINT device_count;// total number of raw input devices on system
-///   UINT keyboard_count;
-///   UINT mouse_count;
-///   UINT hid_count;
    
    vector<RAWINPUTDEVICELIST> mice;
    vector<RAWINPUTDEVICELIST> keyboards;
@@ -95,17 +97,28 @@ public:
    
    WindowHandler window_handler;
    
+
+
+
+   void DrawHandlerToDIB();
+   
+   
 public :
 //   RawInputHandler();
    RawInputHandler() :
-         sw(1024),
-         sh(300),
+         tww(640),
+         twh(400),
          display(0),
          timer(0),
          font(0),
          queue(0),
          mutex(0),
          winhandle(0),
+         allegro_buffer(0),
+         dib_buffer(),
+         log_display(0),
+         lww(1024),
+         lwh(300),
          dev_info_map(),
 ///         ridlist(0),
 ///         ridinfo(0),
@@ -143,6 +156,8 @@ public :
    void SetupDefaultDevices();
    bool RegisterDevices();
    
+   void QueuePaintMessage();
+
    bool HandleWindowMessage(UINT message , WPARAM wparam , LPARAM lparam , LRESULT* result);
       
    void PrintRawHeader(RAWINPUTHEADER hdr);

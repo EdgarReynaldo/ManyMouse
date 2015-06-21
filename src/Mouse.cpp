@@ -19,13 +19,18 @@ ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active) {
    ALLEGRO_BITMAP* cursor_bmp = 0;
 
    if (!active) {
-      cursor_bmp = al_load_bitmap("Images/CursorRed.png");
+///      cursor_bmp = al_load_bitmap("Images/CursorRed.png");
+      cursor_bmp = al_load_bitmap("Images/DaltonRedCursor.png");
    }
    else {
-      cursor_bmp = al_load_bitmap("Images/CursorGreen.png");
+///      cursor_bmp = al_load_bitmap("Images/CursorGreen.png");
+      cursor_bmp = al_load_bitmap("Images/DaltonGreenCursor.png");
    }
 
-   if (!cursor_bmp) {return 0;}
+   if (!cursor_bmp) {
+      log.Log("Failed to load cursor bitmap.\n");
+      return 0;
+   }
    
    if ((w == -1) || (h == -1)) {
       // Return unmodified image
@@ -237,7 +242,7 @@ char const *buttons, int flags)
       return false;
    }
    
-   trans_color = RGB(255,255,255);
+   trans_color = RGB(0,0,0);
    
    window = al_get_win_window_handle(display);
    
@@ -261,7 +266,7 @@ char const *buttons, int flags)
       printf("Failed to create DIB buffer for window %p\n" , (void*)window);
    }
    else {
-      printf("Created DIB buffer for window %p\n" , (void*)window);
+      printf("Created DIB buffer for mouse window %p\n" , (void*)window);
    }
    
    dib_buffer.ClearToColor(trans_color);
@@ -322,6 +327,8 @@ bool Mouse::SetImage(ALLEGRO_BITMAP* mouse_image) {
 
 
 void Mouse::SetPos(int newx , int newy) {
+   ldx = newx - x;
+   ldy = newy - y;
    x = newx;
    y = newy;
    if (display) {
@@ -332,6 +339,8 @@ void Mouse::SetPos(int newx , int newy) {
 
 
 void Mouse::MoveBy(int dx , int dy) {
+   ldx = dx;
+   ldy = dy;
    SetPos(x + dx , y + dy);
 }
    
@@ -374,6 +383,9 @@ void Mouse::HandleRawInput(RAWINPUT rawinput) {
    else if (rms.usFlags & MOUSE_MOVE_ABSOLUTE) {
 //      log.Log("Mouse::HandleRawInput : MOUSE_MOVE_ABSOLUTE\n");
       SetPos(rms.lLastX , rms.lLastY);
+   }
+   else {
+      ldx = ldy = 0;// no movement
    }
 /*
    else if (rms.lLastX || rms.lLastY) {
@@ -690,6 +702,10 @@ void MouseController::HandleRawInput(RAWINPUT rawinput) {
          int button = FlagsToButtonIndex(flags , &down);
          if (button) {
             window_handler->HandleButton(button , down , mouse->X() , mouse->Y());
+         }
+         
+         if (mouse->MouseMoved()) {
+            window_handler->HandleMouseMove(mouse);
          }
       }
    }

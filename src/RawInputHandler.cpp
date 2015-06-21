@@ -189,8 +189,55 @@ void RawInputDevice::PrintDeviceInfo() {
 
 
 
+void RawInputHandler::DrawHandlerToDIB() {
+   
+   if (!allegro_buffer) {
+      log.Log("DrawMouseToDIB() : allegro_buffer is NULL\n");
+      return;
+   }
+
+   dib_buffer.Flush();
+
+   ALLEGRO_LOCKED_REGION* alr = al_lock_bitmap(allegro_buffer , ALLEGRO_PIXEL_FORMAT_ARGB_8888 , ALLEGRO_LOCK_READONLY);
+   if (!alr) {
+      log.Log("Failed to lock bitmap %p in DrawHandlerToDIB.\n" , allegro_buffer);
+      return;
+   }
+   
+   int maxw = al_get_bitmap_width(allegro_buffer)>tww?tww:al_get_bitmap_width(allegro_buffer);
+   int maxh = al_get_bitmap_height(allegro_buffer)>twh?twh:al_get_bitmap_height(allegro_buffer);
+   
+///   dib_buffer.ClearToColor(RGB(255,255,255));
+   
+   for (int y = 0 ; y < maxh ; ++y) {
+      for (int x = 0 ; x < maxw ; ++x) {
+         unsigned int* pdata = (unsigned int*)&((const char*)alr->data)[y*alr->pitch + 4*x];
+///         These won't work if the endianness isn't what we are expecting!!!
+//         unsigned char r = pdata[1];
+//         unsigned char g = pdata[2];
+//         unsigned char b = pdata[3];
+         unsigned char r = (unsigned char)(((*pdata) & 0x00ff0000) >> 16);
+         unsigned char g = (unsigned char)(((*pdata) & 0x0000ff00) >> 8);
+         unsigned char b = (unsigned char)(((*pdata) & 0x000000ff) >> 0);
+         COLORREF rgb = RGB(r , g , b);
+         if (rgb != SetPixel(dib_buffer.GetBufferDC() , x , y , rgb)) {
+            log.Log("Mouse::DrawMouseToDIB - Failed to set exact color value with SetPixel\n");
+         }
+///         prev = rgb;
+///         dib_buffer.SetXYRGB(x , y , pdata[1] , pdata[2] , pdata[3]);
+      }
+   }
+   
+   al_unlock_bitmap(allegro_buffer);
+
+   dib_buffer.Flush();
+}
+
+
+
 int RawInputHandler::SetupAllegro() {
 
+   /// Allegro setup functions
    
    if (!al_init()) {return 1;}
    
@@ -214,46 +261,75 @@ int RawInputHandler::SetupAllegro() {
 
 //   if (!al_install_timer()) {return 2;}
    
-   sw = 1024;
-   sh = 300;
    
    
-//   al_set_new_display_flags(ALLEGRO_FRAMELESS | ALLEGRO_WINDOWED);
-   al_set_new_display_flags(ALLEGRO_WINDOWED);
-///   al_set_new_display_flags(ALLEGRO_OPENGL | ALLEGRO_WINDOWED);
-//   al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);/// todo - this causes assertion failure in vec.c somehow
+
+   /// Setup transparent overlay window for getting raw input
    
-//   display = al_create_display(0,0);
-//   display = al_create_display(200,200);
-///   display = al_create_display(1280,800);
-   display = al_create_display(sw,sh);
+   // The window dimensions for when we are not fullscreen
+   tww = 640;
+   twh = 400;
+   
+   al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
+   
+   display = al_create_display(tww,twh);
    
    if (!display) {return 3;}
    
+   int ww = al_get_display_width(display);
+   int wh = al_get_display_height(display);
+
+   allegro_buffer = al_create_bitmap(ww , wh);
+   
+   if (!allegro_buffer) {return 4;}
+
+   al_set_target_bitmap(allegro_buffer);
    al_clear_to_color(al_map_rgb(255,255,255));
+   
 ///   al_clear_to_color(al_map_rgba(255,255,255,0));
 ///   al_draw_filled_rectangle(320,0,640,400 , al_map_rgba(0,255,0,255));
-   al_flip_display();
+
+///   al_set_target_backbuffer(display);
+///   al_clear_to_color(al_map_rgb(255,255,255));
    
+///   al_flip_display();
+
+
+   /// Setup second allegro window for the visual log
+   lww = 1024;
+   lwh = 300;
+
+   al_set_new_display_flags(ALLEGRO_WINDOWED);
+   
+   log_display = al_create_display(lww , lwh);
+   
+   if (!log_display) {return 5;}
+
+   al_set_target_backbuffer(log_display);
+   al_clear_to_color(al_map_rgb(0,0,0));
+   al_flip_display();
+
+
    timer = al_create_timer(1.0/60.0);
-   if (!timer) {return 4;}
+   if (!timer) {return 6;}
    
    queue = al_create_event_queue();
    
-   if (!queue) {return 4;}
+   if (!queue) {return 7;}
    
    al_register_event_source(queue , al_get_display_event_source(display));
+   al_register_event_source(queue , al_get_display_event_source(log_display));
    al_register_event_source(queue , al_get_keyboard_event_source());
    al_register_event_source(queue , al_get_mouse_event_source());
    al_register_event_source(queue , al_get_timer_event_source(timer));
    
    mutex = al_create_mutex();
    
-   if (!mutex) {return 5;}
+   if (!mutex) {return 8;}
    
    font = al_load_ttf_font("verdana.ttf" , -12 , ALLEGRO_TTF_MONOCHROME);
    
-   if (!font) {return 6;}
+   if (!font) {return 9;}
 
 
    bool imgs_loaded = mouse_controller.CreateMouseImages();
@@ -263,7 +339,7 @@ int RawInputHandler::SetupAllegro() {
 //HWND al_get_win_window_handle(ALLEGRO_DISPLAY *display)
    winhandle = al_get_win_window_handle(display);
    
-   window_handler.SetOurWindows(winhandle , 0);
+   window_handler.SetOurWindows(winhandle , al_get_win_window_handle(log_display) , 0);
    
 /*
 al_win_add_window_callback
@@ -283,9 +359,28 @@ BOOL WINAPI SetWindowPos(
   _In_     UINT uFlags
 );
 */
-
    /// Using HWND_TOPMOST has no effect on the focus, except in the initial call
    SetWindowPos(winhandle , HWND_TOPMOST , 0 , 0 , -1 , -1 , SWP_NOMOVE | SWP_NOSIZE);
+
+   BringWindowToTop(winhandle);
+   
+   COLORREF trans_color = RGB(255,255,255);
+   
+   if (0 == SetWindowLong(winhandle , GWL_EXSTYLE , WS_EX_LAYERED)) {
+      log.Log("Couldn't set WS_EX_LAYERED style attribute\n");
+   }
+
+   if (!SetLayeredWindowAttributes(winhandle , trans_color , 255 , LWA_COLORKEY | LWA_ALPHA)) {
+      log.Log("Couldn't set color key!\n");
+   }
+
+   if (!dib_buffer.Create(winhandle)) {
+      log.Log("Failed to create DIB buffer for RawInputHandler.\n");
+   }
+   
+   dib_buffer.ClearToColor(trans_color);
+
+
 /*
    if (0 == SetWindowLong(handle , GWL_EXSTYLE , WS_EX_LAYERED)) {
       log.Log("Couldn't set WS_EX_LAYERED style attribute\n");
@@ -314,12 +409,23 @@ void RawInputHandler::ShutdownAllegro() {
       al_destroy_timer(timer);
       timer = 0;
    }
+   
+   if (log_display) {
+      al_destroy_display(log_display);
+      log_display = 0;
+   }
+   
+   if (allegro_buffer) {
+      al_destroy_bitmap(allegro_buffer);
+      allegro_buffer = 0;
+   }
+   
    if (display) {
       al_destroy_display(display);
       display = 0;
    }
    
-   window_handler.SetOurWindows(0 , 0);
+   window_handler.SetOurWindows(0 , 0 , 0);
 }
 
 
@@ -329,6 +435,7 @@ void RawInputHandler::InputLoop() {
    bool redraw = true;
    bool quit = false;
 
+   QueuePaintMessage();
 
    al_start_timer(timer);
    while (!quit) {
@@ -337,8 +444,12 @@ void RawInputHandler::InputLoop() {
       
       if (redraw) {
          
-//*
-         al_set_target_backbuffer(display);
+//**
+         al_set_target_backbuffer(log_display);
+///         al_set_target_bitmap(allegro_buffer);
+///         al_clear_to_color(al_map_rgb(255,255,255));
+///         al_draw_filled_rectangle(sw - 1024 , 0 , sw , 300 , al_map_rgb(0,0,0));
+
          al_clear_to_color(al_map_rgb(0,0,0));
 
          vector<Mouse*> micevec = mouse_controller.GetMice();
@@ -353,24 +464,29 @@ void RawInputHandler::InputLoop() {
 //   float x, float y, int flags,
 //   const char *format, ...)
 
-            al_draw_textf(font , al_map_rgb(255,255,0) , sw - 10 , y , ALLEGRO_ALIGN_RIGHT , "HWND = %p , mouse # %u at %i , %i" , hwnd , i , mx , my);
+            al_draw_textf(font , al_map_rgb(255,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT , "HWND = %p , mouse # %u at %i , %i" , hwnd , i , mx , my);
             y += 16;
             WindowInfo winfo;
             if (hwnd) {
                winfo = window_handler.GetWindowInfoFromHandle(hwnd);
             }
-            al_draw_textf(font , al_map_rgb(255,255,0) , sw - 10 , y , ALLEGRO_ALIGN_RIGHT ,
+            al_draw_textf(font , al_map_rgb(255,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT ,
                           "Title = '%s'" , winfo.window_title.c_str());
             y += 16;
-            al_draw_textf(font , al_map_rgb(255,255,0) , sw - 10 , y , ALLEGRO_ALIGN_RIGHT ,
+            al_draw_textf(font , al_map_rgb(255,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT ,
                           "Class = '%s'" , winfo.window_class.c_str());
             y += 16;
-            al_draw_textf(font , al_map_rgb(255,255,0) , sw - 10 , y , ALLEGRO_ALIGN_RIGHT ,
+            al_draw_textf(font , al_map_rgb(255,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT ,
                           "Type = '%s'" , winfo.window_type.c_str());
             y += 16;
          }
          
-         log.DrawLog(font , al_map_rgb(255,255,255) , 10 , sh);
+         log.DrawLog(font , al_map_rgb(254,254,254) , 10 , 300);
+         
+///         DrawHandlerToDIB();
+
+//         QueuePaintMessage();
+         
          
          al_flip_display();
          
@@ -399,6 +515,15 @@ void RawInputHandler::InputLoop() {
             printf("Mice image toggled.\n");
          }  
          
+         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_R) {
+            ShowWindow(al_get_win_window_handle(log_display) , SW_RESTORE);
+         }
+         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_M) {
+            ShowWindow(al_get_win_window_handle(log_display) , SW_MAXIMIZE);
+         }
+         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_N) {
+            ShowWindow(al_get_win_window_handle(log_display) , SW_MINIMIZE);
+         }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_W) {
             window_handler.EnumerateWindows();
             log.Log("\n");
@@ -709,9 +834,18 @@ BOOL WINAPI RegisterRawInputDevices(
 
 
 
+void RawInputHandler::QueuePaintMessage() {
+   if (winhandle) {
+      RECT clrect;
+      GetClientRect(winhandle , &clrect);
+      InvalidateRect(winhandle , &clrect , true);
+      UpdateWindow(winhandle);
+   }
+}
+
+
+
 bool RawInputHandler::HandleWindowMessage(UINT message , WPARAM wparam , LPARAM lparam , LRESULT* result) {
-   
-   bool ret = false;// false indicates we didn't handle this message
    
    (void)result;// unused for now
    
@@ -725,8 +859,21 @@ bool RawInputHandler::HandleWindowMessage(UINT message , WPARAM wparam , LPARAM 
    
    // return true to consume event, false to let allegro handle it as well
    
+   bool ret = false;// false indicates we didn't handle this message
+   
+
    /// We never get WM_CREATE because the callback is registered after the window is created
 
+   PAINTSTRUCT ps;
+   if (message == WM_PAINT) {
+      BeginPaint(winhandle , &ps);
+      
+      dib_buffer.DrawBufferToWindowDC();
+      
+      EndPaint(winhandle , &ps);
+      
+      return true;
+   }
 
    if (message == WM_INPUT) {
       ret = true;// we handle all WM_INPUT messages

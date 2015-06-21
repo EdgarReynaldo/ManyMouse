@@ -13,6 +13,8 @@ using std::string;
 
 
 bool RectContains(RECT r , int xpos , int ypos);
+string RectString(RECT r);
+
 
 
 class WindowInfo {

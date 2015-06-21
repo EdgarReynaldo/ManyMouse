@@ -2,7 +2,7 @@
 
 
 #include "DIBbuffer.hpp"
-
+#include "VisualLogger.hpp"
 
 
 /*   
@@ -121,12 +121,27 @@ bool DIBbuffer::Create(HWND window_handle) {
        !memDC ||
        !GetBitmapInfo(&bm_info , win_handle)) {
       Free();
+      if (!winDC) {
+         log.Log("DIBbuffer::Create - Could not get window DC from hwnd %p\n" , window_handle);
+      }
+      else if (!memDC) {
+         log.Log("DIBbuffer::Create - Could create compatible DC from winDC %p\n" , winDC);
+      }
+      else { // GetBitmapInfo failed
+         log.Log("DIBbuffer::Create - Could not get bitmap info from hwnd %p\n" , window_handle);
+      }
       return false;
    }
 
    hbm_DIBbuffer = CreateDIBSection(memDC , &bm_info , DIB_RGB_COLORS , &hbm_DIBdata , 0 , 0);
    
    if (!hbm_DIBbuffer || !hbm_DIBdata) {
+      if (!hbm_DIBbuffer) {
+         log.Log("DIBbuffer::Create - CreateDIBSection failed\n");
+      }
+      if (!hbm_DIBdata) {
+         log.Log("DIBbuffer::Create - CreateDIBSection did not allocate data!\n");
+      }
       Free();
       return false;
    }
@@ -134,6 +149,7 @@ bool DIBbuffer::Create(HWND window_handle) {
    oldGDIobj = SelectObject(memDC , hbm_DIBbuffer);
    
    if (oldGDIobj == HGDI_ERROR) {
+      log.Log("HGDI_ERROR occurred while selecting object %p\n" , memDC);
       Free();
       return false;
    }
@@ -154,7 +170,10 @@ bool DIBbuffer::GetBitmapInfo(BITMAPINFO* pbi , HWND handle) {
    memset(pbi , 0 , sizeof(*pbi));
    
    RECT clrect;
-   if (!GetClientRect(handle , &clrect)) {return false;}
+   if (!GetClientRect(handle , &clrect)) {
+      log.Log("DIBbuffer::GetBitmapInfo - failed to get client rect from hwnd %p\n" , handle);
+      return false;
+   }
    
    int w = clrect.right - clrect.left;
    int h = clrect.bottom - clrect.top;

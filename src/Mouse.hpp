@@ -9,6 +9,8 @@
 #include "DIBbuffer.hpp"
 #include "Mutex.hpp"
 ///#include "WindowHandler.hpp"
+#include "TransparentWindow.hpp"
+
 class WindowHandler;
 
 #include <vector>
@@ -57,7 +59,8 @@ public :
    
    COLORREF trans_color;
    
-   
+   int ldx;// last delta x
+   int ldy;// last delta y
    
    void QueuePaintMessage();
    void DrawMouseToDIB();
@@ -110,6 +113,10 @@ Mouse() :
    
    int X() {return x;}
    int Y() {return y;}
+   int LastDeltaX() {return ldx;}
+   int LastDeltaY() {return ldy;}
+   
+   bool MouseMoved() {return ldx || ldy;}
    
    
 };
@@ -168,11 +175,7 @@ public :
 
 class MouseController {
 public:
-///   map<HANDLE , Mouse*> dev_map;
-///   map<unsigned int , Mouse*> mouse_id_map;
-   
-///   MouseIdHelper id_helper;
-   
+
    MouseTracker mouse_tracker;
    
    ALLEGRO_BITMAP* ms_enabled_image;

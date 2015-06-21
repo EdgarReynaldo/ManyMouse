@@ -1,4 +1,4 @@
-A5110distro
+A5111GitDistro
 RawInputTest.depend
 RawInputTest.layout
 RawInputTest_build_log.html
@@ -7,7 +7,7 @@ cbbuild/bin/Raw.exe
 cbbuild/bin/RawDebug.exe
 cbbuild/bin/allegro_monolith-5.1.dll
 cbbuild/bin/allegro_monolith-debug-5.1.dll
-cbbuild/bin/libfreetype.dll
+cbbuild/bin/libfreetype-6.dll
 cbbuild/bin/libgcc_s_dw2-1.dll
 cbbuild/bin/libogg-0.dll
 cbbuild/bin/libphysfs.dll

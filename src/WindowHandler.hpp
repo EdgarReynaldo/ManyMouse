@@ -46,6 +46,7 @@ class WindowHandler {
    HWND taskbar_window;
    
    HWND program_window;
+   HWND log_window;
    HWND test_window;
    
    MouseController* mc;
@@ -66,6 +67,7 @@ public :
          shell_window(0),
          taskbar_window(0),
          program_window(0),
+         log_window(0),
          test_window(0),
          mc(mouse_controller),
          mice_windows()
@@ -80,7 +82,7 @@ public :
 
    void ClearWindowInfo();
    void RefreshWindowInfo();
-   void SetOurWindows(HWND program_window_handle , HWND test_window_handle);
+   void SetOurWindows(HWND program_window_handle , HWND log_window_handle , HWND test_window_handle);
    void PrintWindowInfo();
 
    bool IsMouseWindow(HWND hwnd);
@@ -90,11 +92,48 @@ public :
    WindowInfo GetWindowInfoFromHandle(HWND hwnd);
 
 
+//   void HandleMouseMove(Mouse* m);//int nmx , int nmy
+   void HandleMouseMove(Mouse* m) {
+      if (!m) {
+         log.Log("WindowHandler::HandleMouseMove - Mouse* m is NULL\n");
+         return;
+      }
+      int nmx = m->X();
+      int nmy = m->Y();
+      HWND hwnd = GetWindowAtPos(nmx , nmy);
+      if (hwnd) {
+            
+         POINT p;
+         p.x = nmx;
+         p.y = nmy;
+         assert(ScreenToClient(hwnd , &p));
+         nmx = p.x;
+         nmy = p.y;
+         
+//         RECT clrect;
+//         GetClientRect(hwnd , &clrect);
+//         nmx -= clrect.left;
+//         nmy -= clrect.top;
+
+         WPARAM wp = 0;// TODO : Encode modifier flags, see WM_LBUTTONDOWN
+///         LPARAM lp;
+///         lp = (((nmy << 16)&0xffff0000) | (((short)nmx)&0xffff));
+         LPARAM lp = MAKELPARAM((short)nmx , (short)nmy);
+         
+         
+         PostMessage(hwnd , WM_MOUSEMOVE , wp , lp);
+      }
+   }
+   
    /// btn field : LMB = 1 , MMB = 2 , RMB = 3
 //   void HandleButton(int btn , bool down , int bx , int by);
    void HandleButton(int btn , bool down , int bx , int by) {
+      HWND hwnd = GetWindowAtPos(bx , by);
+      if (!hwnd) {
+         // No window under the button press location
+         return;
+      }
       if (down && btn != 0) {
-         HWND hwnd = GetWindowAtPos(bx , by);
          /*      
          typedef struct {
            UINT  cbSize;
@@ -108,115 +147,40 @@ public :
          flash_info.cbSize = sizeof(FLASHWINFO);
          flash_info.hwnd = hwnd;
          flash_info.dwFlags = FLASHW_ALL;
-         flash_info.uCount = 3;
-         flash_info.dwTimeout = 500;
+         flash_info.uCount = 8;
+         flash_info.dwTimeout = 100;
          
          FlashWindowEx(&flash_info);
+
       }
-   }
-
-/*
-   void HandleLeftButtonDown(int cx , int cy);
-   void HandleLeftButtonDown(int cx , int cy) {
-      
-   }
-   void HandleMiddleButtonDown(int cx , int cy);
-   void HandleMiddleButtonDown(int cx , int cy) {
-      
-   }
-   void HandleRightButtonDown(int cx , int cy);
-   void HandleRightButtonDown(int cx , int cy) {
-      
-   }
-   void HandleLeftButtonUp(int cx , int cy);
-   void HandleLeftButtonUp(int cx , int cy) {
-      
-   }
-   void HandleMiddleButtonUp(int cx , int cy);
-   void HandleMiddleButtonUp(int cx , int cy) {
-      
-   }
-   void HandleRightButtonUp(int cx , int cy);
-   void HandleRightButtonUp(int cx , int cy) {
-      
-   }
-*/
-
-
-
-/**
-
-
-   WindowHandler(MouseController* mscontroller);
+      if (btn >= 1 && btn <= 3) {
+         unsigned int msg[8] = {
+            0 , WM_LBUTTONDOWN , WM_MBUTTONDOWN , WM_RBUTTONDOWN , 0 , WM_LBUTTONUP , WM_MBUTTONUP , WM_RBUTTONUP
+         };
    
-   void SetController(MouseController* mscontroller);
-   void EnumerateDesktopWindows();
-   void GetMiceWindows();
-   void Refresh();
-   void SetProgramWindow(HWND main);
-   
-   bool IsProgramWindow(HWND hwindow);
-   bool IsTheDesktopWindow(HWND hwindow);
-   bool IsMouseWindow(HWND hwindow);
-   bool IsOurWindow(HWND hwindow);
-   
-   void PrintWindows();
+         POINT p;
+         p.x = bx;
+         p.y = by;
+         assert(ScreenToClient(hwnd , &p));
+         bx = p.x;
+         by = p.y;
 
-//   void PrintAllWindows();
-   void PrintAllWindows() {
-      deque<WindowInfo>::iterator it = all_window_info.begin();
-      while (it != all_window_info.end()) {
-         log.Log("HWND : %p , PID : %lu\n" , it->hwnd , it->pid);
-         ++it;
+//         RECT clrect;
+//         GetClientRect(hwnd , &clrect);
+//         bx -= clrect.left;
+//         by -= clrect.top;
+
+         WPARAM wp = 0;// TODO : Encode modifier flags, see WM_LBUTTONDOWN
+///         LPARAM lp;
+///         lp = (((by << 16)&0xffff0000) | (((short)bx)&0xffff));
+         LPARAM lp = MAKELPARAM((short)bx , (short)by);// this is a little clearer than and'ing and or'ing
+
+         PostMessage(hwnd , msg[(down?0:4) + btn] , wp , lp);
       }
    }
-
-//   void FindAllWindowsZOrder();
-   void FindAllWindowsZOrder() {
-      all_window_info.clear();
-      
-      WindowInfo wi;
-      DWORD unused;
-      
-      HWND top = GetTopWindow(NULL);
-      
-      wi.hwnd = top;
-      unused = GetWindowThreadProcessId(top , &wi.pid);
-      
-      (void)unused;
-      
-      if (IsWindowVisible(top) && !IsIconic(top)) {
-         all_window_info.push_back(wi);
-      }
-      
-      HWND next = top;
-      
-      while ((next = GetNextWindow(next , GW_HWNDNEXT))) {
-         wi.hwnd = next;
-         unused = GetWindowThreadProcessId(next , &wi.pid);
-         if (IsWindowVisible(next) && !IsIconic(next)) {
-            all_window_info.push_front(wi);
-         }
-      }
-      
-      log.Log("Find all windows found %u windows\n" , all_window_info.size());
-      
-   }
-//*/
-
    
 };
 
-
-
-/*
-LRESULT WINAPI SendMessage(
-  _In_ HWND   hWnd,
-  _In_ UINT   Msg,
-  _In_ WPARAM wParam,
-  _In_ LPARAM lParam
-);
-*/
 
 
 

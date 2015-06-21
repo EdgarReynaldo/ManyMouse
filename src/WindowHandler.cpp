@@ -68,6 +68,9 @@ void WindowHandler::EnumerateWindows() {
       else if (hwnd == test_window) {
          pwi->SetWindowTypeString("Our test window");
       }
+      else if (hwnd == log_window) {
+         pwi->SetWindowTypeString("Our log window");
+      }
       else if (IsMouseWindow(hwnd)) {
          for (unsigned int i = 0 ; i < mice_windows.size() ; ++i) {
             HWND hwndmouse = mice_windows[i];
@@ -117,13 +120,14 @@ void WindowHandler::ClearWindowInfo() {
 void WindowHandler::RefreshWindowInfo() {
    ClearWindowInfo();
    EnumerateWindows();
-   SetOurWindows(program_window , test_window);
+   SetOurWindows(program_window , log_window , test_window);
 }
 
 
 
-void WindowHandler::SetOurWindows(HWND program_window_handle , HWND test_window_handle) {
+void WindowHandler::SetOurWindows(HWND program_window_handle , HWND log_window_handle , HWND test_window_handle) {
    program_window = program_window_handle;
+   log_window = log_window_handle;
    test_window = test_window_handle;
    
    map<HWND , WindowInfo*>::iterator it;
@@ -132,14 +136,21 @@ void WindowHandler::SetOurWindows(HWND program_window_handle , HWND test_window_
       it = window_info_map.find(program_window);
       if (it != window_info_map.end()) {
          WindowInfo* pwi = it->second;
-         pwi->SetWindowTypeString("Our program window : ");
+         pwi->SetWindowTypeString("Our program window");
+      }
+   }
+   if (log_window) {
+      it = window_info_map.find(log_window);
+      if (it != window_info_map.end()) {
+         WindowInfo* pwi = it->second;
+         pwi->SetWindowTypeString("Our log window");
       }
    }
    if (test_window) {
       it = window_info_map.find(test_window);
       if (it != window_info_map.end()) {
          WindowInfo* pwi = it->second;
-         pwi->SetWindowTypeString("The test window    : ");
+         pwi->SetWindowTypeString("The test window");
       }
    }
 }
@@ -186,8 +197,7 @@ HWND WindowHandler::GetWindowAtPos(int xpos , int ypos) {
       HWND hwnd = *it;
       
       /// Need to ignore mouse windows here
-      for (unsigned int i = 0 ; i < mice_windows.size() ; ++i) {
-         if (hwnd == mice_windows[i])
+      if (IsMouseWindow(hwnd)) {
          ++it;
          continue;
       }
@@ -202,8 +212,7 @@ HWND WindowHandler::GetWindowAtPos(int xpos , int ypos) {
       if (!GetWindowRect(hwnd , &r)) {
          log.Log("Failed to get window rect for hwnd %p\n" , hwnd);
       }
-      
-      if (RectContains(r , xpos , ypos)) {
+      else if (RectContains(r , xpos , ypos)) {
          return hwnd;
       }
 //      WindowInfo* pwi = 
