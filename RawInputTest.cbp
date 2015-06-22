@@ -15,7 +15,6 @@
 				<Option use_console_runner="0" />
 				<Compiler>
 					<Add option="-g" />
-					<Add directory="A5111GitDistro/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-lallegro_monolith-debug.dll" />
@@ -23,7 +22,6 @@
 					<Add option="-lglu32" />
 					<Add option="-lgdi32" />
 					<Add option="-lwinmm" />
-					<Add directory="A5111GitDistro/lib" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -48,7 +46,11 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add directory="A5111distro/include" />
 		</Compiler>
+		<Linker>
+			<Add directory="A5111distro/lib" />
+		</Linker>
 		<Unit filename=".gitignore" />
 		<Unit filename="docs/BuildInstructions.html" />
 		<Unit filename="docs/ReadMe.html" />

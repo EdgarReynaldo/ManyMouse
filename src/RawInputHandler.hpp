@@ -93,7 +93,7 @@ public:
    
    WindowHandler window_handler;
    
-
+   bool registered;
 
 
    void DrawHandlerToDIB();
@@ -122,7 +122,8 @@ public :
          hids(),
          rids(),
          mouse_controller(),
-         window_handler(&mouse_controller)
+         window_handler(&mouse_controller),
+         registered(false)
    {
       mouse_controller.SetWindowHandler(&window_handler);
    }
@@ -141,8 +142,9 @@ public :
    
    void PrintDeviceInfo();
    
-   void SetupDefaultDevices();
-   bool RegisterDevices();
+   void SetupDefaultDevices(bool swallow_mouse);
+   bool RegisterDevices(bool swallow_mouse);
+   void UnRegisterDevices();
    
    void QueuePaintMessage();
 

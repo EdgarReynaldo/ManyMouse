@@ -33,7 +33,7 @@
 // Include windows headers
 #include <windows.h>
 #include <winuser.h>
-
+///#include <winable.h>
 
 
 typedef bool (*WINDOW_CALLBACK)(ALLEGRO_DISPLAY* , UINT , WPARAM , LPARAM , LRESULT* , void*);

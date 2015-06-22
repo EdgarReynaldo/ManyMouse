@@ -415,6 +415,7 @@ void RawInputHandler::InputLoop() {
 
    bool redraw = true;
    bool quit = false;
+   bool swallow_mouse = false;
 
    QueuePaintMessage();
 
@@ -497,7 +498,10 @@ void RawInputHandler::InputLoop() {
          }  
          
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_R) {
-            ShowWindow(al_get_win_window_handle(log_display) , SW_RESTORE);
+            swallow_mouse = !swallow_mouse;
+            RegisterDevices(swallow_mouse);
+///            BlockInput(swallow_mouse);
+///            ShowWindow(al_get_win_window_handle(log_display) , SW_RESTORE);
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_M) {
             ShowWindow(al_get_win_window_handle(log_display) , SW_MAXIMIZE);
@@ -550,6 +554,8 @@ void RawInputHandler::InputLoop() {
       
    }
    
+///   BlockInput(false);
+   
 }
 
 
@@ -578,7 +584,7 @@ bool RawInputHandler::InitRawInfo() {
 
    FreeRawInfo();
    
-   SetupDefaultDevices();
+   SetupDefaultDevices(false);
    
    // Setup RawInputDevice
 /*
@@ -753,17 +759,23 @@ void RawInputHandler::PrintDeviceInfo() {
 
 
 
-void RawInputHandler::SetupDefaultDevices() {
+void RawInputHandler::SetupDefaultDevices(bool swallow_mouse) {
+   
+   rids.clear();
    
    RAWINPUTDEVICE default_devices[2];
 
-   
+   int flags = RIDEV_INPUTSINK;
+   if (swallow_mouse) {
+///      flags |= RIDEV_CAPTUREMOUSE;
+   }
 
    // adds HID mouse and also ignores legacy mouse messages
    default_devices[0].usUsagePage = 0x01; // generic desktop controls
    default_devices[0].usUsage = 0x02; // mouse
 //      default_devices[0].dwFlags = RIDEV_NOLEGACY;   
-   default_devices[0].dwFlags = RIDEV_INPUTSINK;   
+///   default_devices[0].dwFlags = RIDEV_INPUTSINK;   
+   default_devices[0].dwFlags = flags;   
 //   default_devices[0].dwFlags = 0;
 ///   default_devices[0].dwFlags = RIDEV_NOLEGACY;
 /// RIDEV_INPUTSINK doesn't work for some reason, registration fails
@@ -771,6 +783,7 @@ void RawInputHandler::SetupDefaultDevices() {
    default_devices[0].hwndTarget = winhandle;
 //   default_devices[0].hwndTarget = 0;
 
+/*
    // adds HID keyboard and also ignores legacy keyboard messages
    default_devices[1].usUsagePage = 0x01; // generic desktop controls
    default_devices[1].usUsage = 0x06; // keyboard
@@ -783,14 +796,38 @@ void RawInputHandler::SetupDefaultDevices() {
    default_devices[1].hwndTarget = winhandle;
 //   default_devices[1].hwndTarget = 0;
 
+*/
    rids.push_back(default_devices[0]);
-   rids.push_back(default_devices[1]);
+///   rids.push_back(default_devices[1]);
    
 }
 
 
 
-bool RawInputHandler::RegisterDevices() {
+void RawInputHandler::UnRegisterDevices() {
+   if (!registered) {
+      vector<RAWINPUTDEVICE> nrids = rids;
+      for (unsigned int i = 0 ; i < nrids.size() ; ++i) {
+         nrids[i].dwFlags = RIDEV_REMOVE;
+         nrids[i].hwndTarget = NULL;
+      }
+      bool ret = false;
+
+      ret = RegisterRawInputDevices(&nrids[0] , rids.size() , sizeof(RAWINPUTDEVICE));
+      
+      if (!ret) {
+         log.Log("Failed to unregister devices. GetLastError reports error %i.\n" , GetLastError());
+      }
+   }
+   registered = false;
+}
+
+
+
+bool RawInputHandler::RegisterDevices(bool swallow_mouse) {
+
+   SetupDefaultDevices(swallow_mouse);
+
 //   bool success = true;
 /*   
 BOOL WINAPI RegisterRawInputDevices(
@@ -800,14 +837,17 @@ BOOL WINAPI RegisterRawInputDevices(
 );
 */
    
+   UnRegisterDevices();
+   
    bool ret = false;
-
-   log.Log("rids.size() = %u\n" , rids.size());
 
    ret = RegisterRawInputDevices(&rids[0] , rids.size() , sizeof(RAWINPUTDEVICE));
    
    if (!ret) {
       log.Log("Register Raw Input Devices unsuccessful. GetLastError reports %lu.\n" , GetLastError());
+   }
+   else {
+      registered = true;
    }
    
    return ret;

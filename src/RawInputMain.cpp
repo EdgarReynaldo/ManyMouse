@@ -91,7 +91,7 @@ int main(int argc , char** argv) {
    
    log.Log("InitRawInfo was %s\n" , raw_init?"successful":"not successful");
    
-   bool registered_devices = rawhandler.RegisterDevices();
+   bool registered_devices = rawhandler.RegisterDevices(false);
    
    log.Log("RegisterDevices was %s\n" , registered_devices?"successful":"not successful");
    
