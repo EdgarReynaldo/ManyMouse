@@ -83,216 +83,22 @@ ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active) {
 
 
 
-bool MouseWindowCallback(ALLEGRO_DISPLAY* d , UINT msg , WPARAM wp , LPARAM lp , LRESULT* lr , void* mouse) {
-   PAINTSTRUCT ps;
-   
-   (void)d;
-   
-   (void)wp;
-   (void)lp;
-   (void)lr;
-   
-   Mouse* m = (Mouse*)mouse;
-   
-   if (msg == WM_PAINT) {
-      BeginPaint(m->window , &ps);
-      
-      m->dib_buffer.DrawBufferToWindowDC();
-      
-      EndPaint(m->window , &ps);
-      
-      return true;
-   }
-   return false;
+Mouse::~Mouse() {
+   CloseOurWindow();
 }
 
 
 
-void Mouse::QueuePaintMessage() {
-   if (window) {
-      RECT clrect;
-      GetClientRect(window , &clrect);
-      InvalidateRect(window , &clrect , true);
-      UpdateWindow(window);
-   }
-}
-
-
-
-void Mouse::DrawMouseToDIB() {
-/*
-   RECT r1,r2;
-   r1.left = 0;
-   r1.right = w;
-   r1.top = 0;
-   r1.bottom = h;
-   r2.left = 10;
-   r2.right = w - 10;
-   r2.top = 10;
-   r2.bottom = h - 10;
-   HBRUSH trans_brush = CreateSolidBrush(RGB(255,255,255));
-   HBRUSH fg_brush = CreateSolidBrush(RGB(0,255,0));
-   
-   FillRect(dib_buffer.GetBufferDC() , &r1 , fg_brush);
-   FillRect(dib_buffer.GetBufferDC() , &r2 , trans_brush);
-   
-   dib_buffer.Flush();
-   
-   DeleteObject(trans_brush);
-   DeleteObject(fg_brush);
-*/
-
-//*
-   if (!ms_image) {
-      log.Log("DrawMouseToDIB() : ms_image is NULL\n");
-      return;
-   }
-
-   dib_buffer.Flush();
-
-   ALLEGRO_LOCKED_REGION* alr = al_lock_bitmap(ms_image , ALLEGRO_PIXEL_FORMAT_ARGB_8888 , ALLEGRO_LOCK_READONLY);
-   if (!alr) {
-      log.Log("Failed to lock bitmap %p in DrawMouseToDIB.\n" , ms_image);
-      return;
-   }
-   
-   int maxh = al_get_bitmap_height(ms_image)>h?h:al_get_bitmap_height(ms_image);
-   int maxw = al_get_bitmap_width(ms_image)>w?w:al_get_bitmap_width(ms_image);
-   
-   dib_buffer.ClearToColor(RGB(255,255,255));
-///   COLORREF prev = RGB(255,255,255);
-   
-   for (int y = 0 ; y < maxh ; ++y) {
-      for (int x = 0 ; x < maxw ; ++x) {
-         unsigned int* pdata = (unsigned int*)&((const char*)alr->data)[y*alr->pitch + 4*x];
-///         These won't work if the endianness isn't what we are expecting!!!
-//         unsigned char r = pdata[1];
-//         unsigned char g = pdata[2];
-//         unsigned char b = pdata[3];
-         unsigned char r = (unsigned char)(((*pdata) & 0x00ff0000) >> 16);
-         unsigned char g = (unsigned char)(((*pdata) & 0x0000ff00) >> 8);
-         unsigned char b = (unsigned char)(((*pdata) & 0x000000ff) >> 0);
-         COLORREF rgb = RGB(r , g , b);
-//         if (prev != rgb) {
-//            printf("Drawing RGB(%i,%i,%i) at %i,%i\n" , (int)r , (int)g , (int)b , x , y);
-//         }
-         if (rgb != SetPixel(dib_buffer.GetBufferDC() , x , y , rgb)) {
-            log.Log("Mouse::DrawMouseToDIB - Failed to set exact color value with SetPixel\n");
-         }
-///         prev = rgb;
-///         dib_buffer.SetXYRGB(x , y , pdata[1] , pdata[2] , pdata[3]);
-      }
-   }
-   
-   al_unlock_bitmap(ms_image);
-
-   dib_buffer.Flush();
-//*/
-}
-
-
-
-void Mouse::Free() {
-   
-   dib_buffer.Free();
-   
-   if (display) {
-      al_destroy_display(display);
-      display = 0;
-   }
-   window = 0;
-   winhdc = 0;
-   ms_image = 0;
-   
-///   x = y = -1;// leave x and y alone so users can preset it
-   w = h = -1;
-   focusx = 0;
-   focusy = 0;
-   active = false;
+void Mouse::CloseOurWindow() {
+   transparent_window.CloseTheWindow();
    ready = false;
 }
 
 
 
-
-bool Mouse::Create(int width , int height) {
-
-   if ((width < 1) || (height < 1)) {return false;}
-
-   Free();
-   
-   w = width;//al_get_bitmap_width(mouse_image);
-   h = height;//al_get_bitmap_height(mouse_image);
-   
-///   al_set_new_display_flags(ALLEGRO_OPENGL | ALLEGRO_WINDOWED | ALLEGRO_FRAMELESS);
-   al_set_new_display_flags(ALLEGRO_WINDOWED | ALLEGRO_FRAMELESS);// d3d
-///   al_set_new_display_flags(ALLEGRO_OPENGL | ALLEGRO_WINDOWED);
-
-/*
-int al_show_native_message_box(ALLEGRO_DISPLAY *display,
-char const *title, char const *heading, char const *text,
-char const *buttons, int flags)
-*/
-
-///   al_set_new_window_position(x,y);
-
-   if (!(display = al_create_display(w , h))) {
-      al_show_native_message_box(NULL , "Error" , "Display" , "Mouse::Create - Could not create a display" , 0 , ALLEGRO_MESSAGEBOX_ERROR);
-      Free();
-      return false;
-   }
-   
-   trans_color = RGB(0,0,0);
-   
-   window = al_get_win_window_handle(display);
-   
-
-
-   /// Using HWND_TOPMOST has no effect on the focus, except in the initial call
-   SetWindowPos(window , HWND_TOPMOST , 0 , 0 , -1 , -1 , SWP_NOMOVE | SWP_NOSIZE);
-   
-   BringWindowToTop(window);
-   
-   if (0 == SetWindowLong(window , GWL_EXSTYLE , WS_EX_LAYERED)) {
-      log.Log("Couldn't set WS_EX_LAYERED style attribute\n");
-   }
-
-   if (!SetLayeredWindowAttributes(window , trans_color , 255 , LWA_COLORKEY | LWA_ALPHA)) {
-      log.Log("Couldn't set color key!\n");
-   }
-
-
-   if (!dib_buffer.Create(window)) {
-      printf("Failed to create DIB buffer for window %p\n" , (void*)window);
-   }
-   else {
-      printf("Created DIB buffer for mouse window %p\n" , (void*)window);
-   }
-   
-   dib_buffer.ClearToColor(trans_color);
-   
-///   DrawMouseToDIB();
-   
-///   dib_buffer.DrawBufferToWindowDC();
-   
-   if (!al_win_add_window_callback(display , MouseWindowCallback , this)) {
-      printf("Couldn't add window callback for mouse %p" , this);
-   }
-   
-   
-   
-   /// Leave dc alone for now
-   /// winhdc = GetDC(window);
-   
-   SetPos(x,y);
-   
-   /// This sets up windows to send a WM_PAINT message to our mouse window
-   QueuePaintMessage();
-
-   log.Log("Successfully created mouse at %i,%i\n" , x , y);
-   
-   return true;
-   
+bool Mouse::CreateOurWindow(ALLEGRO_BITMAP* mouse_image) {
+   ready = transparent_window.CreateTheWindow(mouse_image);
+   return ready;
 }
 
 
@@ -304,24 +110,7 @@ void Mouse::SetHandle(HANDLE hDevice) {
 
 
 bool Mouse::SetImage(ALLEGRO_BITMAP* mouse_image) {
-   if (mouse_image && ms_image != mouse_image) {
-      int iw = al_get_bitmap_width(mouse_image);
-      int ih = al_get_bitmap_height(mouse_image);
-      if ((iw != w) || (ih != h)) {
-         if (!Create(iw,ih)) {
-            printf("Failed to create %d x %d mouse.\n" , iw , ih);
-            return false;
-         }
-      }
-      ms_image = mouse_image;
-
-      DrawMouseToDIB();
-      
-      QueuePaintMessage();
-      return true;
-   }
-   
-   return false;
+   return transparent_window.SetWindowImage(mouse_image);
 }
 
 
@@ -331,9 +120,7 @@ void Mouse::SetPos(int newx , int newy) {
    ldy = newy - y;
    x = newx;
    y = newy;
-   if (display) {
-      al_set_window_position(display , x - focusx , y - focusy);
-   }
+   transparent_window.SetWindowPosition(x - focusx , y - focusy);
 }
 
 
@@ -347,13 +134,7 @@ void Mouse::MoveBy(int dx , int dy) {
 
    
 void Mouse::Draw() {
-   
-   if (!dib_buffer.Ready()) {
-      log.Log("Mouse::Draw - DIB buffer not ready.\n");
-      return;
-   }
-///   dib_buffer.DrawBufferToWindowDC();
-   QueuePaintMessage();
+   transparent_window.PaintTheWindow();
 }
 
 
@@ -412,6 +193,12 @@ void Mouse::HandleRawInput(RAWINPUT rawinput) {
    if (flags & RI_MOUSE_RIGHT_BUTTON_UP) {
       log.Log("Mouse %p : RMB up\n" , hdr.hDevice);
    }
+}
+
+
+
+HWND Mouse::GetMouseWindowHandle() {
+   return transparent_window.GetWindowHandle();
 }
 
 
@@ -756,7 +543,7 @@ void MouseController::GetMiceWindows(vector<HWND>* winvec) {
 
    for (unsigned int i = 0 ; i < micevec.size() ; ++i) {
       Mouse* m = micevec[i];
-      winvec->push_back(m->window);
+      winvec->push_back(m->GetMouseWindowHandle());
    }
 
 }

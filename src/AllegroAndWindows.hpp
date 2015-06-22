@@ -36,7 +36,22 @@
 
 
 
+typedef bool (*WINDOW_CALLBACK)(ALLEGRO_DISPLAY* , UINT , WPARAM , LPARAM , LRESULT* , void*);
 
 
-#endif // AllegroAndWindows_HPP
+
+int SetupAllegro();// returns 0 for success, and non-zero for failure
+
+bool AllegroReady();
+
+void DrawBitmapToHDC(HDC hdc , ALLEGRO_BITMAP* bmp);
+
+
+
+
+
+#endif // #ifdef AllegroAndWindows_HPP
+
+
+
 

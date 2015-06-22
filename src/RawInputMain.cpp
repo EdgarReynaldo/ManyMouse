@@ -67,33 +67,37 @@ int main(int argc , char** argv) {
    signal(SIGINT , AbortHandler);
 //   signal(SIGQUIT , AbortHandler);
 
-
-/**
-   RawInputHandler rawhandler;
-   
-   rawhandler.SetupAllegro();
-   
-   rawhandler.InputLoop();
-*/
-
    printf("Thread ID of main function is 0x%08lx\n" , GetCurrentThreadId());
 
 //   log.Activate(false);
 
-   RawInputHandler rawhandler;
+   int status = SetupAllegro();
+   
+   if (status != 0) {
+      log.Log("Failed to setup allegro. status = %d.\n" , status);
+      return 1;
+   }
 
-   int ret = rawhandler.SetupAllegro();
+   RawInputHandler rawhandler;
+   
+   int windows_setup = rawhandler.SetupWindows();
+   
+   if (windows_setup != 0) {
+      log.Log("Failed to setup windows.\n");
+      return 2;
+   }
+   
+   bool raw_init = rawhandler.InitRawInfo();
+   
+   log.Log("InitRawInfo was %s\n" , raw_init?"successful":"not successful");
+   
+   bool registered_devices = rawhandler.RegisterDevices();
+   
+   log.Log("RegisterDevices was %s\n" , registered_devices?"successful":"not successful");
    
    
-   log.Log("SetupAllegro was %s. Return value was %d\n" , (ret == 0)?"successful":"not successful" , ret);
-   
-   log.Log("InitRawInfo was %s\n" , rawhandler.InitRawInfo()?"successful":"not successful");
-   
-   
-   log.Log("RegisterDevices was %s\n" , (rawhandler.RegisterDevices())?"successful":"not successful");
-   
+
    log.Activate(true);
-   
    
    rawhandler.InputLoop();
    

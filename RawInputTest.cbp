@@ -15,6 +15,7 @@
 				<Option use_console_runner="0" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="A5111GitDistro/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-lallegro_monolith-debug.dll" />
@@ -22,6 +23,7 @@
 					<Add option="-lglu32" />
 					<Add option="-lgdi32" />
 					<Add option="-lwinmm" />
+					<Add directory="A5111GitDistro/lib" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -50,6 +52,7 @@
 		<Unit filename=".gitignore" />
 		<Unit filename="docs/BuildInstructions.html" />
 		<Unit filename="docs/ReadMe.html" />
+		<Unit filename="src/AllegroAndWindows.cpp" />
 		<Unit filename="src/AllegroAndWindows.hpp" />
 		<Unit filename="src/DIBbuffer.cpp" />
 		<Unit filename="src/DIBbuffer.hpp" />

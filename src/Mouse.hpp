@@ -24,17 +24,11 @@ ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active);
 
 
 
-bool MouseWindowCallback(ALLEGRO_DISPLAY* d , UINT msg , WPARAM wp , LPARAM lp , LRESULT* lr , void* mouse);
-
-
-
 class Mouse {
 
 public :
-   // Window info
-   ALLEGRO_DISPLAY* display;
-   HWND window;
-   HDC winhdc;
+   
+   TransparentWindow transparent_window;
    
    // Access control
 ///   Mutex mutex;
@@ -44,61 +38,41 @@ public :
    
    ALLEGRO_BITMAP* ms_image;
    
-   DIBbuffer dib_buffer;
-   
    int x;
    int y;
-   int w;
-   int h;
-   
    int focusx;
    int focusy;
    
-   bool active;
+///   bool active;
    bool ready;
-   
-   COLORREF trans_color;
    
    int ldx;// last delta x
    int ldy;// last delta y
-   
-   void QueuePaintMessage();
-   void DrawMouseToDIB();
    
    
 public :
    
 //   Mouse();
 Mouse() :
-      display(0),
-      window(0),
-      winhdc(0),
-///      mutex(),
+      transparent_window(),
       device_handle(0),
       ms_image(0),
-      dib_buffer(),
       x(0),
       y(0),
-      w(0),
-      h(0),
       focusx(0),
       focusy(0),
-      active(false),
+///      active(false),
       ready(false),
-      trans_color(RGB(255,255,255))
+      ldx(0),
+      ldy(0)
 {
    
 }
 
-///   ~Mouse();
-~Mouse() {
-   Free();
-}
+   ~Mouse();
 
-
-   void Free();
-   bool Create(int width , int height);
-///   bool Create(ALLEGRO_BITMAP* mouse_image);
+   void CloseOurWindow();
+   bool CreateOurWindow(ALLEGRO_BITMAP* mouse_image);
 
    void SetHandle(HANDLE hDevice);
    bool SetImage(ALLEGRO_BITMAP* mouse_image);
@@ -106,8 +80,6 @@ Mouse() :
    void SetPos(int newx , int newy);
    void MoveBy(int dx , int dy);
    void Draw();
-
-
 
    void HandleRawInput(RAWINPUT rawinput);
    
@@ -118,8 +90,10 @@ Mouse() :
    
    bool MouseMoved() {return ldx || ldy;}
    
-   
+   HWND GetMouseWindowHandle();
 };
+
+
 
 class MouseTrackingInfo {
 public :
@@ -138,6 +112,8 @@ public :
       
    }
 };
+
+
 
 /// MouseTracker is responsible for tracking and destroying mice, but does not create them
 
@@ -214,22 +190,6 @@ public :
    
    void SetWindowHandler(WindowHandler* handler);
    
-/*
-   int NumMiceActive();
-int NumMiceActive() {
-   int n = 0;
-   map<HWND , Mouse*>::iterator it = dev_map.begin();
-   while (it != dev_map.end()) {
-      ++n;
-      ++it;
-   }
-   return n;
-}
-   Mouse* GetMouse(int mindex);
-   Mouse* GetMouse(int mindex) {
-      
-   }
-*/
 };
 
 

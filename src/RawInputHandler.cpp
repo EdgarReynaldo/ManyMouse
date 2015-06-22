@@ -235,27 +235,8 @@ void RawInputHandler::DrawHandlerToDIB() {
 
 
 
-int RawInputHandler::SetupAllegro() {
+int RawInputHandler::SetupWindows() {
 
-   /// Allegro setup functions
-   
-   if (!al_init()) {return 1;}
-   
-   if (!al_init_primitives_addon()) {return 1;}
-   
-   if (!al_init_image_addon()) {return 1;}
-   
-   if (!al_init_font_addon()) {return 1;}
-   
-   if (!al_init_ttf_addon()) {return 1;}
-   
-   if (!al_install_mouse()) {return 2;}
-   if (!al_install_keyboard()) {return 2;}
-   
-   if (!al_install_joystick()) {
-      return -1;
-   }
-   
    bool mtx = log.InitMutex();
    log.Log("log.InitMutex() returned %s\n" , mtx?"true":"false");
 
@@ -393,7 +374,7 @@ BOOL WINAPI SetWindowPos(
 
 
 
-void RawInputHandler::ShutdownAllegro() {
+void RawInputHandler::CloseWindows() {
    // mutex , queue , timer , display
    mouse_controller.FreeMouseImages();
    

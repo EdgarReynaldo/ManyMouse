@@ -86,10 +86,6 @@ public:
    vector<RAWINPUTDEVICELIST> keyboards;
    vector<RAWINPUTDEVICELIST> hids;
    
-///   vector<RID_DEVICE_INFO_MOUSE> mouse_info;
-///   vector<RID_DEVICE_INFO_KEYBOARD> keyboard_info;
-///   vector<RID_DEVICE_INFO_HID> hid_info;
-   
    vector<RAWINPUTDEVICE> rids;
 //   RAWINPUTDEVICE rids[2];
    
@@ -120,19 +116,10 @@ public :
          lww(1024),
          lwh(300),
          dev_info_map(),
-///         ridlist(0),
-///         ridinfo(0),
-///         ridnames(0),
          device_count(0),
-///         keyboard_count(0),
-///         mouse_count(0),
-///         hid_count(0),
          mice(),
          keyboards(),
          hids(),
-///         mouse_info(),
-///         keyboard_info(),
-///         hid_info(),
          rids(),
          mouse_controller(),
          window_handler(&mouse_controller)
@@ -141,11 +128,12 @@ public :
    }
 
    ~RawInputHandler() {
-      ShutdownAllegro();
+      CloseWindows();
    }
 
-   int SetupAllegro();
-   void ShutdownAllegro();
+   int SetupWindows();
+   void CloseWindows();
+   
    void InputLoop();
 
    void FreeRawInfo();
