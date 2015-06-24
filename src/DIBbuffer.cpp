@@ -272,7 +272,7 @@ else {
    BLENDFUNCTION blend = {AC_SRC_OVER, 0, 255, AC_SRC_ALPHA};
 
 //*   
-
+   log.Log("Using AlphaBlend");
    if (!AlphaBlend(winDC, dr.left, dr.top, dr.right - dr.left, dr.bottom - dr.top,  memDC, sr.left, sr.top, sr.right, sr.bottom, blend)) {
       log.Log("AlphaBlend failed. GetLastError reports %d.\n" , GetLastError());
    }

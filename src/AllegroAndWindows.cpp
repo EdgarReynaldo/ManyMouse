@@ -138,24 +138,27 @@ void DrawBitmapToDIB(const DIBbuffer& dib_buf , ALLEGRO_BITMAP* bmp) {
 //*
    
    int* fakedata = new int[maxw];
-   for (int i = 0 ; i < maxw ; i+=2) {
+   for (int i = 0 ; i < maxw ; i+=4) {
       fakedata[i] = 0xff0000ff;
-      fakedata[i+1] = 0xffffffff;
+      fakedata[i+1] = 0xff0000ff;
+      fakedata[i+2] = 0xffffffff;
+      fakedata[i+3] = 0xffffffff;
    }
    assert(maxw);
    int stride = alr->pitch;
    char* pdata = (char*)alr->data;
    for (int y = 0 ; y < maxh ; ++y) {
       
-/*
+//*
       for (int x = 0 ; x < 4*maxw ; x += 4) {
          int bmpdata = *(int*)&pdata[x];
 ///         log.Log(" 0x%x",bmpdata);
-         *(int*)&dib_data[x] = bmpdata;/// | 0xff0000ff;
+         *(int*)&dib_data[x] = bmpdata;/// | 0x0000ff00;
+///         *(int*)&dib_data[x] = bmpdata;/// | 0xff0000ff;
 ///         *(int*)&dib_data[x] = bmpdata | 0xffffffff;
       }
-*/
-      memcpy(dib_data , fakedata , 4*maxw);
+//*/
+//      memcpy(dib_data , fakedata , 4*maxw);
 //      memcpy(dib_data , pdata , abs(stride));
       pdata += stride;// bitmap data may have negative pitch
       dib_data += abs(stride);// dib data is top down
