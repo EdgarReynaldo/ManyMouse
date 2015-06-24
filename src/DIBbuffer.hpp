@@ -29,6 +29,8 @@ class DIBbuffer {
 
    BYTE* GetDataByte(int x , int y);// access to hbm_DIBdata array
 
+   friend void DrawBitmapToDIB(const DIBbuffer& dib_buf , ALLEGRO_BITMAP* bmp);
+
 public :
    DIBbuffer();
    ~DIBbuffer();

@@ -23,6 +23,7 @@ bool WindowPainterCallback
    HWND window = transparent_window->GetWindowHandle();
    
    if (message == WM_PAINT) {
+//      log.Log("WM_PAINT called for display %p.\n" , display);
       PAINTSTRUCT ps;
       BeginPaint(window , &ps);
       transparent_window->dib_buffer.DrawBufferToWindowDC();
@@ -44,7 +45,7 @@ void TransparentWindow::DrawImageToDIB() {
 
    dib_buffer.Flush();
 
-   DrawBitmapToHDC(dib_buffer.GetBufferDC() , image);
+   DrawBitmapToDIB(dib_buffer , image);
    
    dib_buffer.Flush();
 }
@@ -112,7 +113,9 @@ bool TransparentWindow::CreateTheWindow(ALLEGRO_BITMAP* img , COLORREF transpare
    
    image = img;
    
+   al_set_target_bitmap(NULL);
    al_set_new_display_flags(ALLEGRO_FRAMELESS | ALLEGRO_WINDOWED);
+///   al_set_new_display_flags(ALLEGRO_FRAMELESS | ALLEGRO_WINDOWED | ALLEGRO_OPENGL);
 
    if (!(display = al_create_display(width , height))) {
       log.Log("TransparentWindow::CreateTheWindow - Could not create the display.\n");
@@ -159,7 +162,10 @@ bool TransparentWindow::CreateTheWindow(ALLEGRO_BITMAP* img , COLORREF transpare
       return false;
    }
    
-   dib_buffer.ClearToColor(trans_color);
+   dib_buffer.ClearToColor(RGB(0,255,255));//trans_color);
+   
+   
+   al_set_target_bitmap(image);
    
    if (image) {
       DrawImageToDIB();
@@ -186,7 +192,10 @@ bool TransparentWindow::CreateTheWindow(ALLEGRO_BITMAP* img , COLORREF transpare
 
 
 void TransparentWindow::PaintTheWindow() {
-   if (ready) {
+   if (!ready) {
+      log.Log("TransparentWindow::PaintTheWindow - paint called when ready is false.\n");
+   }
+   else {
       DrawImageToDIB();
       QueuePaintMessage();
    }

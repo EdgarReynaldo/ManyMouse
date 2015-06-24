@@ -20,11 +20,13 @@ ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active) {
 
    if (!active) {
 ///      cursor_bmp = al_load_bitmap("Images/CursorRed.png");
-      cursor_bmp = al_load_bitmap("Images/DaltonRedCursor.png");
+///      cursor_bmp = al_load_bitmap("Images/DaltonRedCursor2.png");
+      cursor_bmp = al_load_bitmap("Images/TransMouseOverlayB.png");
    }
    else {
 ///      cursor_bmp = al_load_bitmap("Images/CursorGreen.png");
-      cursor_bmp = al_load_bitmap("Images/DaltonGreenCursor.png");
+///      cursor_bmp = al_load_bitmap("Images/DaltonGreenCursor2.png");
+      cursor_bmp = al_load_bitmap("Images/TransMouseOverlayA.png");
    }
 
    if (!cursor_bmp) {
@@ -134,6 +136,11 @@ void Mouse::MoveBy(int dx , int dy) {
 
    
 void Mouse::Draw() {
+   if (!transparent_window.GetAllegroDisplay()) {
+      log.Log("Mouse::Draw - transparent window's display is NULL.\n");
+      return;
+   }
+   al_set_target_backbuffer(transparent_window.GetAllegroDisplay());
    transparent_window.PaintTheWindow();
 }
 

@@ -4,7 +4,7 @@
 
 #include "VisualLogger.hpp"
 
-
+#include "DIBbuffer.hpp"
 
 bool allegro_ready = false;
 
@@ -39,6 +39,7 @@ bool AllegroReady() {
 
 
 void DrawBitmapToHDC(HDC hdc , ALLEGRO_BITMAP* bmp) {
+   assert(0);
    if (!hdc) {
       log.Log("DrawBitmapToHDC() : hdc is NULL\n");
       return;
@@ -84,6 +85,83 @@ void DrawBitmapToHDC(HDC hdc , ALLEGRO_BITMAP* bmp) {
    
    al_unlock_bitmap(bmp);
    
+}
+
+
+int lock_fail_count = 0;
+int lock_success_count = 0;
+
+void DrawBitmapToDIB(const DIBbuffer& dib_buf , ALLEGRO_BITMAP* bmp) {
+   
+   assert(dib_buf.ready);
+   
+   BITMAPINFOHEADER bmihdr = dib_buf.bm_info.bmiHeader;
+   char* dib_data = (char*)dib_buf.hbm_DIBdata;
+   
+   assert(bmihdr.biBitCount == 32);
+   
+   if (!dib_data) {
+      log.Log("DrawBitmapToDIB() : dib_data is NULL\n");
+      return;
+   }
+   if (!bmp) {
+      log.Log("DrawBitmapToDIB() : bmp is NULL\n");
+      return;
+   }
+
+   ALLEGRO_LOCKED_REGION* alr = al_lock_bitmap(bmp , ALLEGRO_PIXEL_FORMAT_ARGB_8888 , ALLEGRO_LOCK_READONLY);
+   if (!alr) {
+      lock_fail_count++;
+      log.Log("DrawBitmapToDIB() - Failed to lock bitmap %p. failcount = %d\n" , bmp , lock_fail_count);
+///      assert(0);
+      return;
+   }
+   
+   lock_success_count++;
+   log.Log("DrawBitmapToDIB() - al_lock_bitmap succeeded. success count is %d\n" , lock_success_count);
+///   assert(0);
+   
+   int maxw = al_get_bitmap_width(bmp);
+   int maxh = al_get_bitmap_height(bmp);
+   int dibw = bmihdr.biWidth;
+   int dibh = bmihdr.biHeight;
+   if (dibw < maxw) {maxw = dibw;}
+   if (abs(dibh) < maxh) {maxh = abs(dibh);}
+   
+///   dib_buffer.ClearToColor(RGB(255,255,255));
+
+   
+   /// 32 bit DIB format is ARGB 8888
+   /// Source and destination data should both have the same stride and format now, so use memcpy directly
+///   memcpy(dib_data , alr->data , 4*maxw*maxh);// pitch can be negative - this won't work
+   
+//*
+   
+   int* fakedata = new int[maxw];
+   for (int i = 0 ; i < maxw ; i+=2) {
+      fakedata[i] = 0xff0000ff;
+      fakedata[i+1] = 0xffffffff;
+   }
+   assert(maxw);
+   int stride = alr->pitch;
+   char* pdata = (char*)alr->data;
+   for (int y = 0 ; y < maxh ; ++y) {
+      
+/*
+      for (int x = 0 ; x < 4*maxw ; x += 4) {
+         int bmpdata = *(int*)&pdata[x];
+///         log.Log(" 0x%x",bmpdata);
+         *(int*)&dib_data[x] = bmpdata;/// | 0xff0000ff;
+///         *(int*)&dib_data[x] = bmpdata | 0xffffffff;
+      }
+*/
+      memcpy(dib_data , fakedata , 4*maxw);
+//      memcpy(dib_data , pdata , abs(stride));
+      pdata += stride;// bitmap data may have negative pitch
+      dib_data += abs(stride);// dib data is top down
+   }
+//*/   
+   al_unlock_bitmap(bmp);
 }
 
 

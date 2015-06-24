@@ -22,6 +22,8 @@
 					<Add option="-lglu32" />
 					<Add option="-lgdi32" />
 					<Add option="-lwinmm" />
+					<Add option="-lmsimg32" />
+					<Add option="-lwin32k" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -41,6 +43,8 @@
 					<Add option="-lglu32" />
 					<Add option="-lgdi32" />
 					<Add option="-lwinmm" />
+					<Add option="-lmsimg32" />
+					<Add option="-lwin32k" />
 				</Linker>
 			</Target>
 		</Build>
@@ -54,6 +58,7 @@
 		<Unit filename=".gitignore" />
 		<Unit filename="docs/BuildInstructions.html" />
 		<Unit filename="docs/ReadMe.html" />
+		<Unit filename="docs/UsefulLinks.html" />
 		<Unit filename="src/AllegroAndWindows.cpp" />
 		<Unit filename="src/AllegroAndWindows.hpp" />
 		<Unit filename="src/DIBbuffer.cpp" />

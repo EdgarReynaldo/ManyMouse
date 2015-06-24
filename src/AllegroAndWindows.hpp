@@ -35,6 +35,7 @@
 #include <winuser.h>
 ///#include <winable.h>
 
+class DIBbuffer;
 
 typedef bool (*WINDOW_CALLBACK)(ALLEGRO_DISPLAY* , UINT , WPARAM , LPARAM , LRESULT* , void*);
 
@@ -45,6 +46,8 @@ int SetupAllegro();// returns 0 for success, and non-zero for failure
 bool AllegroReady();
 
 void DrawBitmapToHDC(HDC hdc , ALLEGRO_BITMAP* bmp);
+
+void DrawBitmapToDIB(const DIBbuffer& dib_buf , ALLEGRO_BITMAP* bmp);
 
 
 

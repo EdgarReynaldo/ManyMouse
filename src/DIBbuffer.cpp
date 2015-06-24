@@ -165,7 +165,15 @@ bool DIBbuffer::Create(HWND window_handle) {
 
 bool DIBbuffer::GetBitmapInfo(BITMAPINFO* pbi , HWND handle) {
    // Gets bitmap info suitable for creating a DIB the same size as the window specified by 'handle'.
-   if (!pbi || !handle) {return false;}
+   if (!pbi || !handle) {
+      if (!pbi) {
+         log.Log("DIBbuffer::GetBitmapInfo - pbi is NULL.\n");
+      }
+      if (!handle) {
+         log.Log("DIBbuffer::GetBitmapInfo - handle is NULL.\n");
+      }
+      return false;
+   }
    
    memset(pbi , 0 , sizeof(*pbi));
    
@@ -181,9 +189,10 @@ bool DIBbuffer::GetBitmapInfo(BITMAPINFO* pbi , HWND handle) {
    BITMAPINFOHEADER* phdr = &(pbi->bmiHeader);
    phdr->biSize = sizeof(BITMAPINFOHEADER);
    phdr->biWidth = w;
-   phdr->biHeight = -h;
+   phdr->biHeight = -h;// negative height indicates this is a top down bitmap
    phdr->biPlanes = 1;
-   phdr->biBitCount = 24;// 32 does no good - alpha is unused?
+//   phdr->biBitCount = 24;// 32 does no good - alpha is unused?
+   phdr->biBitCount = 32;
    phdr->biCompression = BI_RGB;
    phdr->biSizeImage = 0;// okay for BI_RGB bitmaps
    phdr->biXPelsPerMeter = 0;//?
@@ -197,8 +206,11 @@ bool DIBbuffer::GetBitmapInfo(BITMAPINFO* pbi , HWND handle) {
 
 
 void DIBbuffer::DrawBufferToWindowDC() {
-   if (!ready) {return;}
-   
+   if (!ready) {
+      log.Log("DIBbuffer::DrawBufferToWindowDC - not ready.\n");
+      return;
+   }
+/*   
    // if ready, everything is set up, and our DIB is already selected into the memory DC
    
    RECT clrect;
@@ -212,23 +224,86 @@ void DIBbuffer::DrawBufferToWindowDC() {
 
    BitBlt(winDC , dx , dy , dw , dh , memDC , 0 , 0 , SRCCOPY);
    GdiFlush();
+*/
+
+//   BLENDFUNCTION blend = {AC_SRC_OVER, 0, 127, 0};
+   
+///   HBRUSH hbr = CreateSolidBrush(RGB(0,0,255));
+   
+
+///   SetDCPenColor(memDC, RGB(0,0,255));
+///   SetDCBrushColor(memDC, RGB(0,0,255));
+///   FillRect(memDC, &r, hbr);
+
+/*
+BOOL AlphaBlend(
+  _In_  HDC           hdcDest,
+  _In_  int           xoriginDest,
+  _In_  int           yoriginDest,
+  _In_  int           wDest,
+  _In_  int           hDest,
+  _In_  HDC           hdcSrc,
+  _In_  int           xoriginSrc,
+  _In_  int           yoriginSrc,
+  _In_  int           wSrc,
+  _In_  int           hSrc,
+  _In_  BLENDFUNCTION ftn
+);*/
+
+   RECT sr;
+   sr.left = 0;
+   sr.right = bm_info.bmiHeader.biWidth;
+   sr.top = 0;
+   sr.bottom = bm_info.bmiHeader.biHeight;
+   RECT dr;
+   GetClientRect(win_handle , &dr);
+   int dx = dr.left;
+   int dy = dr.top;
+   int dw = dr.right - dr.left;
+   int dh = dr.bottom - dr.top;
+
+   
+//   BitBlt(winDC , dx , dy , dw , dh , memDC , 0 , 0 , SRCCOPY);
+   
+   BLENDFUNCTION blend = {AC_SRC_OVER, 0, 255, AC_SRC_ALPHA};
+   
+   if (!AlphaBlend(winDC, dr.left, dr.top, dr.right - dr.left, dr.bottom - dr.top,  memDC, sr.left, sr.top, sr.right, sr.bottom, blend)) {
+      log.Log("AlphaBlend failed. GetLastError reports %d.\n" , GetLastError());
+   }
+
+   GdiFlush();
+
+///   DeleteObject(hbr);
+
 }
 
-
+//-lmsimg32
+//-lwin32k
 
 void DIBbuffer::ClearToColor(COLORREF c) {
+   
+   if (!ready) {
+      log.Log("DIBbuffer::ClearToColor - not ready.\n");
+      return;
+   }
+   
+   
+   
+/*
    if (!ready) {return;}
    
    HBRUSH hbr = CreateSolidBrush(c);
    if (!hbr) {return;}
    
+
    RECT r;
-   
    GetClientRect(win_handle , &r);
+
    
    FillRect(memDC , &r , hbr);
    
    DeleteObject(hbr);
+*/
 }
 
 
