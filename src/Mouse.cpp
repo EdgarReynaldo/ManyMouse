@@ -13,7 +13,7 @@
 
 
 ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active) {
-   
+
    // Pass -1 for w or h to use default size
 
    ALLEGRO_BITMAP* cursor_bmp = 0;
@@ -33,31 +33,31 @@ ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active) {
       log.Log("Failed to load cursor bitmap.\n");
       return 0;
    }
-   
+
    if ((w == -1) || (h == -1)) {
       // Return unmodified image
       return cursor_bmp;
    }
-   
+
    /// Scale image to specified width and height
    ALLEGRO_BITMAP* user_bmp = 0;
-   
+
    user_bmp = al_create_bitmap(w , h);
    if (!user_bmp) {
       al_destroy_bitmap(cursor_bmp);
       return 0;
    }
-   
+
    al_set_blender(ALLEGRO_ADD , ALLEGRO_ONE , ALLEGRO_ZERO);
    al_set_target_bitmap(user_bmp);
-   
+
 //void al_draw_scaled_bitmap(ALLEGRO_BITMAP *bitmap,
 //   float sx, float sy, float sw, float sh,
 //   float dx, float dy, float dw, float dh, int flags)
 
    al_draw_scaled_bitmap(cursor_bmp , 0.0 , 0.0 , al_get_bitmap_width(cursor_bmp) , al_get_bitmap_height(cursor_bmp),
                                       0.0 , 0.0 , w , h , 0);
-   
+
    al_destroy_bitmap(cursor_bmp);
 
    return user_bmp;
@@ -66,7 +66,7 @@ ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active) {
 
    al_set_target_bitmap(userbmp);
    al_clear_to_color(al_map_rgb(0,0,0));
-   
+
    ALLEGRO_COLOR bg_color = al_map_rgb(255,255,255);
    ALLEGRO_COLOR outline_color;
    if (active) {
@@ -132,9 +132,9 @@ void Mouse::MoveBy(int dx , int dy) {
    ldy = dy;
    SetPos(x + dx , y + dy);
 }
-   
 
-   
+
+
 void Mouse::Draw() {
    if (!transparent_window.GetAllegroDisplay()) {
       log.Log("Mouse::Draw - transparent window's display is NULL.\n");
@@ -149,21 +149,21 @@ void Mouse::Draw() {
 void Mouse::HandleRawInput(RAWINPUT rawinput) {
    RAWINPUTHEADER hdr = rawinput.header;
    RAWMOUSE rms = rawinput.data.mouse;
-   
+
    if (hdr.hDevice != device_handle) {
       log.Log("Mouse::HandleRawInput - Device handle doesn't match.\n");
       return;
    }
-   
+
    if (hdr.dwType != RIM_TYPEMOUSE) {
       // we only handle mouse messages
       log.Log("Mouse::HandleRawInput - dwType doesn't match.\n");
       return;
    }
-   
+
    /// RAWMOUSE::usFlags is always 0 so far, which means MOUSE_MOVE_RELATIVE
    /// Their flags could use a better configuration
-   
+
    if (rms.usFlags == MOUSE_MOVE_RELATIVE) {
 //      log.Log("Mouse::HandleRawInput : MOUSE_MOVE_RELATIVE\n");
       MoveBy(rms.lLastX , rms.lLastY);
@@ -179,9 +179,9 @@ void Mouse::HandleRawInput(RAWINPUT rawinput) {
    else if (rms.lLastX || rms.lLastY) {
       MoveBy(rms.lLastX , rms.lLastY);
    }
-*/   
+*/
    USHORT flags = rms.usButtonFlags;
-   
+
    if (flags & RI_MOUSE_LEFT_BUTTON_DOWN) {
       log.Log("Mouse %p : LMB down\n" , hdr.hDevice);
    }
@@ -220,7 +220,7 @@ HWND Mouse::GetMouseWindowHandle() {
 MouseTracker::MouseTracker() :
       mtinfo()
 {
-   
+
 }
 
 
@@ -353,24 +353,24 @@ vector<Mouse*> MouseTracker::GetMouseVector() {
 
 
 void MouseController::DestroyMouse(HANDLE hDevice) {
-   
+
    mouse_tracker.StopTrackingMouse(hDevice);
-   
+
 }
 
 
 
 bool MouseController::CreateMouse(HANDLE hDevice) {
-   
+
    if (mouse_tracker.GetMouseFromHandle(hDevice)) {
       mouse_tracker.StopTrackingMouse(hDevice);
    }
 
    Mouse* newmouse = new Mouse();
-   
+
    POINT p;
    GetCursorPos(&p);
-   
+
    newmouse->SetPos(p.x , p.y);
 
    ALLEGRO_BITMAP* ms_image = enabled?ms_enabled_image:ms_disabled_image;
@@ -380,9 +380,9 @@ bool MouseController::CreateMouse(HANDLE hDevice) {
       return false;
    }
    newmouse->SetHandle(hDevice);
-   
+
    mouse_tracker.TrackNewMouse(newmouse , hDevice);
-   
+
    return true;
 }
 
@@ -435,7 +435,7 @@ MouseController::MouseController() :
       enabled(true),
       window_handler(0)
 {
-   
+
 }
 
 
@@ -470,13 +470,13 @@ bool MouseController::CreateMouseImages() {
 
 
 void MouseController::HandleRawInput(RAWINPUT rawinput) {
-   
+
    RAWINPUTHEADER hdr = rawinput.header;
-   
+
    /// If hDevice is NULL, this is from SendInput. ( These messages are currently filtered by
    /// RawInputHandler::HandleRawInput )
    if (!hdr.hDevice) {return;}
-   
+
    Mouse* mouse = mouse_tracker.GetMouseFromHandle(hdr.hDevice);
    if (!mouse) {
       log.Log("Creating new mouse. hDevice = %p\n" , hdr.hDevice);
@@ -490,14 +490,14 @@ void MouseController::HandleRawInput(RAWINPUT rawinput) {
       mouse->HandleRawInput(rawinput);
       if (window_handler && hdr.dwType == RIM_TYPEMOUSE) {
          RAWMOUSE rms = rawinput.data.mouse;
-         
+
          USHORT flags = rms.usButtonFlags;
          bool down = false;
          int button = FlagsToButtonIndex(flags , &down);
          if (button) {
             window_handler->HandleButton(button , down , mouse->X() , mouse->Y());
          }
-         
+
          if (mouse->MouseMoved()) {
             window_handler->HandleMouseMove(mouse);
          }
@@ -521,9 +521,9 @@ void MouseController::Draw() {
 
 void MouseController::ToggleMiceEnabled() {
    enabled = !enabled;
-   
+
    ALLEGRO_BITMAP* ms_image = 0;
-   
+
    if (enabled) {
       ms_image = ms_enabled_image;
    }
@@ -569,3 +569,33 @@ void MouseController::SetWindowHandler(WindowHandler* handler) {
 
 
 
+ALLEGRO_BITMAP* DrawMouseImage(bool activee){
+    ALLEGRO_BITMAP* cursor1 = 0;
+    ALLEGRO_BITMAP* circle = 0;
+    cursor1 = al_load_bitmap("Images/NormalCursor1.png");
+    if (!cursor1) {
+          log.Log("Failed to load cursor bitmap.\n");
+          return 0;
+       }
+    circle = al_create_bitmap(32,32);
+    if(!circle){
+        al_destroy_bitmap(cursor1);
+        return 0;
+    }
+    al_clear_to_color(al_map_rgba(0,0,0,0));
+    al_set_blender(ALLEGRO_ADD(ALLEGRO_1,ALLEGRO_0));
+    al_set_target_bitmap(circle);
+    ALLEGRO_COLOR color = al_map_rgba(127,0,0,127);
+
+    if(activee){
+        color = al_map_rgba(0,0,127,127);
+        al_draw_filled_circle(al_map_rgba(16,16,8,color));
+    }
+   else {
+        al_draw_filled_circle(al_map_rgba(16,16,8,color));
+   }
+    al_set_blender(ALLEGRO_ADD,ALLEGRO_ALPHA,ALLEGRO_INV_ALPHA);
+    al_draw_bitmap(cursor1,0,0,0);
+    al_destroy_bitmap(cursor1);
+    return circle;
+}
