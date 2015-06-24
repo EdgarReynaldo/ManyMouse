@@ -97,11 +97,10 @@ ALLEGRO_BITMAP* DrawMouseImage(bool activee){
         al_destroy_bitmap(cursor1);
         return 0;
     }
+    al_set_target_bitmap(circle);
     al_clear_to_color(al_map_rgba(0,0,0,0));
     al_set_blender(ALLEGRO_ADD,ALLEGRO_ONE,ALLEGRO_ZERO);
-    al_set_target_bitmap(circle);
     ALLEGRO_COLOR color = al_map_rgba(127,0,0,127);
-
     if(activee){
         color = al_map_rgba(0,0,127,127);
     }
