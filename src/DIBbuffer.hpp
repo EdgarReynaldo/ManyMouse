@@ -23,6 +23,10 @@ class DIBbuffer {
    
    bool ready;
    
+   bool draw_with_alpha;
+   
+   
+   
    /// Make copy constructor and assigment operator private to disallow copying
    DIBbuffer(const DIBbuffer& dib) {(void)dib;}
    const DIBbuffer& operator=(const DIBbuffer& rhs) {(void)rhs;return *this;}
@@ -54,6 +58,8 @@ public :
    void Test();
 
    void SetXYRGB(int x , int y , char r , char g , char b);
+   
+   void UseAlphaDrawing(bool use_alpha) {draw_with_alpha = use_alpha;}
    
    void Flush();// calls GdiFlush(). Useful?
 

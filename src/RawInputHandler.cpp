@@ -252,7 +252,7 @@ int RawInputHandler::SetupWindows() {
    twh = 400;
    
 ///   al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
-   al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_OPENGL);
+   al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
    
    display = al_create_display(tww,twh);
    

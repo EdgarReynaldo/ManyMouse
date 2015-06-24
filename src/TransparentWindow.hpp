@@ -38,6 +38,7 @@ private :
    
    bool ready;
    
+   bool draw_with_alpha;
    
    /// Give the callback access to our data
    friend bool WindowPainterCallback
@@ -68,7 +69,8 @@ public :
          dib_buffer(),
          trans_color(RGB(0,0,0)),
          image(0),
-         ready(false)
+         ready(false),
+         draw_with_alpha(false)
    {
       
    }
@@ -89,7 +91,7 @@ public :
 
    bool AddWindowCallback(WINDOW_CALLBACK cb , void* cb_data);
 
-
+   void UseAlphaDrawing(bool use_alpha);
 
    ALLEGRO_DISPLAY* GetAllegroDisplay();
 

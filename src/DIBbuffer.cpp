@@ -47,8 +47,11 @@ BYTE* DIBbuffer::GetDataByte(int x , int y) {
       return 0;
    }
    
-   int pitch = 3*w + ((3*w)%4?(4-((3*w)%4)):0);
-   return &((BYTE*)hbm_DIBdata)[y*pitch + 3*x];
+   int pitch = 4*w;
+   return &((BYTE*)hbm_DIBdata)[y*pitch];
+   
+//   int pitch = 3*w + ((3*w)%4?(4-((3*w)%4)):0);
+//   return &((BYTE*)hbm_DIBdata)[y*pitch + 3*x];
 }
 
 
@@ -254,7 +257,7 @@ BOOL AlphaBlend(
    sr.left = 0;
    sr.right = bm_info.bmiHeader.biWidth;
    sr.top = 0;
-   sr.bottom = bm_info.bmiHeader.biHeight;
+   sr.bottom = abs(bm_info.bmiHeader.biHeight);
    RECT dr;
    GetClientRect(win_handle , &dr);
    int dx = dr.left;
@@ -262,15 +265,19 @@ BOOL AlphaBlend(
    int dw = dr.right - dr.left;
    int dh = dr.bottom - dr.top;
 
-   
+if (!draw_with_alpha) {   
    BitBlt(winDC , dx , dy , dw , dh , memDC , 0 , 0 , SRCCOPY);
-   
+}
+else {
    BLENDFUNCTION blend = {AC_SRC_OVER, 0, 255, AC_SRC_ALPHA};
-   
+
+//*   
+
    if (!AlphaBlend(winDC, dr.left, dr.top, dr.right - dr.left, dr.bottom - dr.top,  memDC, sr.left, sr.top, sr.right, sr.bottom, blend)) {
       log.Log("AlphaBlend failed. GetLastError reports %d.\n" , GetLastError());
    }
-
+//*/
+}
    GdiFlush();
 
 ///   DeleteObject(hbr);
@@ -387,6 +394,7 @@ void DIBbuffer::Test() {
          b[0] = 0xff;
          b[1] = 0xaf;
          b[2] = 0x5f;
+         b[3] = 0xff;
       }
    }
    GdiFlush();

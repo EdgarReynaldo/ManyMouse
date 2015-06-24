@@ -118,7 +118,7 @@ void DrawBitmapToDIB(const DIBbuffer& dib_buf , ALLEGRO_BITMAP* bmp) {
    }
    
    lock_success_count++;
-   log.Log("DrawBitmapToDIB() - al_lock_bitmap succeeded. success count is %d\n" , lock_success_count);
+///   log.Log("DrawBitmapToDIB() - al_lock_bitmap succeeded. success count is %d\n" , lock_success_count);
 ///   assert(0);
    
    int maxw = al_get_bitmap_width(bmp);

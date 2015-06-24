@@ -255,6 +255,12 @@ bool TransparentWindow::AddWindowCallback(WINDOW_CALLBACK cb , void* cb_data) {
 
 
 
+void TransparentWindow::UseAlphaDrawing(bool use_alpha) {
+   dib_buffer.UseAlphaDrawing(use_alpha);
+}
+
+
+
 ALLEGRO_DISPLAY* TransparentWindow::GetAllegroDisplay() {
    return display;
 }

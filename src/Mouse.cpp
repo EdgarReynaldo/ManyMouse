@@ -126,6 +126,7 @@ void Mouse::CloseOurWindow() {
 
 
 bool Mouse::CreateOurWindow(ALLEGRO_BITMAP* mouse_image) {
+   transparent_window.UseAlphaDrawing(true);
    ready = transparent_window.CreateTheWindow(mouse_image);
    return ready;
 }
@@ -139,6 +140,7 @@ void Mouse::SetHandle(HANDLE hDevice) {
 
 
 bool Mouse::SetImage(ALLEGRO_BITMAP* mouse_image) {
+   transparent_window.UseAlphaDrawing(true);
    return transparent_window.SetWindowImage(mouse_image);
 }
 
