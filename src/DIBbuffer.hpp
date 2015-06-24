@@ -44,7 +44,8 @@ public :
 
    HDC GetBufferDC() {return memDC;}
    
-   void ClearToColor(COLORREF c);
+   void ClearToColor(COLORREF);
+   void ClearToColor(int red , int green , int blue , int alpha);
 
    void FillAreaRect(float fx , float fy , float fw , float fh , COLORREF c);
 

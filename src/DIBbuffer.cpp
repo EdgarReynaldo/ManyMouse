@@ -263,7 +263,7 @@ BOOL AlphaBlend(
    int dh = dr.bottom - dr.top;
 
    
-//   BitBlt(winDC , dx , dy , dw , dh , memDC , 0 , 0 , SRCCOPY);
+   BitBlt(winDC , dx , dy , dw , dh , memDC , 0 , 0 , SRCCOPY);
    
    BLENDFUNCTION blend = {AC_SRC_OVER, 0, 255, AC_SRC_ALPHA};
    
@@ -280,14 +280,48 @@ BOOL AlphaBlend(
 //-lmsimg32
 //-lwin32k
 
+//*
 void DIBbuffer::ClearToColor(COLORREF c) {
+   
+   if (!ready) {return;}
+   
+   HBRUSH hbr = CreateSolidBrush(c);
+   if (!hbr) {return;}
+   
+
+   RECT r;
+   GetClientRect(win_handle , &r);
+
+   
+   FillRect(memDC , &r , hbr);
+   
+   DeleteObject(hbr);
+}
+//*/
+
+
+
+void DIBbuffer::ClearToColor(int red , int green , int blue , int alpha) {
    
    if (!ready) {
       log.Log("DIBbuffer::ClearToColor - not ready.\n");
       return;
    }
    
+   int color = (((alpha & 0xff) << 24) |
+               ((red & 0xff) << 16) |
+               ((green & 0xff) << 8) |
+               ((blue & 0xff) << 0));
    
+   int pitch = bm_info.bmiHeader.biWidth;
+   int* dat = (int*)hbm_DIBdata;
+   /// data is ARGB
+   for (int y = 0 ; y < bm_info.bmiHeader.biHeight ; ++y) {
+      for (int x = 0 ; x < bm_info.bmiHeader.biWidth ; ++x) {
+         dat[x] = color;
+      }
+      dat += pitch;
+   }
    
 /*
    if (!ready) {return;}

@@ -162,7 +162,7 @@ bool TransparentWindow::CreateTheWindow(ALLEGRO_BITMAP* img , COLORREF transpare
       return false;
    }
    
-   dib_buffer.ClearToColor(RGB(0,255,255));//trans_color);
+   dib_buffer.ClearToColor(127,127,127,127);//trans_color);
    
    
    al_set_target_bitmap(image);

@@ -200,7 +200,7 @@ void RawInputHandler::DrawHandlerToDIB() {
 
    ALLEGRO_LOCKED_REGION* alr = al_lock_bitmap(allegro_buffer , ALLEGRO_PIXEL_FORMAT_ARGB_8888 , ALLEGRO_LOCK_READONLY);
    if (!alr) {
-      log.Log("Failed to lock bitmap %p in DrawHandlerToDIB.\n" , allegro_buffer);
+      log.Log("RawInputHandler::DrawHandlerToDIB - Failed to lock bitmap %p.\n" , allegro_buffer);
       return;
    }
    
@@ -221,7 +221,7 @@ void RawInputHandler::DrawHandlerToDIB() {
          unsigned char b = (unsigned char)(((*pdata) & 0x000000ff) >> 0);
          COLORREF rgb = RGB(r , g , b);
          if (rgb != SetPixel(dib_buffer.GetBufferDC() , x , y , rgb)) {
-            log.Log("Mouse::DrawMouseToDIB - Failed to set exact color value with SetPixel\n");
+            log.Log("RawInputHandler::DrawHandlerToDIB - Failed to set exact color value with SetPixel\n");
          }
 ///         prev = rgb;
 ///         dib_buffer.SetXYRGB(x , y , pdata[1] , pdata[2] , pdata[3]);
@@ -347,7 +347,7 @@ BOOL WINAPI SetWindowPos(
 
    BringWindowToTop(winhandle);
    
-   COLORREF trans_color = RGB(255,255,255);
+   COLORREF trans_color = RGB(127,127,127);
    
    if (0 == SetWindowLong(winhandle , GWL_EXSTYLE , WS_EX_LAYERED)) {
       log.Log("Couldn't set WS_EX_LAYERED style attribute\n");
@@ -361,6 +361,7 @@ BOOL WINAPI SetWindowPos(
       log.Log("Failed to create DIB buffer for RawInputHandler.\n");
    }
    
+///   dib_buffer.ClearToColor(trans_color);
    dib_buffer.ClearToColor(trans_color);
 
 
