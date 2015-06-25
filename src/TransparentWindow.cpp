@@ -200,7 +200,7 @@ void TransparentWindow::PaintTheWindow() {
    }
    else {
       DrawImageToDIB();
-      DrawBufferToWindowDC();
+      dib_buffer.DrawBufferToWindowDC();
 //      QueuePaintMessage();
    }
 }
