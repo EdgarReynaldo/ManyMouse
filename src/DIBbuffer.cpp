@@ -213,7 +213,7 @@ void DIBbuffer::DrawBufferToWindowDC() {
       log.Log("DIBbuffer::DrawBufferToWindowDC - not ready.\n");
       return;
    }
-/*   
+//**   
    // if ready, everything is set up, and our DIB is already selected into the memory DC
    
    RECT clrect;
@@ -227,7 +227,7 @@ void DIBbuffer::DrawBufferToWindowDC() {
 
    BitBlt(winDC , dx , dy , dw , dh , memDC , 0 , 0 , SRCCOPY);
    GdiFlush();
-*/
+//*/
 
 //   BLENDFUNCTION blend = {AC_SRC_OVER, 0, 127, 0};
    
@@ -314,6 +314,8 @@ BOOL WINAPI UpdateLayeredWindow(
 );
 */
 
+
+/**
    HDC screenDC = GetDC(NULL);
    
 
@@ -339,6 +341,7 @@ BOOL WINAPI UpdateLayeredWindow(
 
    ReleaseDC(NULL , screenDC);
 //   ReleaseDC(winhdc);
+//*/
 
 //}
 

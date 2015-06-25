@@ -152,6 +152,7 @@ void DrawBitmapToDIB(const DIBbuffer& dib_buf , ALLEGRO_BITMAP* bmp) {
 //*
       for (int x = 0 ; x < 4*maxw ; x += 4) {
          int bmpdata = *(int*)&pdata[x];
+///         if (
 ///         log.Log(" 0x%x",bmpdata);
          *(int*)&dib_data[x] = bmpdata;/// | 0x0000ff00;
 ///         *(int*)&dib_data[x] = bmpdata;/// | 0xff0000ff;

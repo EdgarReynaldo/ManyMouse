@@ -111,31 +111,33 @@ ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active) {
 ///   return userbmp;
 }
 
-ALLEGRO_BITMAP* DrawMouseImage(bool activee){
-    ALLEGRO_BITMAP* cursor1 = 0;
-    ALLEGRO_BITMAP* circle = 0;
-    cursor1 = al_load_bitmap("Images/NormalCursor1.png");
-    if (!cursor1) {
-          log.Log("Failed to load cursor bitmap.\n");
-          return 0;
-       }
-    circle = al_create_bitmap(32,32);
-    if(!circle){
-        al_destroy_bitmap(cursor1);
-        return 0;
-    }
-    al_set_target_bitmap(circle);
-    al_clear_to_color(al_map_rgba(127,0,0,.5));
-    al_set_blender(ALLEGRO_ADD,ALLEGRO_ONE,ALLEGRO_INVERSE_ALPHA);
-    ALLEGRO_COLOR color = al_map_rgba(0,0,0,.5);
-    if(activee){
-        color = al_map_rgba(0,0,127,63);
-    }
-    al_draw_filled_circle(16,16,8,color);
-    al_set_blender(ALLEGRO_ADD,ALLEGRO_ALPHA,ALLEGRO_ZERO);
-    al_draw_bitmap(cursor1,0,0,0);
-    al_destroy_bitmap(cursor1);
-    return circle;
+ALLEGRO_BITMAP* DrawMouseImage(bool active){
+   
+   ALLEGRO_BITMAP* cursor1 = 0;
+   ALLEGRO_BITMAP* circle = 0;
+   cursor1 = al_load_bitmap("Images/NormalCursor1.png");
+   if (!cursor1) {
+      log.Log("Failed to load cursor bitmap.\n");
+      return 0;
+   }
+   circle = al_create_bitmap(32,32);
+   if(!circle){
+      al_destroy_bitmap(cursor1);
+      return 0;
+   }
+   al_set_target_bitmap(circle);
+   al_clear_to_color(al_map_rgba(0 , 1.0*0.5 , 0 , 0.5));
+   al_set_blender(ALLEGRO_ADD , ALLEGRO_ONE , ALLEGRO_ZERO);
+   float a = 0.5;
+   ALLEGRO_COLOR color = al_map_rgba_f(1.0*a , 0 , 0 , a);
+   if(active){
+      color = al_map_rgba_f(0 , 0 , 1.0*a , a);
+   }
+   al_draw_filled_circle(16,16,8,color);
+   al_set_blender(ALLEGRO_ADD , ALLEGRO_ONE , ALLEGRO_INVERSE_ALPHA);
+   al_draw_bitmap(cursor1,0,0,0);
+   al_destroy_bitmap(cursor1);
+   return circle;
 }
 
 
