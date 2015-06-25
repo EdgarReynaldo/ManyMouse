@@ -18,7 +18,7 @@ bool lograwinput = false;
 bool WindowProcCallback(ALLEGRO_DISPLAY *display, UINT message, WPARAM wparam, LPARAM lparam, LRESULT *result, void *userdata) {
 
    static int init = 0;
-   
+
    if (!init) {
       printf("Thread ID of callback process is 0x%08lx\n" , GetCurrentThreadId());
       RegisterThread("WindowProcCallback thread" , GetCurrentThreadId());
@@ -27,10 +27,10 @@ bool WindowProcCallback(ALLEGRO_DISPLAY *display, UINT message, WPARAM wparam, L
 
    (void)display;
 
-//   log.Log("WindowProcCallback received message %u\n" , message); 
+//   log.Log("WindowProcCallback received message %u\n" , message);
 
    RawInputHandler* handler = (RawInputHandler*)userdata;
-   
+
    if (!handler) {
       log.Log("Failed to get RawInputHandler*\n");
       return false;
@@ -50,10 +50,10 @@ void RawInputDevice::SetDeviceHandle(HANDLE hdev) {
    hdevice = hdev;
    GetDeviceInfo();
 }
-   
+
 void RawInputDevice::GetDeviceInfo() {
    error = false;
-/*      
+/*
 UINT WINAPI GetRawInputDeviceInfo(
 _In_opt_    HANDLE hDevice,
 _In_        UINT   uiCommand,
@@ -65,30 +65,30 @@ UINT WINAPI GetRawInputDeviceInfo(HANDLE hDevice , UINT uiCommand , LPVOID pData
 
    /// Get device info
    UINT size = sizeof(RID_DEVICE_INFO);
-   
+
    memset(&rid_info , -1 , size);
-   
+
    int bytecount = -1;
-   
+
    bytecount = GetRawInputDeviceInfo(hdevice , RIDI_DEVICEINFO , &rid_info , &size);
-   
+
    if (bytecount < 1) {
       error = true;
    }
-   
+
    /// Get device name
    dev_name = "";
-   
+
    int charcount = -1;
    String s;
    UINT rsize = -1;
    TCHAR* buf = (TCHAR*)0;
-   
-   
+
+
 //UINT WINAPI GetRawInputDeviceInfo(HANDLE hDevice , UINT uiCommand , LPVOID pData , PUINT pcbSize);
 // When pData is NULL, the return value is zero
    charcount = GetRawInputDeviceInfo(hdevice , RIDI_DEVICENAME , 0 , &rsize);
-   
+
    if (charcount != 0) {
       error = true;
    }
@@ -103,7 +103,7 @@ UINT WINAPI GetRawInputDeviceInfo(HANDLE hDevice , UINT uiCommand , LPVOID pData
          charcount = GetRawInputDeviceInfo(hdevice , RIDI_DEVICENAME , buf , &size);
          if (charcount < 1 || size != rsize) {
             error = true;
-            
+
          }
          else {
             s = buf;
@@ -111,8 +111,8 @@ UINT WINAPI GetRawInputDeviceInfo(HANDLE hDevice , UINT uiCommand , LPVOID pData
          }
          free(buf);
       }
-      
-      
+
+
    }
 }
 
@@ -152,9 +152,9 @@ void RawInputDevice::PrintDeviceInfo() {
    } RID_DEVICE_INFO_HID, *PRID_DEVICE_INFO_HID;
    */
 
-   
+
    log.Log("Device name = (%s)\n" , dev_name.c_str());
-   
+
    switch(rid_info.dwType) {
    case RIM_TYPEKEYBOARD :
       log.Log("Keyboard type = %lu\n" , rid_info.keyboard.dwType);
@@ -190,7 +190,7 @@ void RawInputDevice::PrintDeviceInfo() {
 
 
 void RawInputHandler::DrawHandlerToDIB() {
-   
+
    if (!allegro_buffer) {
       log.Log("DrawMouseToDIB() : allegro_buffer is NULL\n");
       return;
@@ -203,12 +203,12 @@ void RawInputHandler::DrawHandlerToDIB() {
       log.Log("RawInputHandler::DrawHandlerToDIB - Failed to lock bitmap %p.\n" , allegro_buffer);
       return;
    }
-   
+
    int maxw = al_get_bitmap_width(allegro_buffer)>tww?tww:al_get_bitmap_width(allegro_buffer);
    int maxh = al_get_bitmap_height(allegro_buffer)>twh?twh:al_get_bitmap_height(allegro_buffer);
-   
+
 ///   dib_buffer.ClearToColor(RGB(255,255,255));
-   
+
    for (int y = 0 ; y < maxh ; ++y) {
       for (int x = 0 ; x < maxw ; ++x) {
          unsigned int* pdata = (unsigned int*)&((const char*)alr->data)[y*alr->pitch + 4*x];
@@ -227,7 +227,7 @@ void RawInputHandler::DrawHandlerToDIB() {
 ///         dib_buffer.SetXYRGB(x , y , pdata[1] , pdata[2] , pdata[3]);
       }
    }
-   
+
    al_unlock_bitmap(allegro_buffer);
 
    dib_buffer.Flush();
@@ -241,39 +241,39 @@ int RawInputHandler::SetupWindows() {
    log.Log("log.InitMutex() returned %s\n" , mtx?"true":"false");
 
 //   if (!al_install_timer()) {return 2;}
-   
-   
-   
+
+
+
 
    /// Setup transparent overlay window for getting raw input
-   
+
    // The window dimensions for when we are not fullscreen
    tww = 640;
    twh = 400;
-   
+
 ///   al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
    al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
-   
+
    display = al_create_display(tww,twh);
-   
+
    if (!display) {return 3;}
-   
+
    int ww = al_get_display_width(display);
    int wh = al_get_display_height(display);
 
    allegro_buffer = al_create_bitmap(ww , wh);
-   
+
    if (!allegro_buffer) {return 4;}
 
    al_set_target_bitmap(allegro_buffer);
    al_clear_to_color(al_map_rgb(255,255,255));
-   
+
 ///   al_clear_to_color(al_map_rgba(255,255,255,0));
 ///   al_draw_filled_rectangle(320,0,640,400 , al_map_rgba(0,255,0,255));
 
 ///   al_set_target_backbuffer(display);
 ///   al_clear_to_color(al_map_rgb(255,255,255));
-   
+
 ///   al_flip_display();
 
 
@@ -283,9 +283,9 @@ int RawInputHandler::SetupWindows() {
 
    al_set_new_display_flags(ALLEGRO_WINDOWED);
 ///   al_set_new_display_flags(ALLEGRO_WINDOWED | ALLEGRO_OPENGL);
-   
+
    log_display = al_create_display(lww , lwh);
-   
+
    if (!log_display) {return 5;}
 
    al_set_target_backbuffer(log_display);
@@ -295,23 +295,23 @@ int RawInputHandler::SetupWindows() {
 
    timer = al_create_timer(1.0/60.0);
    if (!timer) {return 6;}
-   
+
    queue = al_create_event_queue();
-   
+
    if (!queue) {return 7;}
-   
+
    al_register_event_source(queue , al_get_display_event_source(display));
    al_register_event_source(queue , al_get_display_event_source(log_display));
    al_register_event_source(queue , al_get_keyboard_event_source());
    al_register_event_source(queue , al_get_mouse_event_source());
    al_register_event_source(queue , al_get_timer_event_source(timer));
-   
+
    mutex = al_create_mutex();
-   
+
    if (!mutex) {return 8;}
-   
+
    font = al_load_ttf_font("verdana.ttf" , -12 , ALLEGRO_TTF_MONOCHROME);
-   
+
    if (!font) {return 9;}
 
 
@@ -321,15 +321,15 @@ int RawInputHandler::SetupWindows() {
 
 //HWND al_get_win_window_handle(ALLEGRO_DISPLAY *display)
    winhandle = al_get_win_window_handle(display);
-   
+
    window_handler.SetOurWindows(winhandle , al_get_win_window_handle(log_display) , 0);
-   
+
 /*
 al_win_add_window_callback
 
 bool al_win_add_window_callback(ALLEGRO_DISPLAY *display,
    bool (*callback)(ALLEGRO_DISPLAY *display, UINT message, WPARAM wparam,
-   LPARAM lparam, LRESULT *result, void *userdata), void *userdata)   
+   LPARAM lparam, LRESULT *result, void *userdata), void *userdata)
 */
 /*
 BOOL WINAPI SetWindowPos(
@@ -346,9 +346,9 @@ BOOL WINAPI SetWindowPos(
    SetWindowPos(winhandle , HWND_TOPMOST , 0 , 0 , -1 , -1 , SWP_NOMOVE | SWP_NOSIZE);
 
    BringWindowToTop(winhandle);
-   
+
    COLORREF trans_color = RGB(127,127,127);
-   
+
    if (0 == SetWindowLong(winhandle , GWL_EXSTYLE , WS_EX_LAYERED)) {
       log.Log("Couldn't set WS_EX_LAYERED style attribute\n");
    }
@@ -360,16 +360,17 @@ BOOL WINAPI SetWindowPos(
    if (!dib_buffer.Create(winhandle)) {
       log.Log("Failed to create DIB buffer for RawInputHandler.\n");
    }
-   
+
 ///   dib_buffer.ClearToColor(trans_color);
    dib_buffer.ClearToColor(trans_color);
+
 
 
 /*
    if (0 == SetWindowLong(handle , GWL_EXSTYLE , WS_EX_LAYERED)) {
       log.Log("Couldn't set WS_EX_LAYERED style attribute\n");
    }
-*/   
+*/
    al_win_add_window_callback(display , WindowProcCallback , this);
 
    return 0;
@@ -380,7 +381,7 @@ BOOL WINAPI SetWindowPos(
 void RawInputHandler::CloseWindows() {
    // mutex , queue , timer , display
    mouse_controller.FreeMouseImages();
-   
+
    if (mutex) {
       al_destroy_mutex(mutex);
       mutex = 0;
@@ -393,22 +394,22 @@ void RawInputHandler::CloseWindows() {
       al_destroy_timer(timer);
       timer = 0;
    }
-   
+
    if (log_display) {
       al_destroy_display(log_display);
       log_display = 0;
    }
-   
+
    if (allegro_buffer) {
       al_destroy_bitmap(allegro_buffer);
       allegro_buffer = 0;
    }
-   
+
    if (display) {
       al_destroy_display(display);
       display = 0;
    }
-   
+
    window_handler.SetOurWindows(0 , 0 , 0);
 }
 
@@ -424,11 +425,11 @@ void RawInputHandler::InputLoop() {
 
    al_start_timer(timer);
    while (!quit) {
-      
+
       string infostr;
-      
+
       if (redraw) {
-         
+
 //**
          al_set_target_backbuffer(log_display);
 ///         al_set_target_bitmap(allegro_buffer);
@@ -465,41 +466,41 @@ void RawInputHandler::InputLoop() {
                           "Type = '%s'" , winfo.window_type.c_str());
             y += 16;
          }
-         
+
          log.DrawLog(font , al_map_rgb(254,254,254) , 10 , 300);
-         
+
 ///         DrawHandlerToDIB();
 
 //         QueuePaintMessage();
-         
-         
+
+
          al_flip_display();
-         
+
          mouse_controller.Draw();
-//*/         
+//*/
       }
-      
+
       do {
          ALLEGRO_EVENT ev;
          al_wait_for_event(queue , &ev);
-         
+
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
             quit = true;
             break;
-         }  
+         }
          if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
             quit = true;
             break;
          }
-         
+
          if (ev.type == ALLEGRO_EVENT_TIMER) {
             redraw = true;
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_G) {
             mouse_controller.ToggleMiceEnabled();
             printf("Mice image toggled.\n");
-         }  
-         
+         }
+
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_R) {
             swallow_mouse = !swallow_mouse;
             RegisterDevices(swallow_mouse);
@@ -524,8 +525,23 @@ void RawInputHandler::InputLoop() {
             system("cls");
             log.Clear();
          }
+         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_O) {
+            swallow_mouse = !swallow_mouse;
+            if(swallow_mouse){
+                RECT R;
+                R.left = 0;
+                R.top = 0;
+                R.right = 1;
+                R.bottom = 1;
+                ClipCursor(&R);
+            }
+            else{
+                ClipCursor(NULL);
+            }
+
+         }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_F) {
-            /*      
+            /*
             typedef struct {
               UINT  cbSize;
               HWND  hwnd;
@@ -540,40 +556,40 @@ void RawInputHandler::InputLoop() {
             flash_info.dwFlags = FLASHW_ALL;
             flash_info.uCount = 3;
             flash_info.dwTimeout = 500;
-            
+
             FlashWindowEx(&flash_info);
          }
-/*         
+/*
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_P) {
             window_handler.PrintWindows();
-         }  
+         }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_A) {
             window_handler.FindAllWindowsZOrder();
             window_handler.PrintAllWindows();
-         }  
-*/         
+         }
+*/
       } while (!al_is_event_queue_empty(queue));
-      
-      
+
+
    }
-   
+
 ///   BlockInput(false);
-   
+
 }
 
 
 
 void RawInputHandler::FreeRawInfo() {
    // Does not handle display
-   
+
    dev_info_map.clear();
-   
+
    device_count = 0;
-   
+
    mice.clear();
    keyboards.clear();
    hids.clear();
-   
+
    rids.clear();
 
 }
@@ -586,9 +602,9 @@ bool RawInputHandler::InitRawInfo() {
    bool success = true;
 
    FreeRawInfo();
-   
+
    SetupDefaultDevices(false);
-   
+
    // Setup RawInputDevice
 /*
 typedef struct tagRAWINPUTDEVICE {
@@ -597,23 +613,23 @@ USHORT usUsage;
 DWORD  dwFlags;
 HWND   hwndTarget;
 } RAWINPUTDEVICE, *PRAWINPUTDEVICE, *LPRAWINPUTDEVICE;
-*/      
+*/
 
    // Get size
    GetRawInputDeviceList(NULL , &device_count , sizeof(RAWINPUTDEVICELIST));
-   
+
    log.Log("Num raw input devices detected = %u\n" , device_count);
 
    const UINT FAIL = UINT(-1);
-   
+
    RAWINPUTDEVICELIST init;
    init.hDevice = (HANDLE)-1;
    init.dwType = -1;
-   
+
    vector<RAWINPUTDEVICELIST> ridlist(device_count , init);
-   
+
    UINT result = GetRawInputDeviceList(&ridlist[0] , &device_count , sizeof(RAWINPUTDEVICELIST));
-   
+
    if (FAIL == result) {
       log.Log("GetRawInputDeviceList failed.\n");
       log.Log("GetLastError reported error %lu. (ERROR_INSUFFICENT_BUFFER = %ld)\n" , GetLastError() , ERROR_INSUFFICIENT_BUFFER);
@@ -628,17 +644,17 @@ HWND   hwndTarget;
    TCHAR* buf = 0;
    UINT rsize = 0;
    UINT size = 0;
-   
-   
-   
-   
+
+
+
+
    for (UINT i = 0 ; i < device_count ; ++i) {
       RAWINPUTDEVICELIST r = ridlist[i];
       RID_DEVICE_INFO* info = &ridinfo[i];
       std::string* namestr = &ridnames[i];
-      
+
       log.Log("Checking device %u\n" , i);
-      
+
       if (GetRawInputDeviceInfo(r.hDevice, RIDI_DEVICENAME, 0 , &rsize) != 0) {// get size of data in rsize
          // error
          log.Log("Error, could not retrieve necessary size for RIDI_DEVICENAME buffer.\n");
@@ -646,7 +662,7 @@ HWND   hwndTarget;
          success = false;
          continue;
       }
-      
+
       buf = (TCHAR*)realloc(buf , rsize*sizeof(TCHAR));
       if (!buf) {
          // error no memory
@@ -655,16 +671,16 @@ HWND   hwndTarget;
          continue;
       }
       memset(buf , 0 , rsize*sizeof(TCHAR));
-      
+
       /// must set size each time before calling GetRawInputDeviceInfo
       size = rsize;
-      
+
       int count = 0;
 
       count = GetRawInputDeviceInfo(r.hDevice, RIDI_DEVICENAME, buf , &size);// store data in buf
-      
+
       log.Log("Char count is %i\n" , count);
-      
+
 //      if (GetRawInputDeviceInfo(r.hDevice, RIDI_DEVICENAME, buf , &size) != rsize) // store data in buf
       if (size != rsize) {
          // error
@@ -673,17 +689,17 @@ HWND   hwndTarget;
 //         continue;
       }
       log.Log("After GRIDI #%u, buf holds (%s)\n" , i , buf);
-      
+
       *namestr = buf;
-      
+
       size = sizeof(RID_DEVICE_INFO);
       info->cbSize = sizeof(RID_DEVICE_INFO);
-//      if (GetRawInputDeviceInfo(r.hDevice, RIDI_DEVICEINFO, info, &size) != sizeof(RID_DEVICE_INFO)) 
+//      if (GetRawInputDeviceInfo(r.hDevice, RIDI_DEVICEINFO, info, &size) != sizeof(RID_DEVICE_INFO))
 
       count = GetRawInputDeviceInfo(r.hDevice, RIDI_DEVICEINFO, info, &size);
 
       log.Log("Byte count is %i , sizeof(RID_DEVICE_INFO) = %u\n" , count , sizeof(RID_DEVICE_INFO));
-      
+
       if (size != sizeof(RID_DEVICE_INFO)) {
          // error reading device info
          log.Log("Error, could not read rid device info for device %u.\n" , i);
@@ -692,7 +708,7 @@ HWND   hwndTarget;
          continue;
       }
 
-      
+
       assert(r.dwType == info->dwType);
 
       switch (info->dwType) {
@@ -706,24 +722,24 @@ HWND   hwndTarget;
          mice.push_back(r);
          mouse_info.push_back(info->mouse);
          break;
-      case RIM_TYPEHID : 
+      case RIM_TYPEHID :
          ++hid_count;
          hids.push_back(r);
          hid_info.push_back(info->hid);
          break;
-      default : 
+      default :
          log.Log("Unknown device type for device # %u\n" , i);
          break;
       };
-      
+
    }
 
    if (buf) {
       free(buf);
       buf = 0;
    }
-//*/      
-      
+//*/
+
 
    /// NEW ******************************************
    for (UINT i = 0 ; i < device_count ; ++i) {
@@ -739,10 +755,10 @@ HWND   hwndTarget;
 
       dev_info_map[r.hDevice] = rid;
    }
-   
+
 ///   PrintDeviceInfo();
-   
-   
+
+
    return success;
 
 }
@@ -763,9 +779,9 @@ void RawInputHandler::PrintDeviceInfo() {
 
 
 void RawInputHandler::SetupDefaultDevices(bool swallow_mouse) {
-   
+
    rids.clear();
-   
+
    RAWINPUTDEVICE default_devices[2];
 
    int flags = RIDEV_INPUTSINK;
@@ -776,9 +792,9 @@ void RawInputHandler::SetupDefaultDevices(bool swallow_mouse) {
    // adds HID mouse and also ignores legacy mouse messages
    default_devices[0].usUsagePage = 0x01; // generic desktop controls
    default_devices[0].usUsage = 0x02; // mouse
-//      default_devices[0].dwFlags = RIDEV_NOLEGACY;   
-///   default_devices[0].dwFlags = RIDEV_INPUTSINK;   
-   default_devices[0].dwFlags = flags;   
+//      default_devices[0].dwFlags = RIDEV_NOLEGACY;
+///   default_devices[0].dwFlags = RIDEV_INPUTSINK;
+   default_devices[0].dwFlags = flags;
 //   default_devices[0].dwFlags = 0;
 ///   default_devices[0].dwFlags = RIDEV_NOLEGACY;
 /// RIDEV_INPUTSINK doesn't work for some reason, registration fails
@@ -802,7 +818,7 @@ void RawInputHandler::SetupDefaultDevices(bool swallow_mouse) {
 */
    rids.push_back(default_devices[0]);
 ///   rids.push_back(default_devices[1]);
-   
+
 }
 
 
@@ -817,7 +833,7 @@ void RawInputHandler::UnRegisterDevices() {
       bool ret = false;
 
       ret = RegisterRawInputDevices(&nrids[0] , rids.size() , sizeof(RAWINPUTDEVICE));
-      
+
       if (!ret) {
          log.Log("Failed to unregister devices. GetLastError reports error %i.\n" , GetLastError());
       }
@@ -832,27 +848,27 @@ bool RawInputHandler::RegisterDevices(bool swallow_mouse) {
    SetupDefaultDevices(swallow_mouse);
 
 //   bool success = true;
-/*   
+/*
 BOOL WINAPI RegisterRawInputDevices(
   _In_ PCRAWINPUTDEVICE pRawInputDevices,
   _In_ UINT             uiNumDevices,
   _In_ UINT             cbSize
 );
 */
-   
+
    UnRegisterDevices();
-   
+
    bool ret = false;
 
    ret = RegisterRawInputDevices(&rids[0] , rids.size() , sizeof(RAWINPUTDEVICE));
-   
+
    if (!ret) {
       log.Log("Register Raw Input Devices unsuccessful. GetLastError reports %lu.\n" , GetLastError());
    }
    else {
       registered = true;
    }
-   
+
    return ret;
 }
 
@@ -870,9 +886,9 @@ void RawInputHandler::QueuePaintMessage() {
 
 
 bool RawInputHandler::HandleWindowMessage(UINT message , WPARAM wparam , LPARAM lparam , LRESULT* result) {
-   
+
    (void)result;// unused for now
-   
+
    /**
       /// Only on Vista or higher, would have to change _WIN32_WINNT to 0x0600
       if (message == WM_INPUT_DEVICE_CHANGE) {
@@ -880,50 +896,50 @@ bool RawInputHandler::HandleWindowMessage(UINT message , WPARAM wparam , LPARAM 
          return true;
       }
    */
-   
+
    // return true to consume event, false to let allegro handle it as well
-   
+
    bool ret = false;// false indicates we didn't handle this message
-   
+
 
    /// We never get WM_CREATE because the callback is registered after the window is created
 
    PAINTSTRUCT ps;
    if (message == WM_PAINT) {
       BeginPaint(winhandle , &ps);
-      
+
       dib_buffer.DrawBufferToWindowDC();
-      
+
       EndPaint(winhandle , &ps);
-      
+
       return true;
    }
 
    if (message == WM_INPUT) {
       ret = true;// we handle all WM_INPUT messages
-      
+
 ///      printf("WM_INPUT received. ");
-      
+
       UINT rsize = 0;
       UINT size = 0;
-      
+
       UINT count = GetRawInputData((HRAWINPUT)lparam , RID_INPUT , NULL , &rsize , sizeof(RAWINPUTHEADER));
-      
+
       if (count != 0) {
          log.Log("Failed to get size of data from GetRawInputData.\n");
       }
       else {// GetRawInputData returned 0, success reading size
-         
+
 ///      void* rawmem = malloc(4*(rsize/4 + 1));// some people experienced alignment issues
-         void* rawmem = malloc(rsize);// 
-         
+         void* rawmem = malloc(rsize);//
+
          if (!rawmem) {
             log.Log("Ran out of memory.\n");
          }
          else {
             memset(rawmem , 0 , rsize);
             size = rsize;
-            
+
             count = GetRawInputData((HRAWINPUT)lparam , RID_INPUT , rawmem , &size , sizeof(RAWINPUTHEADER));
             if (count != rsize) {
                log.Log("Failed to retrieve RAWINPUT data from GetRawIputData. return value = %u\n" , count);
@@ -933,7 +949,7 @@ bool RawInputHandler::HandleWindowMessage(UINT message , WPARAM wparam , LPARAM 
             RAWMOUSE* rms = 0;
             RAWKEYBOARD* rkb = 0;
             RAWHID* rhid = 0;
-            
+
             if (lograwinput) {
                switch(raw->header.dwType) {
                case RIM_TYPEKEYBOARD :
@@ -958,24 +974,24 @@ bool RawInputHandler::HandleWindowMessage(UINT message , WPARAM wparam , LPARAM 
             }
             HandleRawInput(*raw);
          }
-         
+
          if (rawmem) {
             free(rawmem);
             rawmem = 0;
          }
-      
-         
+
+
       }
-      
+
       /// In the case of WM_INPUT, we need to let windows see the message too
       DefWindowProc(winhandle , message , wparam , lparam);
-      
+
    }// end if (message == WM_INPUT)
-   
+
    return ret;
-   
+
 }
-/*         
+/*
 typedef struct tagRAWINPUT {
   RAWINPUTHEADER header;
   union {
@@ -1051,11 +1067,11 @@ void RawInputHandler::PrintRawHeader(RAWINPUTHEADER hdr) {
       typestr = "Unknown";
       break;
    }
-   
+
    log.Log("%s input RAWHDR : hDevice = 0x%08x , wParam = %d , dwType = %s , dwSize = %lu\n" ,
            typestr , (UINT)(hdr.hDevice) , hdr.wParam , typestr , hdr.dwSize);
 }
-   
+
 void RawInputHandler::PrintRawMouse(RAWINPUTHEADER hdr , RAWMOUSE* rms) {
    PrintRawHeader(hdr);
 /*
@@ -1076,12 +1092,12 @@ typedef struct tagRAWMOUSE {
 } RAWMOUSE, *PRAWMOUSE, *LPRAWMOUSE;
 
 */
-   
+
    log.Log("usFlags = %hu , ulButtons = %u {usButtonFlags = %hu , usButtonData = %hu}\n" ,
            rms->usFlags , rms->ulButtons , rms->usButtonFlags , rms->usButtonData);
-   log.Log("ulRawButtons = %u , lLastX = %li , lLastY = %li , ulExtraInformation = %lu\n" , 
+   log.Log("ulRawButtons = %u , lLastX = %li , lLastY = %li , ulExtraInformation = %lu\n" ,
            rms->ulRawButtons , rms->lLastX , rms->lLastY , rms->ulExtraInformation);
-   
+
 }
 void RawInputHandler::PrintRawKeyboard(RAWINPUTHEADER hdr , RAWKEYBOARD* rkb) {
    PrintRawHeader(hdr);
@@ -1097,7 +1113,7 @@ typedef struct tagRAWKEYBOARD {
 } RAWKEYBOARD, *PRAWKEYBOARD, *LPRAWKEYBOARD;
 
 */
-   log.Log("MakeCode = %hu , Flags = %hu , Reserved = %hu\n" , 
+   log.Log("MakeCode = %hu , Flags = %hu , Reserved = %hu\n" ,
            rkb->MakeCode , rkb->Flags , rkb->Reserved);
    log.Log("VKey = %hu , Message = %u , ExtraInformation = %lu",
            rkb->VKey , rkb->Message , rkb->ExtraInformation);
@@ -1120,7 +1136,7 @@ typedef struct tagRAWHID {
 void RawInputHandler::HandleRawInput(RAWINPUT rinput) {
 
    HANDLE hdev = rinput.header.hDevice;
-   
+
    /** TODO
       hdr.hDevice may be NULL, which means it is data inserted by SendInput
       In the future, try to do something useful with it.
@@ -1132,7 +1148,7 @@ void RawInputHandler::HandleRawInput(RAWINPUT rinput) {
       log.Log("Ignoring input from SendInput.\n");
       return;
    }
-   
+
    map<HANDLE , RawInputDevice>::iterator it = dev_info_map.find(hdev);
    if (it == dev_info_map.end()) {
       RawInputDevice rid;
@@ -1184,32 +1200,32 @@ usFlags
     MOUSE_ATTRIBUTES_CHANGED
     0x04
 
-    	
+
 
     Mouse attributes changed; application needs to query the mouse attributes.
 
     MOUSE_MOVE_RELATIVE
     0
 
-    	
+
 
     Mouse movement data is relative to the last mouse position.
 
     MOUSE_MOVE_ABSOLUTE
     1
 
-    	
+
 
     Mouse movement data is based on absolute position.
 
     MOUSE_VIRTUAL_DESKTOP
     0x02
 
-    	
+
 
     Mouse coordinates are mapped to the virtual desktop (for a multiple monitor system).
 
-     
+
 ulButtons
 
     Type: ULONG
@@ -1225,123 +1241,123 @@ usButtonFlags
     RI_MOUSE_LEFT_BUTTON_DOWN
     0x0001
 
-    	
+
 
     Left button changed to down.
 
     RI_MOUSE_LEFT_BUTTON_UP
     0x0002
 
-    	
+
 
     Left button changed to up.
 
     RI_MOUSE_MIDDLE_BUTTON_DOWN
     0x0010
 
-    	
+
 
     Middle button changed to down.
 
     RI_MOUSE_MIDDLE_BUTTON_UP
     0x0020
 
-    	
+
 
     Middle button changed to up.
 
     RI_MOUSE_RIGHT_BUTTON_DOWN
     0x0004
 
-    	
+
 
     Right button changed to down.
 
     RI_MOUSE_RIGHT_BUTTON_UP
     0x0008
 
-    	
+
 
     Right button changed to up.
 
     RI_MOUSE_BUTTON_1_DOWN
     0x0001
 
-    	
+
 
     RI_MOUSE_LEFT_BUTTON_DOWN
 
     RI_MOUSE_BUTTON_1_UP
     0x0002
 
-    	
+
 
     RI_MOUSE_LEFT_BUTTON_UP
 
     RI_MOUSE_BUTTON_2_DOWN
     0x0004
 
-    	
+
 
     RI_MOUSE_RIGHT_BUTTON_DOWN
 
     RI_MOUSE_BUTTON_2_UP
     0x0008
 
-    	
+
 
     RI_MOUSE_RIGHT_BUTTON_UP
 
     RI_MOUSE_BUTTON_3_DOWN
     0x0010
 
-    	
+
 
     RI_MOUSE_MIDDLE_BUTTON_DOWN
 
     RI_MOUSE_BUTTON_3_UP
     0x0020
 
-    	
+
 
     RI_MOUSE_MIDDLE_BUTTON_UP
 
     RI_MOUSE_BUTTON_4_DOWN
     0x0040
 
-    	
+
 
     XBUTTON1 changed to down.
 
     RI_MOUSE_BUTTON_4_UP
     0x0080
 
-    	
+
 
     XBUTTON1 changed to up.
 
     RI_MOUSE_BUTTON_5_DOWN
     0x100
 
-    	
+
 
     XBUTTON2 changed to down.
 
     RI_MOUSE_BUTTON_5_UP
     0x0200
 
-    	
+
 
     XBUTTON2 changed to up.
 
     RI_MOUSE_WHEEL
     0x0400
 
-    	
+
 
     Raw input comes from a mouse wheel. The wheel delta is stored in usButtonData.
 
-     
+
 usButtonData
 
     Type: USHORT

@@ -78,7 +78,34 @@ ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active) {
    }
    al_draw_filled_rectangle(0,0,w,h , outline_color);
    al_draw_filled_rectangle(5,5,w-5,h-5 , bg_color);
-///   al_draw_rectangle(0.5 , 0.5 , w -0.5 , h - 0.5 , outline_color , 1.0);
+///   al_draw_rectangle(0.5 , 0.5 , w -0.5 , h - 0.ALLEGRO_BITMAP* DrawMouseImage(bool activee){
+    ALLEGRO_BITMAP* cursor1 = 0;
+    ALLEGRO_BITMAP* circle = 0;
+    cursor1 = al_load_bitmap("Images/NormalCursor1.png");
+    if (!cursor1) {
+          log.Log("Failed to load cursor bitmap.\n");
+          return 0;
+       }
+    circle = al_create_bitmap(32,32);
+    if(!circle){
+        al_destroy_bitmap(cursor1);
+        return 0;
+    }
+    al_clear_to_color(al_map_rgba(0,0,0,0));
+    al_set_blender(ALLEGRO_ADD,ALLEGRO_ONE,ALLEGRO_ZERO);
+    al_set_target_bitmap(circle);
+    ALLEGRO_COLOR color = al_map_rgba(127,0,0,127);
+
+    if(activee){
+        color = al_map_rgba(0,0,127,127);
+    }
+    al_draw_filled_circle(16,16,8,color);
+    al_set_blender(ALLEGRO_ADD,ALLEGRO_ALPHA,ALLEGRO_INVERSE_ALPHA);
+    al_draw_bitmap(cursor1,0,0,0);
+    al_destroy_bitmap(cursor1);
+    return circle;
+}
+5 , outline_color , 1.0);
 */
 
 ///   return userbmp;
@@ -98,14 +125,14 @@ ALLEGRO_BITMAP* DrawMouseImage(bool activee){
         return 0;
     }
     al_set_target_bitmap(circle);
-    al_clear_to_color(al_map_rgba(0,0,0,0));
-    al_set_blender(ALLEGRO_ADD,ALLEGRO_ONE,ALLEGRO_ZERO);
-    ALLEGRO_COLOR color = al_map_rgba(127,0,0,127);
+    al_clear_to_color(al_map_rgba(127,0,0,.5));
+    al_set_blender(ALLEGRO_ADD,ALLEGRO_ONE,ALLEGRO_INVERSE_ALPHA);
+    ALLEGRO_COLOR color = al_map_rgba(0,0,0,.5);
     if(activee){
-        color = al_map_rgba(0,0,127,127);
+        color = al_map_rgba(0,0,127,63);
     }
     al_draw_filled_circle(16,16,8,color);
-    al_set_blender(ALLEGRO_ADD,ALLEGRO_ALPHA,ALLEGRO_INVERSE_ALPHA);
+    al_set_blender(ALLEGRO_ADD,ALLEGRO_ALPHA,ALLEGRO_ZERO);
     al_draw_bitmap(cursor1,0,0,0);
     al_destroy_bitmap(cursor1);
     return circle;
