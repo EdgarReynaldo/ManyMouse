@@ -253,6 +253,7 @@ BOOL AlphaBlend(
   _In_  BLENDFUNCTION ftn
 );*/
 
+/**   
    RECT sr;
    sr.left = 0;
    sr.right = bm_info.bmiHeader.biWidth;
@@ -265,22 +266,81 @@ BOOL AlphaBlend(
    int dw = dr.right - dr.left;
    int dh = dr.bottom - dr.top;
 
+
 if (!draw_with_alpha) {   
    BitBlt(winDC , dx , dy , dw , dh , memDC , 0 , 0 , SRCCOPY);
 }
 else {
-   BLENDFUNCTION blend = {AC_SRC_OVER, 0, 255, AC_SRC_ALPHA};
 
-//*   
+//typedef struct _BLENDFUNCTION {
+//  BYTE BlendOp;
+//  BYTE BlendFlags;
+//  BYTE SourceConstantAlpha;
+//  BYTE AlphaFormat;
+//} BLENDFUNCTION, *PBLENDFUNCTION, *LPBLENDFUNCTION;
+
+   BLENDFUNCTION blend = {AC_SRC_OVER, 0, 64, 0};//AC_SRC_ALPHA};
+
+   blend.BlendOp = AC_SRC_OVER;
+   blend.BlendFlags = 0;
+   blend.SourceConstantAlpha = 64;
+   blend.AlphaFormat = AC_SRC_ALPHA;
+
    log.Log("Using AlphaBlend");
    if (!AlphaBlend(winDC, dr.left, dr.top, dr.right - dr.left, dr.bottom - dr.top,  memDC, sr.left, sr.top, sr.right, sr.bottom, blend)) {
       log.Log("AlphaBlend failed. GetLastError reports %d.\n" , GetLastError());
    }
-//*/
 }
    GdiFlush();
+//*/
 
 ///   DeleteObject(hbr);
+
+//{
+
+//   HDC winhdc = GetDC(window);
+   
+/*
+BOOL WINAPI UpdateLayeredWindow(
+  _In_     HWND          hwnd,
+  _In_opt_ HDC           hdcDst,
+  _In_opt_ POINT         *pptDst,
+  _In_opt_ SIZE          *psize,
+  _In_opt_ HDC           hdcSrc,
+  _In_opt_ POINT         *pptSrc,
+  _In_     COLORREF      crKey,
+  _In_opt_ BLENDFUNCTION *pblend,
+  _In_     DWORD         dwFlags
+);
+*/
+
+   HDC screenDC = GetDC(NULL);
+   
+
+   POINT pd;
+   pd.x = 0;
+   pd.y = 0;
+   POINT ps;
+   ps.x = 0;
+   ps.y = 0;
+   SIZE ssz;
+   ssz.cx = bm_info.bmiHeader.biWidth;
+   ssz.cy = abs(bm_info.bmiHeader.biHeight);
+   
+   BLENDFUNCTION blend;
+   blend.BlendOp = AC_SRC_OVER;
+   blend.BlendFlags = 0;
+   blend.SourceConstantAlpha = 255;
+   blend.AlphaFormat = AC_SRC_ALPHA;
+   
+   if (!UpdateLayeredWindow(win_handle , screenDC , &pd , &ssz , memDC , &ps , RGB(0,0,0) , &blend , ULW_ALPHA)) {
+      log.Log("Failed to update layered window. GetLastError reports %d.\n" , GetLastError());
+   }
+
+   ReleaseDC(NULL , screenDC);
+//   ReleaseDC(winhdc);
+
+//}
 
 }
 
@@ -403,13 +463,14 @@ void DIBbuffer::Test() {
 
 
 
-void DIBbuffer::SetXYRGB(int x , int y , char r , char g , char b) {
+void DIBbuffer::SetXYRGBA(int x , int y , char r , char g , char b , char a) {
    if (!ready) {return;}
-   BYTE* pb = GetDataByte(x,y);
+   int* pb = (int*)GetDataByte(x,y);
    if (!pb) {return;}
-   pb[0] = r;
-   pb[1] = g;
-   pb[2] = b;
+   
+   int color = (((int)a << 24) | ((int)r << 16) | ((int)g << 8) | (int)b);
+   *pb = color;
+   
 }
 
 

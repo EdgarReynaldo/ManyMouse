@@ -502,8 +502,8 @@ void RawInputHandler::InputLoop() {
          }
 
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_R) {
-            swallow_mouse = !swallow_mouse;
-            RegisterDevices(swallow_mouse);
+///            swallow_mouse = !swallow_mouse;
+///            RegisterDevices(swallow_mouse);
 ///            BlockInput(swallow_mouse);
 ///            ShowWindow(al_get_win_window_handle(log_display) , SW_RESTORE);
          }
