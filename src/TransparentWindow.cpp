@@ -148,12 +148,15 @@ bool TransparentWindow::CreateTheWindow(ALLEGRO_BITMAP* img , COLORREF transpare
       CloseTheWindow();
       return false;
    }
-
+/*
    if (!SetLayeredWindowAttributes(window , trans_color , 255 , LWA_COLORKEY | LWA_ALPHA)) {
       log.Log("TransparentWindow::CreateTheWindow - Could not set layered window attributes.\n");
       CloseTheWindow();
       return false;
    }
+*/
+
+
 
 
    if (!dib_buffer.Create(window)) {
@@ -197,7 +200,8 @@ void TransparentWindow::PaintTheWindow() {
    }
    else {
       DrawImageToDIB();
-      QueuePaintMessage();
+      DrawBufferToWindowDC();
+//      QueuePaintMessage();
    }
 }
 

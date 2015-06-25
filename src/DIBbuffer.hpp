@@ -57,7 +57,7 @@ public :
    
    void Test();
 
-   void SetXYRGB(int x , int y , char r , char g , char b);
+   void SetXYRGBA(int x , int y , char r , char g , char b , char a);
    
    void UseAlphaDrawing(bool use_alpha) {draw_with_alpha = use_alpha;}
    
