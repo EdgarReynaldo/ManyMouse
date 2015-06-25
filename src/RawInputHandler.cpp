@@ -266,7 +266,7 @@ int RawInputHandler::SetupWindows() {
    if (!allegro_buffer) {return 4;}
 
    al_set_target_bitmap(allegro_buffer);
-   al_clear_to_color(al_map_rgb(255,255,255));
+//   al_clear_to_color(al_map_rgb(255,255,255));
 
 ///   al_clear_to_color(al_map_rgba(255,255,255,0));
 ///   al_draw_filled_rectangle(320,0,640,400 , al_map_rgba(0,255,0,255));
@@ -347,7 +347,7 @@ BOOL WINAPI SetWindowPos(
 
    BringWindowToTop(winhandle);
 
-   COLORREF trans_color = RGB(127,127,127);
+   COLORREF trans_color = RGB(64,64,64);
 
    if (0 == SetWindowLong(winhandle , GWL_EXSTYLE , WS_EX_LAYERED)) {
       log.Log("Couldn't set WS_EX_LAYERED style attribute\n");
@@ -363,8 +363,9 @@ BOOL WINAPI SetWindowPos(
 
 ///   dib_buffer.ClearToColor(trans_color);
    dib_buffer.ClearToColor(trans_color);
+   dib_buffer.SetXYRGBA(0,0,255,255,255,255);
 
-
+    dib_buffer.DrawBufferToWindowDC();
 
 /*
    if (0 == SetWindowLong(handle , GWL_EXSTYLE , WS_EX_LAYERED)) {
