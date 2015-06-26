@@ -208,9 +208,9 @@ bool DIBbuffer::GetBitmapInfo(BITMAPINFO* pbi , HWND handle) {
 
 
 
-void DIBbuffer::DrawBufferToWindowDC() {
+void DIBbuffer::BlitBufferToWindowDC() {
    if (!ready) {
-      log.Log("DIBbuffer::DrawBufferToWindowDC - not ready.\n");
+      log.Log("DIBbuffer::BlitBufferToWindowDC - not ready.\n");
       return;
    }
 //**   
@@ -227,6 +227,8 @@ void DIBbuffer::DrawBufferToWindowDC() {
 
    BitBlt(winDC , dx , dy , dw , dh , memDC , 0 , 0 , SRCCOPY);
    GdiFlush();
+
+
 //*/
 
 //   BLENDFUNCTION blend = {AC_SRC_OVER, 0, 127, 0};
@@ -254,6 +256,7 @@ BOOL AlphaBlend(
 );*/
 
 /**   
+
    RECT sr;
    sr.left = 0;
    sr.right = bm_info.bmiHeader.biWidth;
@@ -267,11 +270,6 @@ BOOL AlphaBlend(
    int dh = dr.bottom - dr.top;
 
 
-if (!draw_with_alpha) {   
-   BitBlt(winDC , dx , dy , dw , dh , memDC , 0 , 0 , SRCCOPY);
-}
-else {
-
 //typedef struct _BLENDFUNCTION {
 //  BYTE BlendOp;
 //  BYTE BlendFlags;
@@ -283,20 +281,29 @@ else {
 
    blend.BlendOp = AC_SRC_OVER;
    blend.BlendFlags = 0;
-   blend.SourceConstantAlpha = 64;
+   blend.SourceConstantAlpha = 255;
    blend.AlphaFormat = AC_SRC_ALPHA;
 
-   log.Log("Using AlphaBlend");
-   if (!AlphaBlend(winDC, dr.left, dr.top, dr.right - dr.left, dr.bottom - dr.top,  memDC, sr.left, sr.top, sr.right, sr.bottom, blend)) {
-      log.Log("AlphaBlend failed. GetLastError reports %d.\n" , GetLastError());
-   }
-}
+   GdiFlush();
+   
+///   log.Log("Using AlphaBlend");
+///   if (!AlphaBlend(winDC, dr.left, dr.top, dr.right - dr.left, dr.bottom - dr.top,  memDC, sr.left, sr.top, sr.right, sr.bottom, blend)) {
+///      log.Log("AlphaBlend failed. GetLastError reports %d.\n" , GetLastError());
+///   }
+   
    GdiFlush();
 //*/
 
 ///   DeleteObject(hbr);
 
-//{
+}
+
+//-lmsimg32
+//-lwin32k
+
+//*
+
+void DIBbuffer::BlendBufferToWindowDC() {
 
 //   HDC winhdc = GetDC(window);
    
@@ -313,11 +320,8 @@ BOOL WINAPI UpdateLayeredWindow(
   _In_     DWORD         dwFlags
 );
 */
-
-
 /**
-   HDC screenDC = GetDC(NULL);
-   
+//   HDC screenDC = GetDC(NULL);
 
    POINT pd;
    pd.x = 0;
@@ -335,22 +339,57 @@ BOOL WINAPI UpdateLayeredWindow(
    blend.SourceConstantAlpha = 255;
    blend.AlphaFormat = AC_SRC_ALPHA;
    
-   if (!UpdateLayeredWindow(win_handle , screenDC , &pd , &ssz , memDC , &ps , RGB(0,0,0) , &blend , ULW_ALPHA)) {
+   if (!UpdateLayeredWindow(win_handle , winDC , &pd , &ssz , memDC , &ps , RGB(0,0,0) , &blend , ULW_ALPHA)) {
       log.Log("Failed to update layered window. GetLastError reports %d.\n" , GetLastError());
    }
 
-   ReleaseDC(NULL , screenDC);
-//   ReleaseDC(winhdc);
+//   ReleaseDC(NULL , screenDC);
 //*/
 
-//}
+   RECT sr;
+   sr.left = 0;
+   sr.right = bm_info.bmiHeader.biWidth;
+   sr.top = 0;
+   sr.bottom = abs(bm_info.bmiHeader.biHeight);
+   RECT dr;
+   GetClientRect(win_handle , &dr);
+   int dx = dr.left;
+   int dy = dr.top;
+   int dw = dr.right - dr.left;
+   int dh = dr.bottom - dr.top;
 
+
+   if (!draw_with_alpha) {   
+      BitBlt(winDC , dx , dy , dw , dh , memDC , 0 , 0 , SRCCOPY);
+   }
+   else {
+
+   //typedef struct _BLENDFUNCTION {
+   //  BYTE BlendOp;
+   //  BYTE BlendFlags;
+   //  BYTE SourceConstantAlpha;
+   //  BYTE AlphaFormat;
+   //} BLENDFUNCTION, *PBLENDFUNCTION, *LPBLENDFUNCTION;
+
+      BLENDFUNCTION blend = {AC_SRC_OVER, 0, 64, 0};//AC_SRC_ALPHA};
+
+      blend.BlendOp = AC_SRC_OVER;
+      blend.BlendFlags = 0;
+      blend.SourceConstantAlpha = 64;
+      blend.AlphaFormat = AC_SRC_ALPHA;
+
+      log.Log("Using AlphaBlend");
+      if (!AlphaBlend(winDC, dr.left, dr.top, dr.right - dr.left, dr.bottom - dr.top,  memDC, sr.left, sr.top, sr.right, sr.bottom, blend)) {
+         log.Log("AlphaBlend failed. GetLastError reports %d.\n" , GetLastError());
+      }
+   }
+   GdiFlush();
+//}
 }
 
-//-lmsimg32
-//-lwin32k
 
-//*
+
+
 void DIBbuffer::ClearToColor(COLORREF c) {
    
    if (!ready) {return;}
@@ -374,7 +413,7 @@ void DIBbuffer::ClearToColor(COLORREF c) {
 void DIBbuffer::ClearToColor(int red , int green , int blue , int alpha) {
    
    if (!ready) {
-      log.Log("DIBbuffer::ClearToColor - not ready.\n");
+      log.Log("DIBbuffer::ClearToColor(r,g,b,a) - not ready.\n");
       return;
    }
    
@@ -461,7 +500,7 @@ void DIBbuffer::Test() {
       }
    }
    GdiFlush();
-   DrawBufferToWindowDC();
+   BlitBufferToWindowDC();
 }
 
 
