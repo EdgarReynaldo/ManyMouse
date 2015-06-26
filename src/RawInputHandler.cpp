@@ -364,6 +364,11 @@ BOOL WINAPI SetWindowPos(
 ///   dib_buffer.ClearToColor(trans_color);
    dib_buffer.ClearToColor(trans_color);
 
+   dib_buffer.SetXYRGBA(0,0,255,255,255,255);
+   dib_buffer.SetXYRGBA(0,1,255,255,255,255);
+   dib_buffer.SetXYRGBA(1,0,255,255,255,255);
+   dib_buffer.SetXYRGBA(1,1,255,255,255,255);
+
 
 /*
    if (0 == SetWindowLong(handle , GWL_EXSTYLE , WS_EX_LAYERED)) {
@@ -500,6 +505,21 @@ void RawInputHandler::InputLoop() {
             printf("Mice image toggled.\n");
          }  
          
+         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_O) {
+            swallow_mouse = !swallow_mouse;
+
+            if(swallow_mouse){
+                RECT R;
+                R.left = 0;
+                R.top = 0;
+                R.right = 1;
+                R.bottom = 1;
+                ClipCursor(&R);
+            }
+            else{
+                ClipCursor(NULL);
+            }
+         }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_R) {
 ///            swallow_mouse = !swallow_mouse;
 ///            RegisterDevices(swallow_mouse);

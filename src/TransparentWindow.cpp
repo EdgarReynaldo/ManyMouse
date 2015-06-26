@@ -26,7 +26,8 @@ bool WindowPainterCallback
 //      log.Log("WM_PAINT called for display %p.\n" , display);
       PAINTSTRUCT ps;
       BeginPaint(window , &ps);
-      transparent_window->dib_buffer.BlendBufferToWindowDC();
+///      transparent_window->dib_buffer.BlendBufferToWindowDC();
+      transparent_window->dib_buffer.BlitBufferToWindowDC();
       EndPaint(window , &ps);
       return true;
    }
@@ -174,7 +175,8 @@ bool TransparentWindow::CreateTheWindow(ALLEGRO_BITMAP* img , COLORREF transpare
       DrawImageToDIB();
    }
    
-   dib_buffer.BlendBufferToWindowDC();
+///   dib_buffer.BlendBufferToWindowDC();
+   dib_buffer.BlitBufferToWindowDC();
    
    if (!AddWindowCallback(WindowPainterCallback , this)) {
       log.Log("TransparentWindow::CreateTheWindow - Failed to add the window painter callback.\n");
@@ -226,7 +228,8 @@ bool TransparentWindow::SetWindowImage(ALLEGRO_BITMAP* img) {
    }
    
    if (ready) {
-      dib_buffer.BlendBufferToWindowDC();
+///      dib_buffer.BlendBufferToWindowDC();
+      dib_buffer.BlitBufferToWindowDC();
       QueuePaintMessage();
    }
    
