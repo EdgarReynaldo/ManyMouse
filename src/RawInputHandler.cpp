@@ -191,6 +191,8 @@ void RawInputDevice::PrintDeviceInfo() {
 
 void RawInputHandler::DrawHandlerToDIB() {
    
+   log.Log("RawInputHandler::DrawHandlerToDIB() called\n");
+   
    if (!allegro_buffer) {
       log.Log("DrawMouseToDIB() : allegro_buffer is NULL\n");
       return;
@@ -322,6 +324,8 @@ int RawInputHandler::SetupWindows() {
 //HWND al_get_win_window_handle(ALLEGRO_DISPLAY *display)
    winhandle = al_get_win_window_handle(display);
    
+   SetParent(winhandle , NULL);
+   
    window_handler.SetOurWindows(winhandle , al_get_win_window_handle(log_display) , 0);
    
 /*
@@ -347,13 +351,13 @@ BOOL WINAPI SetWindowPos(
 
    BringWindowToTop(winhandle);
    
-   COLORREF trans_color = RGB(127,127,127);
+   COLORREF trans_color = RGB(0,0,0);
    
    if (0 == SetWindowLong(winhandle , GWL_EXSTYLE , WS_EX_LAYERED)) {
       log.Log("Couldn't set WS_EX_LAYERED style attribute\n");
    }
 
-   if (!SetLayeredWindowAttributes(winhandle , trans_color , 255 , LWA_COLORKEY | LWA_ALPHA)) {
+   if (!SetLayeredWindowAttributes(winhandle , trans_color , 255 , LWA_COLORKEY)) {
       log.Log("Couldn't set color key!\n");
    }
 
@@ -362,13 +366,15 @@ BOOL WINAPI SetWindowPos(
    }
    
 ///   dib_buffer.ClearToColor(trans_color);
-   dib_buffer.ClearToColor(trans_color);
+///   dib_buffer.ClearToColor(trans_color);
+   dib_buffer.ClearToColor(0,0,0,0);
 
    dib_buffer.SetXYRGBA(0,0,255,255,255,255);
    dib_buffer.SetXYRGBA(0,1,255,255,255,255);
    dib_buffer.SetXYRGBA(1,0,255,255,255,255);
    dib_buffer.SetXYRGBA(1,1,255,255,255,255);
 
+   dib_buffer.FillAreaRect(0.0 , 0.0 , 0.1 , 0.1 , RGB(255,255,255));
 
 /*
    if (0 == SetWindowLong(handle , GWL_EXSTYLE , WS_EX_LAYERED)) {
@@ -473,12 +479,9 @@ void RawInputHandler::InputLoop() {
          
          log.DrawLog(font , al_map_rgb(254,254,254) , 10 , 300);
          
-///         DrawHandlerToDIB();
-
-//         QueuePaintMessage();
-         
-         
          al_flip_display();
+         
+         QueuePaintMessage();
          
          mouse_controller.Draw();
 //*/         

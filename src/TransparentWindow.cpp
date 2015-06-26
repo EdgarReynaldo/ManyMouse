@@ -131,6 +131,8 @@ bool TransparentWindow::CreateTheWindow(ALLEGRO_BITMAP* img , COLORREF transpare
    
    window = al_get_win_window_handle(display);
    
+   SetParent(window , NULL);
+   
    /// Using HWND_TOPMOST has no effect on the focus, except in the initial call
    if (!SetWindowPos(window , HWND_TOPMOST , 0 , 0 , -1 , -1 , SWP_NOMOVE | SWP_NOSIZE)) {
       log.Log("TransparentWindow::CreateTheWindow - Could not make window a topmost window.\n");

@@ -227,6 +227,8 @@ void DIBbuffer::BlitBufferToWindowDC() {
 
    BitBlt(winDC , dx , dy , dw , dh , memDC , 0 , 0 , SRCCOPY);
    GdiFlush();
+
+
 //*/
 
 //   BLENDFUNCTION blend = {AC_SRC_OVER, 0, 127, 0};
@@ -254,6 +256,7 @@ BOOL AlphaBlend(
 );*/
 
 /**   
+
    RECT sr;
    sr.left = 0;
    sr.right = bm_info.bmiHeader.biWidth;
@@ -267,11 +270,6 @@ BOOL AlphaBlend(
    int dh = dr.bottom - dr.top;
 
 
-if (!draw_with_alpha) {   
-   BitBlt(winDC , dx , dy , dw , dh , memDC , 0 , 0 , SRCCOPY);
-}
-else {
-
 //typedef struct _BLENDFUNCTION {
 //  BYTE BlendOp;
 //  BYTE BlendFlags;
@@ -283,14 +281,16 @@ else {
 
    blend.BlendOp = AC_SRC_OVER;
    blend.BlendFlags = 0;
-   blend.SourceConstantAlpha = 64;
+   blend.SourceConstantAlpha = 255;
    blend.AlphaFormat = AC_SRC_ALPHA;
 
-   log.Log("Using AlphaBlend");
-   if (!AlphaBlend(winDC, dr.left, dr.top, dr.right - dr.left, dr.bottom - dr.top,  memDC, sr.left, sr.top, sr.right, sr.bottom, blend)) {
-      log.Log("AlphaBlend failed. GetLastError reports %d.\n" , GetLastError());
-   }
-}
+   GdiFlush();
+   
+///   log.Log("Using AlphaBlend");
+///   if (!AlphaBlend(winDC, dr.left, dr.top, dr.right - dr.left, dr.bottom - dr.top,  memDC, sr.left, sr.top, sr.right, sr.bottom, blend)) {
+///      log.Log("AlphaBlend failed. GetLastError reports %d.\n" , GetLastError());
+///   }
+   
    GdiFlush();
 //*/
 
@@ -320,7 +320,7 @@ BOOL WINAPI UpdateLayeredWindow(
   _In_     DWORD         dwFlags
 );
 */
-//**
+/**
 //   HDC screenDC = GetDC(NULL);
 
    POINT pd;
@@ -346,6 +346,44 @@ BOOL WINAPI UpdateLayeredWindow(
 //   ReleaseDC(NULL , screenDC);
 //*/
 
+   RECT sr;
+   sr.left = 0;
+   sr.right = bm_info.bmiHeader.biWidth;
+   sr.top = 0;
+   sr.bottom = abs(bm_info.bmiHeader.biHeight);
+   RECT dr;
+   GetClientRect(win_handle , &dr);
+   int dx = dr.left;
+   int dy = dr.top;
+   int dw = dr.right - dr.left;
+   int dh = dr.bottom - dr.top;
+
+
+   if (!draw_with_alpha) {   
+      BitBlt(winDC , dx , dy , dw , dh , memDC , 0 , 0 , SRCCOPY);
+   }
+   else {
+
+   //typedef struct _BLENDFUNCTION {
+   //  BYTE BlendOp;
+   //  BYTE BlendFlags;
+   //  BYTE SourceConstantAlpha;
+   //  BYTE AlphaFormat;
+   //} BLENDFUNCTION, *PBLENDFUNCTION, *LPBLENDFUNCTION;
+
+      BLENDFUNCTION blend = {AC_SRC_OVER, 0, 64, 0};//AC_SRC_ALPHA};
+
+      blend.BlendOp = AC_SRC_OVER;
+      blend.BlendFlags = 0;
+      blend.SourceConstantAlpha = 64;
+      blend.AlphaFormat = AC_SRC_ALPHA;
+
+      log.Log("Using AlphaBlend");
+      if (!AlphaBlend(winDC, dr.left, dr.top, dr.right - dr.left, dr.bottom - dr.top,  memDC, sr.left, sr.top, sr.right, sr.bottom, blend)) {
+         log.Log("AlphaBlend failed. GetLastError reports %d.\n" , GetLastError());
+      }
+   }
+   GdiFlush();
 //}
 }
 
