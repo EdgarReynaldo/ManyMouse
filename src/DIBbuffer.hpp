@@ -44,7 +44,8 @@ public :
 
    bool GetBitmapInfo(BITMAPINFO* pbi , HWND handle);
 
-   void DrawBufferToWindowDC();
+   void BlitBufferToWindowDC();
+   void BlendBufferToWindowDC();
 
    HDC GetBufferDC() {return memDC;}
    

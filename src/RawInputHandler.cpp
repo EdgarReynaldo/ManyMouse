@@ -534,6 +534,7 @@ void RawInputHandler::InputLoop() {
               DWORD dwTimeout;
             } FLASHWINFO, *PFLASHWINFO;
             */
+            /*
             FLASHWINFO flash_info;
             flash_info.cbSize = sizeof(FLASHWINFO);
             flash_info.hwnd = winhandle;
@@ -542,6 +543,7 @@ void RawInputHandler::InputLoop() {
             flash_info.dwTimeout = 500;
             
             FlashWindowEx(&flash_info);
+            */
          }
 /*         
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_P) {
@@ -892,7 +894,7 @@ bool RawInputHandler::HandleWindowMessage(UINT message , WPARAM wparam , LPARAM 
    if (message == WM_PAINT) {
       BeginPaint(winhandle , &ps);
       
-      dib_buffer.DrawBufferToWindowDC();
+      dib_buffer.BlitBufferToWindowDC();
       
       EndPaint(winhandle , &ps);
       

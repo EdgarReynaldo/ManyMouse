@@ -208,9 +208,9 @@ bool DIBbuffer::GetBitmapInfo(BITMAPINFO* pbi , HWND handle) {
 
 
 
-void DIBbuffer::DrawBufferToWindowDC() {
+void DIBbuffer::BlitBufferToWindowDC() {
    if (!ready) {
-      log.Log("DIBbuffer::DrawBufferToWindowDC - not ready.\n");
+      log.Log("DIBbuffer::BlitBufferToWindowDC - not ready.\n");
       return;
    }
 //**   
@@ -296,7 +296,14 @@ else {
 
 ///   DeleteObject(hbr);
 
-//{
+}
+
+//-lmsimg32
+//-lwin32k
+
+//*
+
+void DIBbuffer::BlendBufferToWindowDC() {
 
 //   HDC winhdc = GetDC(window);
    
@@ -313,11 +320,8 @@ BOOL WINAPI UpdateLayeredWindow(
   _In_     DWORD         dwFlags
 );
 */
-
-
-/**
-   HDC screenDC = GetDC(NULL);
-   
+//**
+//   HDC screenDC = GetDC(NULL);
 
    POINT pd;
    pd.x = 0;
@@ -335,22 +339,19 @@ BOOL WINAPI UpdateLayeredWindow(
    blend.SourceConstantAlpha = 255;
    blend.AlphaFormat = AC_SRC_ALPHA;
    
-   if (!UpdateLayeredWindow(win_handle , screenDC , &pd , &ssz , memDC , &ps , RGB(0,0,0) , &blend , ULW_ALPHA)) {
+   if (!UpdateLayeredWindow(win_handle , winDC , &pd , &ssz , memDC , &ps , RGB(0,0,0) , &blend , ULW_ALPHA)) {
       log.Log("Failed to update layered window. GetLastError reports %d.\n" , GetLastError());
    }
 
-   ReleaseDC(NULL , screenDC);
-//   ReleaseDC(winhdc);
+//   ReleaseDC(NULL , screenDC);
 //*/
 
 //}
-
 }
 
-//-lmsimg32
-//-lwin32k
 
-//*
+
+
 void DIBbuffer::ClearToColor(COLORREF c) {
    
    if (!ready) {return;}
@@ -374,7 +375,7 @@ void DIBbuffer::ClearToColor(COLORREF c) {
 void DIBbuffer::ClearToColor(int red , int green , int blue , int alpha) {
    
    if (!ready) {
-      log.Log("DIBbuffer::ClearToColor - not ready.\n");
+      log.Log("DIBbuffer::ClearToColor(r,g,b,a) - not ready.\n");
       return;
    }
    
@@ -461,7 +462,7 @@ void DIBbuffer::Test() {
       }
    }
    GdiFlush();
-   DrawBufferToWindowDC();
+   BlitBufferToWindowDC();
 }
 
 
