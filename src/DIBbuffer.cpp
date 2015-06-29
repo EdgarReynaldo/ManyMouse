@@ -4,6 +4,7 @@
 #include "DIBbuffer.hpp"
 #include "VisualLogger.hpp"
 
+using namespace ManyMouse;
 
 /*   
 HBITMAP CreateDIBSection(

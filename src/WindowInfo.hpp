@@ -63,7 +63,9 @@ public :
    bool WindowContains(int xpos , int ypos);
    bool ClientContains(int xpos , int ypos);
 
-
+   string WindowTitle() {return window_title;}
+   string WindowClass() {return window_class;}
+   string WindowType() {return window_type;}
 };
 
 

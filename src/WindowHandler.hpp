@@ -15,6 +15,7 @@ class MouseController;
 #include "VisualLogger.hpp"
 #include "WindowInfo.hpp"
 
+using namespace ManyMouse;
 
 #include <vector>
 using std::vector;
@@ -105,17 +106,30 @@ public :
          log.Log("WindowHandler::HandleMouseMove - Mouse* m is NULL\n");
          return;
       }
-      int nmx = m->X();
-      int nmy = m->Y();
+      if (!m->MouseMoved()) {
+         return;
+      }
+      const int nmx = m->X();
+      const int nmy = m->Y();
       hwnd = GetWindowAtPos(nmx , nmy);
       if (hwnd) {
-            
+         {
+            WindowInfo info = GetWindowInfoFromHandle(hwnd);
+            WPARAM wp = 0;
+            LPARAM lp = MAKELPARAM((short)nmx , (short)nmy);
+            htmsg = SendMessage(hwnd , WM_NCHITTEST , wp , lp);
+///            log.Log("htmsg = %d\n" , htmsg);
+            if ((htmsg != oldhtmsg) || (hwnd != oldhwnd)) {
+               log.Log("htmsg = %d , window title = '%s'\n" , htmsg , info.WindowTitle().c_str());
+            }
+         }
+
          POINT p;
          p.x = nmx;
          p.y = nmy;
          assert(ScreenToClient(hwnd , &p));
-         nmx = p.x;
-         nmy = p.y;
+///         nmx = p.x;
+///         nmy = p.y;
          
 //         RECT clrect;
 //         GetClientRect(hwnd , &clrect);
@@ -123,13 +137,15 @@ public :
 //         nmy -= clrect.top;
 
          WPARAM wp = 0;// TODO : Encode modifier flags, see WM_LBUTTONDOWN
-///         LPARAM lp;
-///         lp = (((nmy << 16)&0xffff0000) | (((short)nmx)&0xffff));
          LPARAM lp = MAKELPARAM((short)nmx , (short)nmy);
          
          
          PostMessage(hwnd , WM_MOUSEMOVE , wp , lp);
       }
+      
+      oldhwnd = hwnd;
+      oldhtmsg = htmsg;
+      
    }
    
    /// btn field : LMB = 1 , MMB = 2 , RMB = 3
@@ -143,34 +159,54 @@ public :
       }
       if (btn >= 1 && btn <= 3) {
          if (down) {
-/*
-LRESULT WINAPI SendMessage(
-  _In_ HWND   hWnd,
-  _In_ UINT   Msg,
-  _In_ WPARAM wParam,
-  _In_ LPARAM lParam
-);
-*/
-            oldhtmsg = htmsg;
-
-            {
-               WPARAM wp = 0;
-               LPARAM lp = MAKELPARAM((short)bx , (short)by);
+            WPARAM wp = 0;
+            LPARAM lp = MAKELPARAM((short)bx , (short)by);
+            if (hwnd) {
                htmsg = SendMessage(hwnd , WM_NCHITTEST , wp , lp);
-               if ((htmsg != oldhtmsg) || (hwnd != oldhwnd)) {
-                  log.Log("htmsg = %d\n" , htmsg);
-               }
-            }
-            {
-               WPARAM wp = MAKEWPARAM(WA_ACTIVE , 0);
-               LPARAM lp = 0;
                
-               PostMessage(hwnd , WM_ACTIVATE , wp , lp);
+               
+               switch (htmsg) {
+               case HTCLOSE :
+                  wp = SC_CLOSE;
+                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
+                  break;
+               case HTMAXBUTTON :
+                  wp = SC_MAXIMIZE;
+                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
+                  break;
+               case HTMINBUTTON :
+                  wp = SC_MINIMIZE;
+                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
+                  break;
+               case HTSIZE :
+                  wp = SC_SIZE;
+                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
+                  break;
+               case HTCAPTION :
+                  wp = SC_MOVE;
+                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
+                  break;
+               default : break;
+               }
+            
+            /// TODO : Need MouseActivate and NCActivate or something
+            wp = MAKEWPARAM(WA_ACTIVE , 0);
+            lp = 0;
+            
+            PostMessage(hwnd , WM_ACTIVATE , wp , lp);
             }
          }
-         unsigned int msg[8] = {
-            0 , WM_LBUTTONDOWN , WM_MBUTTONDOWN , WM_RBUTTONDOWN , 0 , WM_LBUTTONUP , WM_MBUTTONUP , WM_RBUTTONUP
+         unsigned int msg[16] = {
+            0 , WM_LBUTTONDOWN , WM_MBUTTONDOWN , WM_RBUTTONDOWN , 0 , WM_LBUTTONUP , WM_MBUTTONUP , WM_RBUTTONUP ,
+            0 , WM_NCLBUTTONDOWN , WM_NCMBUTTONDOWN , WM_NCRBUTTONDOWN , 0 , WM_NCLBUTTONUP , WM_NCMBUTTONUP , WM_NCRBUTTONUP
          };
+         bool nc = false;
+         if (htmsg == HTCLOSE || 
+             htmsg == HTMAXBUTTON ||
+             htmsg == HTMINBUTTON ||
+             htmsg == HTCAPTION) {
+            nc = true;
+         }
    
          POINT p;
          p.x = bx;
@@ -189,7 +225,7 @@ LRESULT WINAPI SendMessage(
 ///         lp = (((by << 16)&0xffff0000) | (((short)bx)&0xffff));
          LPARAM lp = MAKELPARAM((short)bx , (short)by);// this is a little clearer than and'ing and or'ing
 
-         PostMessage(hwnd , msg[(down?0:4) + btn] , wp , lp);
+         PostMessage(hwnd , msg[nc?8:0 + (down?0:4) + btn] , wp , lp);
       }
    }
    
@@ -331,7 +367,152 @@ In a Maximize button.
 
 */
 
+/*
+Parameters
 
+wParam
+
+    The type of system command requested. This parameter can be one of the following values.
+    Value	Meaning
+
+    SC_CLOSE
+    0xF060
+
+    	
+
+    Closes the window.
+
+    SC_CONTEXTHELP
+    0xF180
+
+    	
+
+    Changes the cursor to a question mark with a pointer. If the user then clicks a control in the dialog box, the control receives a WM_HELP message.
+
+    SC_DEFAULT
+    0xF160
+
+    	
+
+    Selects the default item; the user double-clicked the window menu.
+
+    SC_HOTKEY
+    0xF150
+
+    	
+
+    Activates the window associated with the application-specified hot key. The lParam parameter identifies the window to activate.
+
+    SC_HSCROLL
+    0xF080
+
+    	
+
+    Scrolls horizontally.
+
+    SCF_ISSECURE
+    0x00000001
+
+    	
+
+    Indicates whether the screen saver is secure.
+
+    SC_KEYMENU
+    0xF100
+
+    	
+
+    Retrieves the window menu as a result of a keystroke. For more information, see the Remarks section.
+
+    SC_MAXIMIZE
+    0xF030
+
+    	
+
+    Maximizes the window.
+
+    SC_MINIMIZE
+    0xF020
+
+    	
+
+    Minimizes the window.
+
+    SC_MONITORPOWER
+    0xF170
+
+    	
+
+    Sets the state of the display. This command supports devices that have power-saving features, such as a battery-powered personal computer.
+
+    The lParam parameter can have the following values:
+
+        -1 (the display is powering on)
+        1 (the display is going to low power)
+        2 (the display is being shut off)
+
+    SC_MOUSEMENU
+    0xF090
+
+    	
+
+    Retrieves the window menu as a result of a mouse click.
+
+    SC_MOVE
+    0xF010
+
+    	
+
+    Moves the window.
+
+    SC_NEXTWINDOW
+    0xF040
+
+    	
+
+    Moves to the next window.
+
+    SC_PREVWINDOW
+    0xF050
+
+    	
+
+    Moves to the previous window.
+
+    SC_RESTORE
+    0xF120
+
+    	
+
+    Restores the window to its normal position and size.
+
+    SC_SCREENSAVE
+    0xF140
+
+    	
+
+    Executes the screen saver application specified in the [boot] section of the System.ini file.
+
+    SC_SIZE
+    0xF000
+
+    	
+
+    Sizes the window.
+
+    SC_TASKLIST
+    0xF130
+
+    	
+
+    Activates the Start menu.
+
+    SC_VSCROLL
+    0xF070
+
+    	
+
+    Scrolls vertically.*/
 
 
 #endif // WindowHandler_HPP
