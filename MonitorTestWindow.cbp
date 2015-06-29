@@ -7,16 +7,23 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/MonitorTestWindow" prefix_auto="1" extension_auto="1" />
+				<Option output="cbbuild/bin/MonitorTestWindow" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
+				<Linker>
+					<Add option="-lallegro_monolith-debug.dll" />
+					<Add option="-lgdi32" />
+					<Add option="-lwinmm" />
+					<Add option="-lmsimg32" />
+					<Add option="-lwin32k" />
+				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/MonitorTestWindow" prefix_auto="1" extension_auto="1" />
+				<Option output="cbbuild/bin/MonitorTestWindow" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -25,12 +32,32 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lallegro_monolith-debug.dll" />
+					<Add option="-lgdi32" />
+					<Add option="-lwinmm" />
+					<Add option="-lmsimg32" />
+					<Add option="-lwin32k" />
 				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add directory="A5111distro/include" />
 		</Compiler>
+		<Linker>
+			<Add directory="A5111distro/lib" />
+		</Linker>
+		<Unit filename="src/AllegroAndWindows.cpp" />
+		<Unit filename="src/AllegroAndWindows.hpp" />
+		<Unit filename="src/DIBbuffer.cpp" />
+		<Unit filename="src/DIBbuffer.hpp" />
+		<Unit filename="src/MonitorWindowMain.cpp" />
+		<Unit filename="src/Mutex.cpp" />
+		<Unit filename="src/Mutex.hpp" />
+		<Unit filename="src/String.cpp" />
+		<Unit filename="src/String.hpp" />
+		<Unit filename="src/VisualLogger.cpp" />
+		<Unit filename="src/VisualLogger.hpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
