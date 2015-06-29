@@ -4,6 +4,9 @@
 
 #include "VisualLogger.hpp"
 
+using namespace ManyMouse;
+
+
 #include "DIBbuffer.hpp"
 
 bool allegro_ready = false;

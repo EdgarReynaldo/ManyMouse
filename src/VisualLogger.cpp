@@ -9,9 +9,9 @@
 #include "String.hpp"
 using std::vector;
 
-
-VisualLogger log;
-
+namespace ManyMouse {
+   VisualLogger log;
+};
 
 
 void VisualLogger::FreeMutex() {

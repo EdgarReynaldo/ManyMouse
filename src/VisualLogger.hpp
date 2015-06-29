@@ -50,9 +50,9 @@ public :
 };
 
 
-
-extern VisualLogger log;
-
+namespace ManyMouse {
+   extern VisualLogger log;
+};
 
 #endif // VisualLogger_HPP
 

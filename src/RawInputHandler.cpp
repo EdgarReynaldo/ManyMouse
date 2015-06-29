@@ -6,8 +6,12 @@
 
 #include "VisualLogger.hpp"
 
+using namespace ManyMouse;
+
+
 #include <cstdio>
 
+#include "allegro5/allegro_direct3d.h"
 
 
 bool lograwinput = false;
@@ -32,7 +36,7 @@ bool WindowProcCallback(ALLEGRO_DISPLAY *display, UINT message, WPARAM wparam, L
    RawInputHandler* handler = (RawInputHandler*)userdata;
    
    if (!handler) {
-      log.Log("Failed to get RawInputHandler*\n");
+      ManyMouse::log.Log("Failed to get RawInputHandler*\n");
       return false;
    }
 
@@ -153,34 +157,34 @@ void RawInputDevice::PrintDeviceInfo() {
    */
 
    
-   log.Log("Device name = (%s)\n" , dev_name.c_str());
+   ManyMouse::log.Log("Device name = (%s)\n" , dev_name.c_str());
    
    switch(rid_info.dwType) {
    case RIM_TYPEKEYBOARD :
-      log.Log("Keyboard type = %lu\n" , rid_info.keyboard.dwType);
-      log.Log("Keyboard sub type = %lu\n" , rid_info.keyboard.dwSubType);
-      log.Log("Keyboard mode = %lu\n" , rid_info.keyboard.dwKeyboardMode);
-      log.Log("Keyboard # of F-keys = %lu\n" , rid_info.keyboard.dwNumberOfFunctionKeys);
-      log.Log("Keyboard # of Indicators = %lu\n" , rid_info.keyboard.dwNumberOfIndicators);
-      log.Log("Keyboard total # of keys = %lu\n" , rid_info.keyboard.dwNumberOfKeysTotal);
+      ManyMouse::log.Log("Keyboard type = %lu\n" , rid_info.keyboard.dwType);
+      ManyMouse::log.Log("Keyboard sub type = %lu\n" , rid_info.keyboard.dwSubType);
+      ManyMouse::log.Log("Keyboard mode = %lu\n" , rid_info.keyboard.dwKeyboardMode);
+      ManyMouse::log.Log("Keyboard # of F-keys = %lu\n" , rid_info.keyboard.dwNumberOfFunctionKeys);
+      ManyMouse::log.Log("Keyboard # of Indicators = %lu\n" , rid_info.keyboard.dwNumberOfIndicators);
+      ManyMouse::log.Log("Keyboard total # of keys = %lu\n" , rid_info.keyboard.dwNumberOfKeysTotal);
       break;
 
    case RIM_TYPEMOUSE :
-      log.Log("Mouse ID = %lu\n" , rid_info.mouse.dwId);
-      log.Log("Number of mouse buttons = %lu\n" , rid_info.mouse.dwNumberOfButtons);
-      log.Log("Mouse sample rate = %lu\n" , rid_info.mouse.dwSampleRate);
-      log.Log("Mouse %s horizontal scroll wheel\n" , rid_info.mouse.fHasHorizontalWheel?"has a":"does not have a");
+      ManyMouse::log.Log("Mouse ID = %lu\n" , rid_info.mouse.dwId);
+      ManyMouse::log.Log("Number of mouse buttons = %lu\n" , rid_info.mouse.dwNumberOfButtons);
+      ManyMouse::log.Log("Mouse sample rate = %lu\n" , rid_info.mouse.dwSampleRate);
+      ManyMouse::log.Log("Mouse %s horizontal scroll wheel\n" , rid_info.mouse.fHasHorizontalWheel?"has a":"does not have a");
       break;
 
    case RIM_TYPEHID :
-      log.Log("HID vendor Id = %lu\n" , rid_info.hid.dwVendorId);
-      log.Log("HID product Id = %lu\n" , rid_info.hid.dwProductId);
-      log.Log("HID version number = %lu\n" , rid_info.hid.dwVersionNumber);
-      log.Log("HID usage page = %hu\n" , rid_info.hid.usUsagePage);
-      log.Log("HID usage = %hu\n" , rid_info.hid.usUsage);
+      ManyMouse::log.Log("HID vendor Id = %lu\n" , rid_info.hid.dwVendorId);
+      ManyMouse::log.Log("HID product Id = %lu\n" , rid_info.hid.dwProductId);
+      ManyMouse::log.Log("HID version number = %lu\n" , rid_info.hid.dwVersionNumber);
+      ManyMouse::log.Log("HID usage page = %hu\n" , rid_info.hid.usUsagePage);
+      ManyMouse::log.Log("HID usage = %hu\n" , rid_info.hid.usUsage);
       break;
    }
-   log.Log("\n");
+   ManyMouse::log.Log("\n");
 }
 
 
@@ -191,10 +195,10 @@ void RawInputDevice::PrintDeviceInfo() {
 
 void RawInputHandler::DrawHandlerToDIB() {
    
-   log.Log("RawInputHandler::DrawHandlerToDIB() called\n");
+   ManyMouse::log.Log("RawInputHandler::DrawHandlerToDIB() called\n");
    
    if (!allegro_buffer) {
-      log.Log("DrawMouseToDIB() : allegro_buffer is NULL\n");
+      ManyMouse::log.Log("DrawMouseToDIB() : allegro_buffer is NULL\n");
       return;
    }
 
@@ -202,7 +206,7 @@ void RawInputHandler::DrawHandlerToDIB() {
 
    ALLEGRO_LOCKED_REGION* alr = al_lock_bitmap(allegro_buffer , ALLEGRO_PIXEL_FORMAT_ARGB_8888 , ALLEGRO_LOCK_READONLY);
    if (!alr) {
-      log.Log("RawInputHandler::DrawHandlerToDIB - Failed to lock bitmap %p.\n" , allegro_buffer);
+      ManyMouse::log.Log("RawInputHandler::DrawHandlerToDIB - Failed to lock bitmap %p.\n" , allegro_buffer);
       return;
    }
    
@@ -223,7 +227,7 @@ void RawInputHandler::DrawHandlerToDIB() {
          unsigned char b = (unsigned char)(((*pdata) & 0x000000ff) >> 0);
          COLORREF rgb = RGB(r , g , b);
          if (rgb != SetPixel(dib_buffer.GetBufferDC() , x , y , rgb)) {
-            log.Log("RawInputHandler::DrawHandlerToDIB - Failed to set exact color value with SetPixel\n");
+            ManyMouse::log.Log("RawInputHandler::DrawHandlerToDIB - Failed to set exact color value with SetPixel\n");
          }
 ///         prev = rgb;
 ///         dib_buffer.SetXYRGB(x , y , pdata[1] , pdata[2] , pdata[3]);
@@ -239,8 +243,8 @@ void RawInputHandler::DrawHandlerToDIB() {
 
 int RawInputHandler::SetupWindows() {
 
-   bool mtx = log.InitMutex();
-   log.Log("log.InitMutex() returned %s\n" , mtx?"true":"false");
+   bool mtx = ManyMouse::log.InitMutex();
+   ManyMouse::log.Log("log.InitMutex() returned %s\n" , mtx?"true":"false");
 
 //   if (!al_install_timer()) {return 2;}
    
@@ -319,7 +323,7 @@ int RawInputHandler::SetupWindows() {
 
    bool imgs_loaded = mouse_controller.CreateMouseImages();
 
-   log.Log("Images %s\n" , imgs_loaded?"loaded successfully":"failed to load");
+   ManyMouse::log.Log("Images %s\n" , imgs_loaded?"loaded successfully":"failed to load");
 
 //HWND al_get_win_window_handle(ALLEGRO_DISPLAY *display)
    winhandle = al_get_win_window_handle(display);
@@ -354,31 +358,37 @@ BOOL WINAPI SetWindowPos(
    COLORREF trans_color = RGB(0,0,0);
    
    if (0 == SetWindowLong(winhandle , GWL_EXSTYLE , WS_EX_LAYERED)) {
-      log.Log("Couldn't set WS_EX_LAYERED style attribute\n");
+      ManyMouse::log.Log("Couldn't set WS_EX_LAYERED style attribute\n");
    }
 
    if (!SetLayeredWindowAttributes(winhandle , trans_color , 255 , LWA_COLORKEY)) {
-      log.Log("Couldn't set color key!\n");
+      ManyMouse::log.Log("Couldn't set color key!\n");
    }
 
    if (!dib_buffer.Create(winhandle)) {
-      log.Log("Failed to create DIB buffer for RawInputHandler.\n");
+      ManyMouse::log.Log("Failed to create DIB buffer for RawInputHandler.\n");
    }
    
 ///   dib_buffer.ClearToColor(trans_color);
 ///   dib_buffer.ClearToColor(trans_color);
    dib_buffer.ClearToColor(0,0,0,0);
 
+   dib_buffer.FillAreaRect(0.0 , 0.0 , 0.1 , 0.1 , RGB(255,255,255));
+
+   dib_buffer.BlitBufferToWindowDC();
+
+
+/*
    dib_buffer.SetXYRGBA(0,0,255,255,255,255);
    dib_buffer.SetXYRGBA(0,1,255,255,255,255);
    dib_buffer.SetXYRGBA(1,0,255,255,255,255);
    dib_buffer.SetXYRGBA(1,1,255,255,255,255);
 
    dib_buffer.FillAreaRect(0.0 , 0.0 , 0.1 , 0.1 , RGB(255,255,255));
-
+*/
 /*
    if (0 == SetWindowLong(handle , GWL_EXSTYLE , WS_EX_LAYERED)) {
-      log.Log("Couldn't set WS_EX_LAYERED style attribute\n");
+      ManyMouse::log.Log("Couldn't set WS_EX_LAYERED style attribute\n");
    }
 */   
    al_win_add_window_callback(display , WindowProcCallback , this);
@@ -477,7 +487,7 @@ void RawInputHandler::InputLoop() {
             y += 16;
          }
          
-         log.DrawLog(font , al_map_rgb(254,254,254) , 10 , 300);
+         ManyMouse::log.DrawLog(font , al_map_rgb(254,254,254) , 10 , 300);
          
          al_flip_display();
          
@@ -524,10 +534,20 @@ void RawInputHandler::InputLoop() {
             }
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_R) {
-///            swallow_mouse = !swallow_mouse;
-///            RegisterDevices(swallow_mouse);
-///            BlockInput(swallow_mouse);
-///            ShowWindow(al_get_win_window_handle(log_display) , SW_RESTORE);
+            ShowWindow(al_get_win_window_handle(log_display) , SW_RESTORE);
+         }
+         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_H) {
+            if (!SetCapture(al_get_win_window_handle(display))) {
+               ManyMouse::log.Log("Failed to capture the mouse.\n");
+            }
+            else {
+               ManyMouse::log.Log("Successfully captured the mouse.\n");
+            }
+            LPDIRECT3DDEVICE9 lpd3d9 = al_get_d3d_device(display);
+            while (lpd3d9->ShowCursor(false) > -1);
+         }
+         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_S) {
+            ShowCursor(true);
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_M) {
             ShowWindow(al_get_win_window_handle(log_display) , SW_MAXIMIZE);
@@ -537,7 +557,7 @@ void RawInputHandler::InputLoop() {
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_W) {
             window_handler.EnumerateWindows();
-            log.Log("\n");
+            ManyMouse::log.Log("\n");
             window_handler.PrintWindowInfo();
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_D) {
@@ -545,7 +565,7 @@ void RawInputHandler::InputLoop() {
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_C) {
             system("cls");
-            log.Clear();
+            ManyMouse::log.Clear();
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_F) {
             /*      
@@ -627,7 +647,7 @@ HWND   hwndTarget;
    // Get size
    GetRawInputDeviceList(NULL , &device_count , sizeof(RAWINPUTDEVICELIST));
    
-   log.Log("Num raw input devices detected = %u\n" , device_count);
+   ManyMouse::log.Log("Num raw input devices detected = %u\n" , device_count);
 
    const UINT FAIL = UINT(-1);
    
@@ -640,8 +660,8 @@ HWND   hwndTarget;
    UINT result = GetRawInputDeviceList(&ridlist[0] , &device_count , sizeof(RAWINPUTDEVICELIST));
    
    if (FAIL == result) {
-      log.Log("GetRawInputDeviceList failed.\n");
-      log.Log("GetLastError reported error %lu. (ERROR_INSUFFICENT_BUFFER = %ld)\n" , GetLastError() , ERROR_INSUFFICIENT_BUFFER);
+      ManyMouse::log.Log("GetRawInputDeviceList failed.\n");
+      ManyMouse::log.Log("GetLastError reported error %lu. (ERROR_INSUFFICENT_BUFFER = %ld)\n" , GetLastError() , ERROR_INSUFFICIENT_BUFFER);
       return false;
    }
 
@@ -662,11 +682,11 @@ HWND   hwndTarget;
       RID_DEVICE_INFO* info = &ridinfo[i];
       std::string* namestr = &ridnames[i];
       
-      log.Log("Checking device %u\n" , i);
+      ManyMouse::log.Log("Checking device %u\n" , i);
       
       if (GetRawInputDeviceInfo(r.hDevice, RIDI_DEVICENAME, 0 , &rsize) != 0) {// get size of data in rsize
          // error
-         log.Log("Error, could not retrieve necessary size for RIDI_DEVICENAME buffer.\n");
+         ManyMouse::log.Log("Error, could not retrieve necessary size for RIDI_DEVICENAME buffer.\n");
          // return false;
          success = false;
          continue;
@@ -675,7 +695,7 @@ HWND   hwndTarget;
       buf = (TCHAR*)realloc(buf , rsize*sizeof(TCHAR));
       if (!buf) {
          // error no memory
-         log.Log("Error, out of memory. Could not allocate buf in InitRawInfo.\n");
+         ManyMouse::log.Log("Error, out of memory. Could not allocate buf in InitRawInfo.\n");
          success = false;
          continue;
       }
@@ -688,16 +708,16 @@ HWND   hwndTarget;
 
       count = GetRawInputDeviceInfo(r.hDevice, RIDI_DEVICENAME, buf , &size);// store data in buf
       
-      log.Log("Char count is %i\n" , count);
+      ManyMouse::log.Log("Char count is %i\n" , count);
       
 //      if (GetRawInputDeviceInfo(r.hDevice, RIDI_DEVICENAME, buf , &size) != rsize) // store data in buf
       if (size != rsize) {
          // error
-         log.Log("Error, did not read full string for RIDI_DEVICENAME buffer.\n");
+         ManyMouse::log.Log("Error, did not read full string for RIDI_DEVICENAME buffer.\n");
          success = false;
 //         continue;
       }
-      log.Log("After GRIDI #%u, buf holds (%s)\n" , i , buf);
+      ManyMouse::log.Log("After GRIDI #%u, buf holds (%s)\n" , i , buf);
       
       *namestr = buf;
       
@@ -707,11 +727,11 @@ HWND   hwndTarget;
 
       count = GetRawInputDeviceInfo(r.hDevice, RIDI_DEVICEINFO, info, &size);
 
-      log.Log("Byte count is %i , sizeof(RID_DEVICE_INFO) = %u\n" , count , sizeof(RID_DEVICE_INFO));
+      ManyMouse::log.Log("Byte count is %i , sizeof(RID_DEVICE_INFO) = %u\n" , count , sizeof(RID_DEVICE_INFO));
       
       if (size != sizeof(RID_DEVICE_INFO)) {
          // error reading device info
-         log.Log("Error, could not read rid device info for device %u.\n" , i);
+         ManyMouse::log.Log("Error, could not read rid device info for device %u.\n" , i);
          // return false;
          success = false;
          continue;
@@ -737,7 +757,7 @@ HWND   hwndTarget;
          hid_info.push_back(info->hid);
          break;
       default : 
-         log.Log("Unknown device type for device # %u\n" , i);
+         ManyMouse::log.Log("Unknown device type for device # %u\n" , i);
          break;
       };
       
@@ -757,7 +777,7 @@ HWND   hwndTarget;
       RawInputDevice rid;
       rid.SetDeviceHandle(r.hDevice);
       if (rid.Error()) {
-         log.Log("Error retrieving raw device info for hDevice %p\n" , r.hDevice);
+         ManyMouse::log.Log("Error retrieving raw device info for hDevice %p\n" , r.hDevice);
          success = false;
          continue;// don't add this device to the map
       }
@@ -778,7 +798,7 @@ void RawInputHandler::PrintDeviceInfo() {
    map<HANDLE , RawInputDevice>::iterator it = dev_info_map.begin();
    int i = 0;
    while (it != dev_info_map.end()) {
-      log.Log("\nDevice # %u Handle %p\n" , i , it->first);
+      ManyMouse::log.Log("\nDevice # %u Handle %p\n" , i , it->first);
       it->second.PrintDeviceInfo();
       ++i;
       ++it;
@@ -844,7 +864,7 @@ void RawInputHandler::UnRegisterDevices() {
       ret = RegisterRawInputDevices(&nrids[0] , rids.size() , sizeof(RAWINPUTDEVICE));
       
       if (!ret) {
-         log.Log("Failed to unregister devices. GetLastError reports error %i.\n" , GetLastError());
+         ManyMouse::log.Log("Failed to unregister devices. GetLastError reports error %i.\n" , GetLastError());
       }
    }
    registered = false;
@@ -872,7 +892,7 @@ BOOL WINAPI RegisterRawInputDevices(
    ret = RegisterRawInputDevices(&rids[0] , rids.size() , sizeof(RAWINPUTDEVICE));
    
    if (!ret) {
-      log.Log("Register Raw Input Devices unsuccessful. GetLastError reports %lu.\n" , GetLastError());
+      ManyMouse::log.Log("Register Raw Input Devices unsuccessful. GetLastError reports %lu.\n" , GetLastError());
    }
    else {
       registered = true;
@@ -901,7 +921,7 @@ bool RawInputHandler::HandleWindowMessage(UINT message , WPARAM wparam , LPARAM 
    /**
       /// Only on Vista or higher, would have to change _WIN32_WINNT to 0x0600
       if (message == WM_INPUT_DEVICE_CHANGE) {
-         log.Log("WM_INPUT_DEVICE_CHANGE received.\n");
+         ManyMouse::log.Log("WM_INPUT_DEVICE_CHANGE received.\n");
          return true;
       }
    */
@@ -915,9 +935,11 @@ bool RawInputHandler::HandleWindowMessage(UINT message , WPARAM wparam , LPARAM 
 
    PAINTSTRUCT ps;
    if (message == WM_PAINT) {
+//      ManyMouse::log.Log("WM_PAINT");
+      
       BeginPaint(winhandle , &ps);
       
-      dib_buffer.BlitBufferToWindowDC();
+///      dib_buffer.BlitBufferToWindowDC();
       
       EndPaint(winhandle , &ps);
       
@@ -935,7 +957,7 @@ bool RawInputHandler::HandleWindowMessage(UINT message , WPARAM wparam , LPARAM 
       UINT count = GetRawInputData((HRAWINPUT)lparam , RID_INPUT , NULL , &rsize , sizeof(RAWINPUTHEADER));
       
       if (count != 0) {
-         log.Log("Failed to get size of data from GetRawInputData.\n");
+         ManyMouse::log.Log("Failed to get size of data from GetRawInputData.\n");
       }
       else {// GetRawInputData returned 0, success reading size
          
@@ -943,7 +965,7 @@ bool RawInputHandler::HandleWindowMessage(UINT message , WPARAM wparam , LPARAM 
          void* rawmem = malloc(rsize);// 
          
          if (!rawmem) {
-            log.Log("Ran out of memory.\n");
+            ManyMouse::log.Log("Ran out of memory.\n");
          }
          else {
             memset(rawmem , 0 , rsize);
@@ -951,7 +973,7 @@ bool RawInputHandler::HandleWindowMessage(UINT message , WPARAM wparam , LPARAM 
             
             count = GetRawInputData((HRAWINPUT)lparam , RID_INPUT , rawmem , &size , sizeof(RAWINPUTHEADER));
             if (count != rsize) {
-               log.Log("Failed to retrieve RAWINPUT data from GetRawIputData. return value = %u\n" , count);
+               ManyMouse::log.Log("Failed to retrieve RAWINPUT data from GetRawIputData. return value = %u\n" , count);
             }
 
             RAWINPUT* raw = (RAWINPUT*)rawmem;
@@ -1077,7 +1099,7 @@ void RawInputHandler::PrintRawHeader(RAWINPUTHEADER hdr) {
       break;
    }
    
-   log.Log("%s input RAWHDR : hDevice = 0x%08x , wParam = %d , dwType = %s , dwSize = %lu\n" ,
+   ManyMouse::log.Log("%s input RAWHDR : hDevice = 0x%08x , wParam = %d , dwType = %s , dwSize = %lu\n" ,
            typestr , (UINT)(hdr.hDevice) , hdr.wParam , typestr , hdr.dwSize);
 }
    
@@ -1102,9 +1124,9 @@ typedef struct tagRAWMOUSE {
 
 */
    
-   log.Log("usFlags = %hu , ulButtons = %u {usButtonFlags = %hu , usButtonData = %hu}\n" ,
+   ManyMouse::log.Log("usFlags = %hu , ulButtons = %u {usButtonFlags = %hu , usButtonData = %hu}\n" ,
            rms->usFlags , rms->ulButtons , rms->usButtonFlags , rms->usButtonData);
-   log.Log("ulRawButtons = %u , lLastX = %li , lLastY = %li , ulExtraInformation = %lu\n" , 
+   ManyMouse::log.Log("ulRawButtons = %u , lLastX = %li , lLastY = %li , ulExtraInformation = %lu\n" , 
            rms->ulRawButtons , rms->lLastX , rms->lLastY , rms->ulExtraInformation);
    
 }
@@ -1122,9 +1144,9 @@ typedef struct tagRAWKEYBOARD {
 } RAWKEYBOARD, *PRAWKEYBOARD, *LPRAWKEYBOARD;
 
 */
-   log.Log("MakeCode = %hu , Flags = %hu , Reserved = %hu\n" , 
+   ManyMouse::log.Log("MakeCode = %hu , Flags = %hu , Reserved = %hu\n" , 
            rkb->MakeCode , rkb->Flags , rkb->Reserved);
-   log.Log("VKey = %hu , Message = %u , ExtraInformation = %lu",
+   ManyMouse::log.Log("VKey = %hu , Message = %u , ExtraInformation = %lu",
            rkb->VKey , rkb->Message , rkb->ExtraInformation);
 }
 void RawInputHandler::PrintRawHid(RAWINPUTHEADER hdr , RAWHID* rhid) {
@@ -1138,7 +1160,7 @@ typedef struct tagRAWHID {
 } RAWHID, *PRAWHID, *LPRAWHID;
 
 */
-   log.Log("dwSizeHid = %lu , dwCount = %lu , bRawData = %p" ,
+   ManyMouse::log.Log("dwSizeHid = %lu , dwCount = %lu , bRawData = %p" ,
            rhid->dwSizeHid , rhid->dwCount  , rhid->bRawData);
 }
 
@@ -1154,7 +1176,7 @@ void RawInputHandler::HandleRawInput(RAWINPUT rinput) {
       NULL hDevice it reports. :P
    //*/
    if (hdev == (HANDLE)0) {
-      log.Log("Ignoring input from SendInput.\n");
+      ManyMouse::log.Log("Ignoring input from SendInput.\n");
       return;
    }
    
@@ -1166,7 +1188,7 @@ void RawInputHandler::HandleRawInput(RAWINPUT rinput) {
          dev_info_map[hdev] = rid;
       }
       else {
-         log.Log("Error getting device info for handle %p\n" , hdev);
+         ManyMouse::log.Log("Error getting device info for handle %p\n" , hdev);
       }
    }
    if (rinput.header.dwType == RIM_TYPEMOUSE) {

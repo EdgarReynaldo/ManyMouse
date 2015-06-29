@@ -4,6 +4,7 @@
 
 #include "VisualLogger.hpp"
 
+using namespace ManyMouse;
 
 
 bool WindowPainterCallback

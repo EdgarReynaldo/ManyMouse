@@ -21,13 +21,13 @@ ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active) {
 
    if (!active) {
 ///      cursor_bmp = al_load_bitmap("Images/CursorRed.png");
-///      cursor_bmp = al_load_bitmap("Images/DaltonRedCursor2.png");
-      cursor_bmp = al_load_bitmap("Images/TransMouseOverlayB.png");
+      cursor_bmp = al_load_bitmap("Images/DaltonRedCursor2.png");
+///      cursor_bmp = al_load_bitmap("Images/TransMouseOverlayB.png");
    }
    else {
 ///      cursor_bmp = al_load_bitmap("Images/CursorGreen.png");
-///      cursor_bmp = al_load_bitmap("Images/DaltonGreenCursor2.png");
-      cursor_bmp = al_load_bitmap("Images/TransMouseOverlayA.png");
+      cursor_bmp = al_load_bitmap("Images/DaltonGreenCursor2.png");
+///      cursor_bmp = al_load_bitmap("Images/TransMouseOverlayA.png");
    }
 
    if (!cursor_bmp) {
