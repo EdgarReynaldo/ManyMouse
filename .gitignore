@@ -26,3 +26,6 @@ cbbuild/bin/RawLog.txt
 MonitorTestWindow.depend
 cbbuild/bin/MonitorTestWindow.exe
 cbbuild/bin/Hooks.dll
+Hooks.depend
+Hooks.layout
+Hooks_build_log.html

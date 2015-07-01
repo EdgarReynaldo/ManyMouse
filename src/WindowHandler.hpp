@@ -129,7 +129,8 @@ public :
       const int nmy = m->Y();
       hwnd = GetWindowAtPos(nmx , nmy);
       if (hwnd) {
-         EnableWindow(hwnd , system_mouse_on);
+/// EnableWindow is dangerous - if you disable a window and never re-enable it it can't get input anymore
+///         EnableWindow(hwnd , system_mouse_on);
          {
             WindowInfo info = GetWindowInfoFromHandle(hwnd);
             WPARAM wp = 0;

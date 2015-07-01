@@ -103,6 +103,7 @@ public:
    LRESULT CALLBACK (*ll_mouse_hook_func) (int , WPARAM , LPARAM);
    void (*start_mouse_func)();
    void (*stop_mouse_func)();
+   HHOOK hhook;
 /*
 FARPROC WINAPI GetProcAddress(
   _In_ HMODULE hModule,
@@ -150,7 +151,8 @@ public :
          hMod_hook_dll(0),
          ll_mouse_hook_func(0),
          start_mouse_func(0),
-         stop_mouse_func(0)
+         stop_mouse_func(0),
+         hhook(0)
    {
       mouse_controller.SetWindowHandler(&window_handler);
 /*
@@ -190,14 +192,25 @@ _Z10StartMousev
          else {
             log.Log("StopMouse loaded successfully.\n");
          }
+         hhook = SetWindowsHookEx(WH_MOUSE_LL , ll_mouse_hook_func , hMod_hook_dll , 0);
+         if (!hhook) {
+            log.Log("SetWindowsHookEx failed. GetLastError says %d\n" , GetLastError());
+         }
+         else {
+            log.Log("SetWindowsHookEx succeeded.\n");
+         }
       }
    }
 
    ~RawInputHandler() {
       CloseWindows();
+      if (hhook) {
+         log.Log("UnhookWindowsHookEx returned %s\n" , UnhookWindowsHookEx(hhook)?"true":"false");
+         hhook = 0;
+      }
       if (hMod_hook_dll) {
          FreeLibrary(hMod_hook_dll);
-         
+         hMod_hook_dll = 0;
       }
    }
 

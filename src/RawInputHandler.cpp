@@ -520,6 +520,22 @@ void RawInputHandler::InputLoop() {
          
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_S) {
             window_handler.ToggleSystemMouseOnOff(!window_handler.SystemMouseOn());
+            
+            swallow_mouse = !swallow_mouse;
+            if (swallow_mouse) {
+///               StopMouse();
+               if (stop_mouse_func) {
+                  (*stop_mouse_func)();
+               }
+            }
+            else {
+///               StartMouse();
+               if (start_mouse_func) {
+                  (*start_mouse_func)();
+               }
+            }
+            
+            
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_O) {
             /*

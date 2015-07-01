@@ -2,7 +2,7 @@
 
 
 
-bool swallowmouse;
+bool swallowmouse = false;
 
 void StopMouse(){
    swallowmouse = true;
