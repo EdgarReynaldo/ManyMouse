@@ -59,6 +59,15 @@ class WindowHandler {
    LRESULT htmsg;
    LRESULT oldhtmsg;
 
+   bool system_mouse_on;
+   
+   deque<HWND> all_windows;
+   deque<HWND> all_visible_windows;
+   deque<HWND> all_other_windows;// all windows except our own
+   deque<HWND> disabled_windows;
+//   bool windows_disabled;
+
+   friend BOOL CALLBACK EnumerateWindowsProcess(HWND hwindow , LPARAM lp);
 
 
 public :
@@ -78,7 +87,11 @@ public :
          hwnd(0),
          oldhwnd(0),
          htmsg(0),
-         oldhtmsg(0)
+         oldhtmsg(0),
+         system_mouse_on(true),
+         all_windows(),
+         all_other_windows(),
+         disabled_windows()
    {
       assert(mouse_controller);
    }
@@ -99,7 +112,9 @@ public :
 
    WindowInfo GetWindowInfoFromHandle(HWND hwndA);
 
-
+   void ToggleSystemMouseOnOff(bool on);
+   bool SystemMouseOn() {return system_mouse_on;}
+   
 //   void HandleMouseMove(Mouse* m);//int nmx , int nmy
    void HandleMouseMove(Mouse* m) {
       if (!m) {
@@ -113,6 +128,7 @@ public :
       const int nmy = m->Y();
       hwnd = GetWindowAtPos(nmx , nmy);
       if (hwnd) {
+         EnableWindow(hwnd , system_mouse_on);
          {
             WindowInfo info = GetWindowInfoFromHandle(hwnd);
             WPARAM wp = 0;
@@ -157,31 +173,74 @@ public :
          // No window under the button press location
          return;
       }
+      POINT p;
+      p.x = bx;
+      p.y = by;
+      HWND childhwnd = ChildWindowFromPoint(hwnd , p);
+///      hwnd = ChildWindowFromPointEx(hwnd , p , CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);
+      
+      WindowInfo winfo;
+      WindowInfo winfo2;
+      winfo.SetWindowHandle(hwnd);
+      winfo2.SetWindowHandle(childhwnd);
+      
+      log.Log(winfo.GetWindowInfoString());
+      log.Log(winfo2.GetWindowInfoString());
+      
+      unsigned int msg[16] = {
+         0 , WM_LBUTTONDOWN , WM_MBUTTONDOWN , WM_RBUTTONDOWN , 0 , WM_LBUTTONUP , WM_MBUTTONUP , WM_RBUTTONUP ,
+         0 , WM_NCLBUTTONDOWN , WM_NCMBUTTONDOWN , WM_NCRBUTTONDOWN , 0 , WM_NCLBUTTONUP , WM_NCMBUTTONUP , WM_NCRBUTTONUP
+      };
+      const char* strs[16] = {
+         0 , "WM_LBUTTONDOWN" , "WM_MBUTTONDOWN" , "WM_RBUTTONDOWN" , 0 , "WM_LBUTTONUP" , "WM_MBUTTONUP" , "WM_RBUTTONUP" ,
+         0 , "WM_NCLBUTTONDOWN" , "WM_NCMBUTTONDOWN" , "WM_NCRBUTTONDOWN" , 0 , "WM_NCLBUTTONUP" , "WM_NCMBUTTONUP" , "WM_NCRBUTTONUP"
+      };
+      
+      bool nc = false;
       if (btn >= 1 && btn <= 3) {
          if (down) {
             WPARAM wp = 0;
             LPARAM lp = MAKELPARAM((short)bx , (short)by);
             if (hwnd) {
                htmsg = SendMessage(hwnd , WM_NCHITTEST , wp , lp);
-               
-               
+               int index = (nc?8:0) + (down?0:4) + btn;
+               const char* str = strs[index];
+               if (str) {
+                  log.Log("%s sent to hwnd %p\n" , str , hwnd);
+               }
+               if (htmsg == HTCLOSE || 
+                   htmsg == HTSIZE || 
+                   htmsg == HTMAXBUTTON ||
+                   htmsg == HTMINBUTTON ||
+                   htmsg == HTCAPTION) {
+                  nc = true;
+               }
+
                switch (htmsg) {
                case HTCLOSE :
                   wp = SC_CLOSE;
+                  DestroyWindow(hwnd);
                   PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
                   break;
                case HTMAXBUTTON :
                   wp = SC_MAXIMIZE;
-                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
+                  ShowWindow(hwnd , SW_MAXIMIZE);
+///                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
                   break;
                case HTMINBUTTON :
                   wp = SC_MINIMIZE;
-                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
+                  ShowWindow(hwnd , SW_MINIMIZE);
+///                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
                   break;
                case HTSIZE :
                   wp = SC_SIZE;
-                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
+                  ShowWindow(hwnd , SW_RESTORE);
+///                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
                   break;
+//               case HTREDUCE :/// Same as HTMINBUTTON
+//                  wp = SC_RESTORE;
+//                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
+//                  break;
                case HTCAPTION :
                   wp = SC_MOVE;
                   PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
@@ -189,43 +248,47 @@ public :
                default : break;
                }
             
-            /// TODO : Need MouseActivate and NCActivate or something
-            wp = MAKEWPARAM(WA_ACTIVE , 0);
-            lp = 0;
             
-            PostMessage(hwnd , WM_ACTIVATE , wp , lp);
+               SetForegroundWindow(hwnd);
+            
+/*            
+               /// TODO : Need MouseActivate and NCActivate or something
+               wp = MAKEWPARAM(WA_ACTIVE , 0);
+               lp = 0;
+               
+               PostMessage(hwnd , WM_ACTIVATE , wp , lp);
+               
+               wp = (WPARAM)GetParent(hwnd);
+               lp = MAKELPARAM(htmsg , msg[nc?8:0 + (down?0:4) + btn]);
+               
+               PostMessage(hwnd , WM_MOUSEACTIVATE , wp , lp);
+*/
             }
          }
-         unsigned int msg[16] = {
-            0 , WM_LBUTTONDOWN , WM_MBUTTONDOWN , WM_RBUTTONDOWN , 0 , WM_LBUTTONUP , WM_MBUTTONUP , WM_RBUTTONUP ,
-            0 , WM_NCLBUTTONDOWN , WM_NCMBUTTONDOWN , WM_NCRBUTTONDOWN , 0 , WM_NCLBUTTONUP , WM_NCMBUTTONUP , WM_NCRBUTTONUP
-         };
-         bool nc = false;
-         if (htmsg == HTCLOSE || 
-             htmsg == HTMAXBUTTON ||
-             htmsg == HTMINBUTTON ||
-             htmsg == HTCAPTION) {
-            nc = true;
-         }
-   
-         POINT p;
+         
+         /// Send button message
          p.x = bx;
          p.y = by;
-         assert(ScreenToClient(hwnd , &p));
-         bx = p.x;
-         by = p.y;
+         if (!ScreenToClient(hwnd , &p)) {
+            log.Log("WindowHandler::HandleButton() - ScreenToClient failed\n");
+            log.Log("GetLastError reports error %i\n" , GetLastError());
+         }
+         else {
+            bx = p.x;
+            by = p.y;
 
-//         RECT clrect;
-//         GetClientRect(hwnd , &clrect);
-//         bx -= clrect.left;
-//         by -= clrect.top;
+   //         RECT clrect;
+   //         GetClientRect(hwnd , &clrect);
+   //         bx -= clrect.left;
+   //         by -= clrect.top;
 
-         WPARAM wp = 0;// TODO : Encode modifier flags, see WM_LBUTTONDOWN
-///         LPARAM lp;
-///         lp = (((by << 16)&0xffff0000) | (((short)bx)&0xffff));
-         LPARAM lp = MAKELPARAM((short)bx , (short)by);// this is a little clearer than and'ing and or'ing
+            WPARAM wp = 0;// TODO : Encode modifier flags, see WM_LBUTTONDOWN
+   ///         LPARAM lp;
+   ///         lp = (((by << 16)&0xffff0000) | (((short)bx)&0xffff));
+            LPARAM lp = MAKELPARAM((short)bx , (short)by);// this is a little clearer than and'ing and or'ing
 
-         PostMessage(hwnd , msg[nc?8:0 + (down?0:4) + btn] , wp , lp);
+            PostMessage(hwnd , msg[nc?8:0 + (down?0:4) + btn] , wp , lp);
+         }
       }
    }
    

@@ -525,10 +525,10 @@ void MouseController::FreeMouseImages() {
 
 bool MouseController::CreateMouseImages() {
    FreeMouseImages();
-   //ms_enabled_image = CreateMouseImage(-1,-1,true);
-   //ms_disabled_image = CreateMouseImage(-1,-1,false);
-   ms_enabled_image = DrawMouseImage(true);
-   ms_disabled_image = DrawMouseImage(false);
+   ms_enabled_image = CreateMouseImage(-1,-1,true);
+   ms_disabled_image = CreateMouseImage(-1,-1,false);
+//   ms_enabled_image = DrawMouseImage(true);
+//   ms_disabled_image = DrawMouseImage(false);
    return ms_enabled_image && ms_disabled_image;
 }
 

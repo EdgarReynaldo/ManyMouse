@@ -518,6 +518,9 @@ void RawInputHandler::InputLoop() {
             printf("Mice image toggled.\n");
          }  
          
+         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_S) {
+            window_handler.ToggleSystemMouseOnOff(!window_handler.SystemMouseOn());
+         }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_O) {
             swallow_mouse = !swallow_mouse;
 
@@ -533,9 +536,6 @@ void RawInputHandler::InputLoop() {
                 ClipCursor(NULL);
             }
          }
-         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_R) {
-            ShowWindow(al_get_win_window_handle(log_display) , SW_RESTORE);
-         }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_H) {
             if (!SetCapture(al_get_win_window_handle(display))) {
                ManyMouse::log.Log("Failed to capture the mouse.\n");
@@ -548,6 +548,9 @@ void RawInputHandler::InputLoop() {
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_S) {
             ShowCursor(true);
+         }
+         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_R) {
+            ShowWindow(al_get_win_window_handle(log_display) , SW_RESTORE);
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_M) {
             ShowWindow(al_get_win_window_handle(log_display) , SW_MAXIMIZE);

@@ -10,7 +10,60 @@
 
 #include <cstdio>
 
+BOOL WINAPI EnumChildWindows(
+  _In_opt_ HWND        hWndParent,
+  _In_     WNDENUMPROC lpEnumFunc,
+  _In_     LPARAM      lParam
+);
 
+
+BOOL CALLBACK EnumerateChildWindowsProcess(HWND hwindow , LPARAM lp);
+BOOL CALLBACK EnumerateChildWindowsProcess(HWND hwindow , LPARAM lp) {
+   deque<HWND>* pdeq = (deque<HWND>*)lp;
+   ALLEGRO_ASSERT(pdeq);
+   pdeq->push_back(hwindow);
+}
+
+//friend BOOL CALLBACK EnumerateWindowsProcess(HWND hwindow , LPARAM lp);
+BOOL CALLBACK EnumerateWindowsProcess(HWND hwindow , LPARAM lp) {
+   WindowHandler* wh = (WindowHandler*)lp;
+   ALLEGRO_ASSERT(wh);
+//   deque<HWND> all_windows;
+//   deque<HWND> all_visible_windows;
+//   deque<HWND> all_other_windows;// all windows except our own
+   wh->all_windows.push_back(hwindow);
+   EnumChildWindows(hwindow , EnumerateChildWindowsProcess , (LPARAM)&wh->all_windows);
+   if (IsWindowVisible(hwindow) {
+      wh->all_visible_windows.push_back(hwindow);
+      EnumChildWindows(hwindow , EnumerateChildWindowsProcess , (LPARAM)&wh->all_visible_windows);
+   }
+   if (wh->NotOurWindow(hwindow)) {
+      wh->all_other_windows.push_back(hwindow);
+      EnumChildWindows(hwindow , EnumerateChildWindowsProcess , (LPARAM)&wh->all_other_windows);
+   }
+   return true;
+}
+
+
+
+BOOL CALLBACK EnumerateVisibleWindowsProcess(HWND hwindow , LPARAM lp) {
+   deque<HWND>* pwin = (deque<HWND>*)lp;
+   ALLEGRO_ASSERT(pwin);
+   if (IsWindowVisible(hwindow)) {
+      pwin->push_back(hwindow);
+   }
+   return true;
+}
+
+BOOL CALLBACK EnumerateAllWindowsProcess(HWND hwindow , LPARAM lp) {
+   deque<HWND>* pwin = (deque<HWND>*)lp;
+   ALLEGRO_ASSERT(pwin);
+   pwin->push_back(hwindow);
+   return true;
+}
+
+
+/*
 BOOL CALLBACK EnumerationProcess(HWND hwindow , LPARAM lp) {
    deque<HWND>* pwin = (deque<HWND>*)lp;
    if (IsWindowVisible(hwindow)) {
@@ -18,7 +71,7 @@ BOOL CALLBACK EnumerationProcess(HWND hwindow , LPARAM lp) {
    }
    return true;
 }
-
+*/
 
 
 
@@ -37,7 +90,8 @@ void WindowHandler::EnumerateWindows() {
    
    GetMiceWindows();
    
-   EnumWindows(EnumerationProcess , (LPARAM)(&hwnds_zorder));
+   EnumWindows(EnumerateWindowsProcess , (LPARAM)(this));
+   EnumWindows(EnumerateVisibleWindowsProcess , (LPARAM)&hwnds_zorder);
    desktop_window = GetDesktopWindow();
    shell_window = GetShellWindow();
    taskbar_window = FindWindow("Shell_TrayWnd" , NULL);
@@ -227,10 +281,21 @@ HWND WindowHandler::GetWindowAtPos(int xpos , int ypos) {
 
 
 WindowInfo WindowHandler::GetWindowInfoFromHandle(HWND hwndA) {
-   if (window_info_map.find(hwnd) != window_info_map.end()) {
-      return *(window_info_map[hwndA]);
-   }
+   
+   WindowInfo winfo;
+   winfo.SetWindowHandle(hwndA);
+   return winfo;
+   
+//   if (window_info_map.find(hwnd) != window_info_map.end()) {
+//      return *(window_info_map[hwndA]);
+//   }
    return WindowInfo();
+}
+
+
+
+void WindowHandler::ToggleSystemMouseOnOff(bool on) {
+   system_mouse_on = on;
 }
 
 
