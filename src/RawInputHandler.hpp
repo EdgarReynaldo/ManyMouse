@@ -96,6 +96,29 @@ public:
    bool registered;
 
 
+
+
+   HMODULE hMod_hook_dll;
+   
+   LRESULT CALLBACK (*ll_mouse_hook_func) (int , WPARAM , LPARAM);
+   void (*start_mouse_func)();
+   void (*stop_mouse_func)();
+/*
+FARPROC WINAPI GetProcAddress(
+  _In_ HMODULE hModule,
+  _In_ LPCSTR  lpProcName
+);
+/// From Hooks.dll
+
+LRESULT CALLBACK LowLevelMouseHook(int nCode, WPARAM wParam, LPARAM lParam);
+
+void StopMouse();
+
+void StartMouse();
+
+*/   
+
+
    void DrawHandlerToDIB();
    
    
@@ -123,13 +146,59 @@ public :
          rids(),
          mouse_controller(),
          window_handler(&mouse_controller),
-         registered(false)
+         registered(false),
+         hMod_hook_dll(0),
+         ll_mouse_hook_func(0),
+         start_mouse_func(0),
+         stop_mouse_func(0)
    {
       mouse_controller.SetWindowHandler(&window_handler);
+/*
+      HMODULE WINAPI LoadLibrary(
+        _In_ LPCTSTR lpFileName
+      );      
+LRESULT CALLBACK LowLevelMouseHook(int nCode, WPARAM wParam, LPARAM lParam);
+
+void StopMouse();
+
+void StartMouse();
+_Z10StartMousev
+*/
+      hMod_hook_dll = LoadLibrary("Hooks.dll");
+      log.Log("Hook dll %s\n" , hMod_hook_dll?"loaded successfully":"failed to load");
+      if (hMod_hook_dll) {
+         ll_mouse_hook_func = (LRESULT CALLBACK (*)(int , WPARAM , LPARAM))GetProcAddress(hMod_hook_dll , "_Z17LowLevelMouseHookijl@12");
+         if (!ll_mouse_hook_func) {
+            log.Log("LowLevelMouseHook failed to load. GetLastError reports %d\n" , GetLastError());
+         }
+         else {
+            log.Log("LowLevelMouseHook loaded successfully.\n");
+         }
+
+         start_mouse_func = (void (*) ())GetProcAddress(hMod_hook_dll , "_Z10StartMousev");
+         if (!start_mouse_func) {
+            log.Log("StartMouse failed to load. GetLastError reports %d\n" , GetLastError());
+         }
+         else {
+            log.Log("StartMouse loaded successfully.\n");
+         }
+
+         stop_mouse_func = (void (*) ())GetProcAddress(hMod_hook_dll , "_Z9StopMousev");
+         if (!stop_mouse_func) {
+            log.Log("StopMouse failed to load. GetLastError reports %d\n" , GetLastError());
+         }
+         else {
+            log.Log("StopMouse loaded successfully.\n");
+         }
+      }
    }
 
    ~RawInputHandler() {
       CloseWindows();
+      if (hMod_hook_dll) {
+         FreeLibrary(hMod_hook_dll);
+         
+      }
    }
 
    int SetupWindows();

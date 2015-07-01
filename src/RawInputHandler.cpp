@@ -522,6 +522,7 @@ void RawInputHandler::InputLoop() {
             window_handler.ToggleSystemMouseOnOff(!window_handler.SystemMouseOn());
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_O) {
+            /*
             swallow_mouse = !swallow_mouse;
 
             if(swallow_mouse){
@@ -535,6 +536,7 @@ void RawInputHandler::InputLoop() {
             else{
                 ClipCursor(NULL);
             }
+            */
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_H) {
             if (!SetCapture(al_get_win_window_handle(display))) {
@@ -1106,6 +1108,8 @@ void RawInputHandler::PrintRawHeader(RAWINPUTHEADER hdr) {
            typestr , (UINT)(hdr.hDevice) , hdr.wParam , typestr , hdr.dwSize);
 }
    
+
+
 void RawInputHandler::PrintRawMouse(RAWINPUTHEADER hdr , RAWMOUSE* rms) {
    PrintRawHeader(hdr);
 /*
@@ -1133,6 +1137,9 @@ typedef struct tagRAWMOUSE {
            rms->ulRawButtons , rms->lLastX , rms->lLastY , rms->ulExtraInformation);
    
 }
+
+
+
 void RawInputHandler::PrintRawKeyboard(RAWINPUTHEADER hdr , RAWKEYBOARD* rkb) {
    PrintRawHeader(hdr);
 /*
@@ -1152,6 +1159,9 @@ typedef struct tagRAWKEYBOARD {
    ManyMouse::log.Log("VKey = %hu , Message = %u , ExtraInformation = %lu",
            rkb->VKey , rkb->Message , rkb->ExtraInformation);
 }
+
+
+
 void RawInputHandler::PrintRawHid(RAWINPUTHEADER hdr , RAWHID* rhid) {
    PrintRawHeader(hdr);
 /*

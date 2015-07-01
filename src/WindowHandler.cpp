@@ -10,19 +10,25 @@
 
 #include <cstdio>
 
+/*
 BOOL WINAPI EnumChildWindows(
   _In_opt_ HWND        hWndParent,
   _In_     WNDENUMPROC lpEnumFunc,
   _In_     LPARAM      lParam
 );
+*/
 
 
-BOOL CALLBACK EnumerateChildWindowsProcess(HWND hwindow , LPARAM lp);
+
+///BOOL CALLBACK EnumerateChildWindowsProcess(HWND hwindow , LPARAM lp);
 BOOL CALLBACK EnumerateChildWindowsProcess(HWND hwindow , LPARAM lp) {
    deque<HWND>* pdeq = (deque<HWND>*)lp;
    ALLEGRO_ASSERT(pdeq);
    pdeq->push_back(hwindow);
+   return true;
 }
+
+
 
 //friend BOOL CALLBACK EnumerateWindowsProcess(HWND hwindow , LPARAM lp);
 BOOL CALLBACK EnumerateWindowsProcess(HWND hwindow , LPARAM lp) {
@@ -33,7 +39,7 @@ BOOL CALLBACK EnumerateWindowsProcess(HWND hwindow , LPARAM lp) {
 //   deque<HWND> all_other_windows;// all windows except our own
    wh->all_windows.push_back(hwindow);
    EnumChildWindows(hwindow , EnumerateChildWindowsProcess , (LPARAM)&wh->all_windows);
-   if (IsWindowVisible(hwindow) {
+   if (IsWindowVisible(hwindow)) {
       wh->all_visible_windows.push_back(hwindow);
       EnumChildWindows(hwindow , EnumerateChildWindowsProcess , (LPARAM)&wh->all_visible_windows);
    }
@@ -90,12 +96,13 @@ void WindowHandler::EnumerateWindows() {
    
    GetMiceWindows();
    
-   EnumWindows(EnumerateWindowsProcess , (LPARAM)(this));
-   EnumWindows(EnumerateVisibleWindowsProcess , (LPARAM)&hwnds_zorder);
    desktop_window = GetDesktopWindow();
    shell_window = GetShellWindow();
    taskbar_window = FindWindow("Shell_TrayWnd" , NULL);
    
+   EnumWindows(EnumerateWindowsProcess , (LPARAM)(this));
+   EnumWindows(EnumerateVisibleWindowsProcess , (LPARAM)&hwnds_zorder);
+
    log.Log("Desktop window handle = %p\n" , desktop_window);
    log.Log("Shell   window handle = %p\n" , shell_window);
    log.Log("Taskbar window handle = %p\n" , taskbar_window);
@@ -228,6 +235,49 @@ void WindowHandler::PrintWindowInfo() {
       ++itwin;
    }
 }
+
+
+
+bool WindowHandler::NotOurWindow(HWND hwindow) {
+   if ((hwindow != desktop_window) &&
+       (hwindow != shell_window) &&
+       (hwindow != taskbar_window) &&
+       (hwindow != program_window) &&
+       (hwindow != test_window) &&
+       (hwindow != log_window) &&
+       !(IsMouseWindow(hwindow)) ) {
+      return true;
+   }
+   return false;
+/*
+      if (hwndA == desktop_window) {
+         pwi->SetWindowTypeString("The desktop window");
+      }
+      else if (hwndA == shell_window) {
+         pwi->SetWindowTypeString("The shell window");
+      }
+      else if (hwndA == taskbar_window) {
+         pwi->SetWindowTypeString("The taskbar window");
+      }
+      else if (hwndA == program_window) {
+         pwi->SetWindowTypeString("Our program window");
+      }
+      else if (hwndA == test_window) {
+         pwi->SetWindowTypeString("Our test window");
+      }
+      else if (hwndA == log_window) {
+         pwi->SetWindowTypeString("Our log window");
+      }
+      else if (IsMouseWindow(hwndA)) {
+         for (unsigned int i = 0 ; i < mice_windows.size() ; ++i) {
+            HWND hwndmouse = mice_windows[i];
+            if (hwndA == hwndmouse) {
+               pwi->SetWindowTypeString(StringPrintF("Our mouse window #%u" , i));
+            }
+         }
+      }
+
+*/}
 
 
 

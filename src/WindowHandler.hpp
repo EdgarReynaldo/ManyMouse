@@ -106,6 +106,7 @@ public :
    void SetOurWindows(HWND program_window_handle , HWND log_window_handle , HWND test_window_handle);
    void PrintWindowInfo();
 
+   bool NotOurWindow(HWND hwindow);
    bool IsMouseWindow(HWND hwndA);
 
    HWND GetWindowAtPos(int xpos , int ypos);

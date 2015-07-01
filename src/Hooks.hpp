@@ -4,9 +4,11 @@
 bool HookMouse(){
 
 }*/
-LRESULT CALLBACK LowLevelMouseHook(int nCode, WPARAM wParam, LPARAM lParam);
-void StopMouse();
-void StartMouse();
+__declspec(dllexport) LRESULT CALLBACK LowLevelMouseHook(int nCode, WPARAM wParam, LPARAM lParam);
+
+__declspec(dllexport) void StopMouse();
+
+__declspec(dllexport) void StartMouse();
 
 
 
