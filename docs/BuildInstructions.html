@@ -22,7 +22,7 @@ ManyMouse has been successfully built on Windows Vista using MinGW 4.8.1 and All
 <div style="width : 800px; float: left;margin-bottom : 200px">
 <h3><u>Libraries necessary to build ManyMouse</u></h3>
 <p>
-ManyMouse depends on the Allegro 5 Library for windowing, graphics, and some input. Allegro 5 in turn depends on several optional libraries. One of them is FreeType. Allegro uses FreeType to render ttf fonts, which we use in our application, so Allegro needs to be built with FreeType support.<br/>
+ManyMouse depends on the Allegro 5 Library for windowing, graphics, and some input. Allegro 5 in turn depends on several optional libraries. One of them is FreeType. Allegro uses FreeType to render ttf fonts, which we use in our application, so Allegro needs to be built with FreeType support. ManyMouse is currently using Allegro's DirectX backend to render its windows, so DX for MinGW is needed as well.<br/>
 <br/>
 You can find binaries for Allegro 5 at allegro.cc, on the files page :<br/>
 <a href="https://www.allegro.cc/files/">
@@ -44,7 +44,12 @@ http://sourceforge.net/projects/unofficialmingw/files/latest/download
 http://sourceforge.net/projects/unofficialallegro5distribution/files/latest/download
 </a><br/>
 <br/>
-
+DirectX 9 for MinGW can be found here :<br/>
+<a href="http://alleg.sourceforge.net/files/dx9mgw.zip">
+http://alleg.sourceforge.net/files/dx9mgw.zip
+</a><br/>
+<br/>
+<br/>
 The distros are in .7z format, which means you need 7-zip to decompress them. You can download 7-zip for free at their website :<br/>
 <a href="http://www.7-zip.org/download.html">
 http://www.7-zip.org/download.html
@@ -52,6 +57,8 @@ http://www.7-zip.org/download.html
 <br/>
 <h3><u>Installing MinGW</u></h3>
 To install mingw all you need to do is extract the contents of the mingw_4_8_1-4.tar.7z file twice. This will create a mingw_4_8_1-4 directory, which you can rename as you like.<br/>
+<br/>
+To install the DirectX package, simply extract dx9mgw.zip over your new mingw folder, overwriting files as necessary.<br/>
 <br/>
 I use CodeBlocks with MinGW so the installation directions that follow are for CB and MinGW. To configure CodeBlocks to use the new compiler go to Menu->Settings->Compiler and select the Toolchain Executables tab. Click on the ... button next to the auto-detect button and navigate to your new mingw folder. Select it and say okay. CB should detect everything okay at which point you can compile with MinGW.<br/>
 <br/>
