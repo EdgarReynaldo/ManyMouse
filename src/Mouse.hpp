@@ -81,7 +81,7 @@ Mouse() :
    void SetHandle(HANDLE hDevice);
    bool SetImage(ALLEGRO_BITMAP* mouse_image);
 
-   void SetBounds(RECT r);
+///   void SetBounds(RECT r);
    void SetBounds(RECT r){
       bounds = r;
       SetPos(x,y);

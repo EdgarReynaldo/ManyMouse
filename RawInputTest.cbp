@@ -17,6 +17,7 @@
 					<Add option="-g" />
 				</Compiler>
 				<Linker>
+					<Add option="-lHooks.dll" />
 					<Add option="-lallegro_monolith-debug.dll" />
 					<Add option="-lopengl32" />
 					<Add option="-lglu32" />
@@ -38,6 +39,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lHooks.dll" />
 					<Add option="-lallegro_monolith.dll" />
 					<Add option="-lopengl32" />
 					<Add option="-lglu32" />
@@ -51,37 +53,19 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add directory="A5111distro/include" />
+			<Add directory="src" />
 		</Compiler>
 		<Linker>
 			<Add directory="A5111distro/lib" />
+			<Add directory="../ManyMouse" />
 		</Linker>
 		<Unit filename=".gitignore" />
 		<Unit filename="docs/BuildInstructions.html" />
 		<Unit filename="docs/ReadMe.html" />
 		<Unit filename="docs/UsefulLinks.html" />
-		<Unit filename="src/AllegroAndWindows.cpp" />
-		<Unit filename="src/AllegroAndWindows.hpp" />
-		<Unit filename="src/DIBbuffer.cpp" />
-		<Unit filename="src/DIBbuffer.hpp" />
-		<Unit filename="src/Mouse.cpp" />
-		<Unit filename="src/Mouse.hpp" />
-		<Unit filename="src/Mutex.cpp" />
-		<Unit filename="src/Mutex.hpp" />
 		<Unit filename="src/RawInputHandler.cpp" />
 		<Unit filename="src/RawInputHandler.hpp" />
 		<Unit filename="src/RawInputMain.cpp" />
-		<Unit filename="src/String.cpp" />
-		<Unit filename="src/String.hpp" />
-		<Unit filename="src/TestWindow.cpp" />
-		<Unit filename="src/TestWindow.hpp" />
-		<Unit filename="src/TransparentWindow.cpp" />
-		<Unit filename="src/TransparentWindow.hpp" />
-		<Unit filename="src/VisualLogger.cpp" />
-		<Unit filename="src/VisualLogger.hpp" />
-		<Unit filename="src/WindowHandler.cpp" />
-		<Unit filename="src/WindowHandler.hpp" />
-		<Unit filename="src/WindowInfo.cpp" />
-		<Unit filename="src/WindowInfo.hpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
