@@ -73,7 +73,7 @@ std::string StringPrintF(const char* format_str , ...) {
 
 
 
-vector<string> SplitByNewlines(std::string s) {
+vector<string> SplitByNewLines(std::string s) {
    vector<string> lines;
    
    if (s.length() == 0) {

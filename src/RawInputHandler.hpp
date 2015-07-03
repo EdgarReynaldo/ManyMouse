@@ -104,6 +104,11 @@ public:
    void (*start_mouse_func)();
    void (*stop_mouse_func)();
    HHOOK hhook;
+   
+   LRESULT CALLBACK (*shell_hook_func) (int , WPARAM , LPARAM);
+   HHOOK shellhook;
+
+
 /*
 FARPROC WINAPI GetProcAddress(
   _In_ HMODULE hModule,
@@ -152,7 +157,9 @@ public :
          ll_mouse_hook_func(0),
          start_mouse_func(0),
          stop_mouse_func(0),
-         hhook(0)
+         hhook(0),
+         shell_hook_func(0),
+         shellhook(0)
    {
       mouse_controller.SetWindowHandler(&window_handler);
 /*
@@ -192,6 +199,10 @@ _Z10StartMousev
          else {
             log.Log("StopMouse loaded successfully.\n");
          }
+         
+         
+         
+         
          hhook = SetWindowsHookEx(WH_MOUSE_LL , ll_mouse_hook_func , hMod_hook_dll , 0);
          if (!hhook) {
             log.Log("SetWindowsHookEx failed. GetLastError says %d\n" , GetLastError());
@@ -199,11 +210,25 @@ _Z10StartMousev
          else {
             log.Log("SetWindowsHookEx succeeded.\n");
          }
+         
+         /// Setup our hook to monitor shell commands like window creation, activation, and destruction
+         /// Make sure to init window handler first
+         
+         shell_hook_func = (LRESULT CALLBACK (*)(int , WPARAM , LPARAM))
+                           GetProcAddress(hMod_hook_dll , "");         
+
+
+         shellhook = SetWindowsHookEx(WH_SHELL , shell_hook_func , hMod_hook_dll , 0);
+         
       }
    }
 
    ~RawInputHandler() {
       CloseWindows();
+      if (shellhook) {
+         log.Log("UnhookWindowsHookEx(shellhook) returned %s\n" , UnhookWindowsHookEx(shellhook)?"true":"false");
+         shellhook = 0;
+      }
       if (hhook) {
          log.Log("UnhookWindowsHookEx returned %s\n" , UnhookWindowsHookEx(hhook)?"true":"false");
          hhook = 0;

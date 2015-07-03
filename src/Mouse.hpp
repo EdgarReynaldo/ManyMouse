@@ -50,6 +50,7 @@ public :
    int ldy;// last delta y
    
    
+   
 public :
    
 //   Mouse();
@@ -76,6 +77,7 @@ Mouse() :
 
    void SetHandle(HANDLE hDevice);
    bool SetImage(ALLEGRO_BITMAP* mouse_image);
+
 
    void SetPos(int newx , int newy);
    void MoveBy(int dx , int dy);

@@ -33,6 +33,8 @@
 		</Compiler>
 		<Unit filename="src/Hooks.cpp" />
 		<Unit filename="src/Hooks.hpp" />
+		<Unit filename="src/WindowHandler.cpp" />
+		<Unit filename="src/WindowHandler.hpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

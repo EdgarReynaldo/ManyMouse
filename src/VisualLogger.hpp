@@ -47,6 +47,8 @@ public :
    void Activate(bool activate);
    
    void Clear();
+   
+   FILE* GetLogFile() {return logfile;}
 };
 
 

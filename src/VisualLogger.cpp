@@ -34,7 +34,7 @@ VisualLogger::VisualLogger() :
       log(),
       active(true)
 {
-   logfile = fopen("RawLog.txt" , "w");
+   logfile = fopen("RawLog2.txt" , "w");
 }
 
 
@@ -108,7 +108,7 @@ void VisualLogger::Log(string s) {
 
       fflush(logfile);
       
-      vector<string> lines = SplitByNewlines(s);
+      vector<string> lines = SplitByNewLines(s);
       
       /// CRITICAL SECTION
       mutex.Lock();

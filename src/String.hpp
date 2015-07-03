@@ -66,7 +66,7 @@ extern int STRINGPRINTF_BUFFER_SIZE;
 
 std::string StringPrintF(const char* format_str , ...);
 
-std::vector<std::string> SplitByNewlines(std::string s);
+std::vector<std::string> SplitByNewLines(std::string s);
 
 
 

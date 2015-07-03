@@ -88,6 +88,7 @@ void WindowInfo::RefreshInfo() {
 
 void WindowInfo::SetWindowHandle(HWND window) {
    hwnd = window;
+   parent = GetParent(hwnd);
    RefreshInfo();
 }
 
@@ -106,8 +107,8 @@ string WindowInfo::GetWindowInfoString() {
    int b = window_rect.bottom;
    int w = r - l;
    int h = b - t;
-   return StringPrintF("%-20s : HWND = %p , PID = %i\nPOS = %i,%i,%i,%i , DIM = %i x %i\nTitle = '%s' , Class = '%s'\n",
-                       window_type.c_str() , hwnd , pid , l,t,r,b , w,h , window_title.c_str() , window_class.c_str());
+   return StringPrintF("%-20s : HWND = %p , PARENT = %p , PID = %i\nPOS = %i,%i,%i,%i , DIM = %i x %i\nTitle = '%s' , Class ='%s'\n",
+                       window_type.c_str() , hwnd , parent , pid , l,t,r,b , w,h , window_title.c_str() , window_class.c_str());
 }
 
 

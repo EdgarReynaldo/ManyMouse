@@ -11,35 +11,11 @@
 //#define WINVER 0x0600
 //#define _WIN32_WINNT 0x0600
 
-#include <cstdio>
-#include <csignal>
-
-///#include <windows.h>
-///#include <winuser.h>
-//#include <iostream>
+#include "ManyMouse.hpp"
 
 #include "RawInputHandler.hpp"
 
-#include "VisualLogger.hpp"
-
-#include "Mouse.hpp"
-
-/*
-int main(int argc , char** argv) {
-   int x = _WIN32_WINNT;
-   int y = WM_INPUT;
-//   std::cout << x << std::endl;
-   
-   printf("_WIN32_WINNT = 0x%08x\n" , x);
-   printf("WM_INPUT = 0x%08x\n" , y);
-   
-   
-   return 0;
-   
-}
-*/
-
-//bool WindowProcCallback(ALLEGRO_DISPLAY *display, UINT message, WPARAM wparam, LPARAM lparam, LRESULT *result, void *userdata);
+#include <signal.h>
 
 
 void AbortHandler(int) {
@@ -71,7 +47,7 @@ int main(int argc , char** argv) {
 
 //   log.Activate(false);
 
-   int status = SetupAllegro();
+   int status = SetupAllegro(atexit);
    
    if (status != 0) {
       log.Log("Failed to setup allegro. status = %d.\n" , status);

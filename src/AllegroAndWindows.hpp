@@ -41,7 +41,7 @@ typedef bool (*WINDOW_CALLBACK)(ALLEGRO_DISPLAY* , UINT , WPARAM , LPARAM , LRES
 
 
 
-int SetupAllegro();// returns 0 for success, and non-zero for failure
+int SetupAllegro(int (*atexit_ptr)(void (*)(void)));// returns 0 for success, and non-zero for failure
 
 bool AllegroReady();
 

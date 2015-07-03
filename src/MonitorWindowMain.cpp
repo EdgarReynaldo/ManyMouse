@@ -4,6 +4,7 @@
 #include <windowsx.h>
 #include "VisualLogger.hpp"
 
+using ManyMouse::log;
 
 bool passback(ALLEGRO_DISPLAY *display, UINT message, WPARAM wparam,
    LPARAM lparam, LRESULT *result, void *userdata){

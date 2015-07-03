@@ -21,6 +21,7 @@ class WindowInfo {
 
 public :
    HWND hwnd;
+   HWND parent;
    DWORD pid;
    WNDPROC window_process;
 
@@ -43,6 +44,7 @@ public :
 //   WindowInfo();
    WindowInfo() :
          hwnd((HWND)0),
+         parent((HWND)0),
          pid(-1),
          window_process((WNDPROC)0),
          window_rect(),

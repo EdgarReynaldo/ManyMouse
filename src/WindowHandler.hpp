@@ -8,14 +8,16 @@
 
 
 #include "AllegroAndWindows.hpp"
-///#include "Mouse.hpp"
+#include "Mouse.hpp"
 class MouseController;
 
-#include "String.hpp"
+///#include "String.hpp"
 #include "VisualLogger.hpp"
 #include "WindowInfo.hpp"
 
 using namespace ManyMouse;
+
+#include <cstdio>
 
 #include <vector>
 using std::vector;
@@ -32,8 +34,11 @@ using std::deque;
 */
 
 
+bool GetDesktopBounds(RECT* b);
+
 
 BOOL CALLBACK EnumerationProcess(HWND hwindow , LPARAM lp);
+
 
 
 
@@ -67,7 +72,12 @@ class WindowHandler {
    deque<HWND> disabled_windows;
 //   bool windows_disabled;
 
+   Mutex mutex;
+   
+
+
    friend BOOL CALLBACK EnumerateWindowsProcess(HWND hwindow , LPARAM lp);
+
 
 
 public :
@@ -91,12 +101,29 @@ public :
          system_mouse_on(true),
          all_windows(),
          all_other_windows(),
-         disabled_windows()
+         disabled_windows(),
+         mutex()
    {
       assert(mouse_controller);
+      if (!mutex.Init()) {
+         log.Log("WindowHandler::WindowHandler - Failed to init mutex.\n");
+      }
    }
 
    ~WindowHandler();
+
+///   void HandleShellHookInfo(int code , WPARAM wp , LPARAM lp); 
+   void HandleShellHookInfo(int code , WPARAM wp , LPARAM lp) {
+      mutex.Lock();
+      // Handle our hook information
+      
+      
+      mutex.Unlock();
+   }
+
+   
+   void PrintAllWindows();
+
 
    void GetMiceWindows();
    void EnumerateWindows();
@@ -110,6 +137,7 @@ public :
    bool IsMouseWindow(HWND hwndA);
 
    HWND GetWindowAtPos(int xpos , int ypos);
+
 
    WindowInfo GetWindowInfoFromHandle(HWND hwndA);
 
@@ -159,6 +187,10 @@ public :
          
          
          PostMessage(hwnd , WM_MOUSEMOVE , wp , lp);
+         
+//         RECT r;
+//         GetWindowRect(hwnd , &r)
+         
       }
       
       oldhwnd = hwnd;
@@ -178,14 +210,15 @@ public :
       POINT p;
       p.x = bx;
       p.y = by;
-      HWND childhwnd = ChildWindowFromPoint(hwnd , p);
-///      hwnd = ChildWindowFromPointEx(hwnd , p , CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);
+///      HWND childhwnd = ChildWindowFromPoint(hwnd , p);
+      HWND childhwnd = ChildWindowFromPointEx(hwnd , p , CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);
       
       WindowInfo winfo;
       WindowInfo winfo2;
       winfo.SetWindowHandle(hwnd);
       winfo2.SetWindowHandle(childhwnd);
       
+      log.Log("\n");
       log.Log(winfo.GetWindowInfoString());
       log.Log(winfo2.GetWindowInfoString());
       
@@ -197,6 +230,8 @@ public :
          0 , "WM_LBUTTONDOWN" , "WM_MBUTTONDOWN" , "WM_RBUTTONDOWN" , 0 , "WM_LBUTTONUP" , "WM_MBUTTONUP" , "WM_RBUTTONUP" ,
          0 , "WM_NCLBUTTONDOWN" , "WM_NCMBUTTONDOWN" , "WM_NCRBUTTONDOWN" , 0 , "WM_NCLBUTTONUP" , "WM_NCMBUTTONUP" , "WM_NCRBUTTONUP"
       };
+      
+//      hwnd = childhwnd;
       
       bool nc = false;
       if (btn >= 1 && btn <= 3) {

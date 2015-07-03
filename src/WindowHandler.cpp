@@ -7,6 +7,8 @@
 
 #include "VisualLogger.hpp"
 
+#include "String.hpp"
+
 
 #include <cstdio>
 
@@ -17,6 +19,15 @@ BOOL WINAPI EnumChildWindows(
   _In_     LPARAM      lParam
 );
 */
+
+
+bool GetDesktopBounds(RECT* b) {
+   b->left = 0;
+   b->right = 0;
+   b->top = 0;
+   b->bottom = 0;
+   return GetWindowRect(GetDesktopWindow() , b);
+}
 
 
 
@@ -78,6 +89,46 @@ BOOL CALLBACK EnumerationProcess(HWND hwindow , LPARAM lp) {
    return true;
 }
 */
+
+
+
+void WindowHandler::PrintAllWindows() {
+   
+   FILE* logfile = log.GetLogFile();
+   
+   if (!logfile) {printf("Failed to get log file.\n");}
+   
+   deque<HWND>::iterator itwin = all_windows.begin();
+   while (itwin != all_windows.end()) {
+      HWND hwindow = *itwin;
+      HWND parent = hwindow;
+      int depth = 0;
+      while ((parent = GetParent(parent))) {
+         ++depth;
+      }
+      depth *= 3;
+      char* buf = new char[depth + 1];
+      for (int i = 0 ; i < depth ; ++i) {
+         buf[i] = ' ';
+      }
+      buf[depth] = '\0';
+      
+      WindowInfo info;
+      info.SetWindowHandle(hwindow);
+      
+      string infostr = info.GetWindowInfoString();
+      
+      vector<string> lines = SplitByNewLines(infostr);
+      
+      fprintf(logfile , "\n");
+      for (unsigned int i = 0 ; i < lines.size() ; ++i) {
+         fprintf(logfile , "%s%s\n" , buf , lines[i].c_str());
+      }
+      
+      delete buf;
+      ++itwin;
+   }
+}
 
 
 

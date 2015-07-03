@@ -1,15 +1,15 @@
 
 
+
+#include "ManyMouse.hpp"
+
+
 #include "RawInputHandler.hpp"
 
-#include "String.hpp"
 
-#include "VisualLogger.hpp"
 
 using namespace ManyMouse;
 
-
-#include <cstdio>
 
 #include "allegro5/allegro_direct3d.h"
 
@@ -583,6 +583,11 @@ void RawInputHandler::InputLoop() {
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_D) {
             PrintDeviceInfo();
+         }
+         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_P) {
+            window_handler.EnumerateWindows();
+            window_handler.PrintAllWindows();
+            
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_C) {
             system("cls");
