@@ -43,20 +43,20 @@ BOOL CALLBACK EnumerationProcess(HWND hwindow , LPARAM lp);
 
 
 class WindowHandler {
-   
+
    map<HWND , WindowInfo*> window_info_map;
    deque<HWND> hwnds_zorder;// front is front - ie on top of everything else
 
    HWND desktop_window;
    HWND shell_window;
    HWND taskbar_window;
-   
+
    HWND program_window;
    HWND log_window;
    HWND test_window;
-   
+
    MouseController* mc;
-   
+
    vector<HWND> mice_windows;
 
    HWND hwnd;
@@ -65,7 +65,7 @@ class WindowHandler {
    LRESULT oldhtmsg;
 
    bool system_mouse_on;
-   
+
    deque<HWND> all_windows;
    deque<HWND> all_visible_windows;
    deque<HWND> all_other_windows;// all windows except our own
@@ -143,7 +143,7 @@ public :
 
    void ToggleSystemMouseOnOff(bool on);
    bool SystemMouseOn() {return system_mouse_on;}
-   
+
 //   void HandleMouseMove(Mouse* m);//int nmx , int nmy
    void HandleMouseMove(Mouse* m) {
       if (!m) {
@@ -176,7 +176,7 @@ public :
          assert(ScreenToClient(hwnd , &p));
 ///         nmx = p.x;
 ///         nmy = p.y;
-         
+
 //         RECT clrect;
 //         GetClientRect(hwnd , &clrect);
 //         nmx -= clrect.left;
@@ -184,20 +184,20 @@ public :
 
          WPARAM wp = 0;// TODO : Encode modifier flags, see WM_LBUTTONDOWN
          LPARAM lp = MAKELPARAM((short)nmx , (short)nmy);
-         
-         
+
+
          PostMessage(hwnd , WM_MOUSEMOVE , wp , lp);
          
 //         RECT r;
 //         GetWindowRect(hwnd , &r)
          
       }
-      
+
       oldhwnd = hwnd;
       oldhtmsg = htmsg;
-      
+
    }
-   
+
    /// btn field : LMB = 1 , MMB = 2 , RMB = 3
 //   void HandleButton(int btn , bool down , int bx , int by);
    void HandleButton(int btn , bool down , int bx , int by) {
@@ -210,18 +210,20 @@ public :
       POINT p;
       p.x = bx;
       p.y = by;
+      
 ///      HWND childhwnd = ChildWindowFromPoint(hwnd , p);
       HWND childhwnd = ChildWindowFromPointEx(hwnd , p , CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);
-      
+
       WindowInfo winfo;
       WindowInfo winfo2;
       winfo.SetWindowHandle(hwnd);
       winfo2.SetWindowHandle(childhwnd);
       
       log.Log("\n");
+      
       log.Log(winfo.GetWindowInfoString());
       log.Log(winfo2.GetWindowInfoString());
-      
+
       unsigned int msg[16] = {
          0 , WM_LBUTTONDOWN , WM_MBUTTONDOWN , WM_RBUTTONDOWN , 0 , WM_LBUTTONUP , WM_MBUTTONUP , WM_RBUTTONUP ,
          0 , WM_NCLBUTTONDOWN , WM_NCMBUTTONDOWN , WM_NCRBUTTONDOWN , 0 , WM_NCLBUTTONUP , WM_NCMBUTTONUP , WM_NCRBUTTONUP
@@ -245,8 +247,8 @@ public :
                if (str) {
                   log.Log("%s sent to hwnd %p\n" , str , hwnd);
                }
-               if (htmsg == HTCLOSE || 
-                   htmsg == HTSIZE || 
+               if (htmsg == HTCLOSE ||
+                   htmsg == HTSIZE ||
                    htmsg == HTMAXBUTTON ||
                    htmsg == HTMINBUTTON ||
                    htmsg == HTCAPTION) {
@@ -284,25 +286,25 @@ public :
                   break;
                default : break;
                }
-            
-            
+
+
                SetForegroundWindow(hwnd);
-            
-/*            
+
+/*
                /// TODO : Need MouseActivate and NCActivate or something
                wp = MAKEWPARAM(WA_ACTIVE , 0);
                lp = 0;
-               
+
                PostMessage(hwnd , WM_ACTIVATE , wp , lp);
-               
+
                wp = (WPARAM)GetParent(hwnd);
                lp = MAKELPARAM(htmsg , msg[nc?8:0 + (down?0:4) + btn]);
-               
+
                PostMessage(hwnd , WM_MOUSEACTIVATE , wp , lp);
 */
             }
          }
-         
+
          /// Send button message
          p.x = bx;
          p.y = by;
@@ -328,7 +330,7 @@ public :
          }
       }
    }
-   
+
 };
 /*
 WM_NCHITTEST return value
@@ -461,7 +463,7 @@ HTVSCROLL
 In the vertical scroll bar.
 
 HTZOOM
-9 
+9
 
 In a Maximize button.
 
@@ -478,70 +480,70 @@ wParam
     SC_CLOSE
     0xF060
 
-    	
+
 
     Closes the window.
 
     SC_CONTEXTHELP
     0xF180
 
-    	
+
 
     Changes the cursor to a question mark with a pointer. If the user then clicks a control in the dialog box, the control receives a WM_HELP message.
 
     SC_DEFAULT
     0xF160
 
-    	
+
 
     Selects the default item; the user double-clicked the window menu.
 
     SC_HOTKEY
     0xF150
 
-    	
+
 
     Activates the window associated with the application-specified hot key. The lParam parameter identifies the window to activate.
 
     SC_HSCROLL
     0xF080
 
-    	
+
 
     Scrolls horizontally.
 
     SCF_ISSECURE
     0x00000001
 
-    	
+
 
     Indicates whether the screen saver is secure.
 
     SC_KEYMENU
     0xF100
 
-    	
+
 
     Retrieves the window menu as a result of a keystroke. For more information, see the Remarks section.
 
     SC_MAXIMIZE
     0xF030
 
-    	
+
 
     Maximizes the window.
 
     SC_MINIMIZE
     0xF020
 
-    	
+
 
     Minimizes the window.
 
     SC_MONITORPOWER
     0xF170
 
-    	
+
 
     Sets the state of the display. This command supports devices that have power-saving features, such as a battery-powered personal computer.
 
@@ -554,63 +556,63 @@ wParam
     SC_MOUSEMENU
     0xF090
 
-    	
+
 
     Retrieves the window menu as a result of a mouse click.
 
     SC_MOVE
     0xF010
 
-    	
+
 
     Moves the window.
 
     SC_NEXTWINDOW
     0xF040
 
-    	
+
 
     Moves to the next window.
 
     SC_PREVWINDOW
     0xF050
 
-    	
+
 
     Moves to the previous window.
 
     SC_RESTORE
     0xF120
 
-    	
+
 
     Restores the window to its normal position and size.
 
     SC_SCREENSAVE
     0xF140
 
-    	
+
 
     Executes the screen saver application specified in the [boot] section of the System.ini file.
 
     SC_SIZE
     0xF000
 
-    	
+
 
     Sizes the window.
 
     SC_TASKLIST
     0xF130
 
-    	
+
 
     Activates the Start menu.
 
     SC_VSCROLL
     0xF070
 
-    	
+
 
     Scrolls vertically.*/
 

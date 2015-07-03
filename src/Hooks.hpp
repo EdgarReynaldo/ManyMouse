@@ -4,8 +4,6 @@
 ///#include <windows.h>
 ///#include <winuser.h>
 
-
-
 class WindowHandler;
 
 void SetWindowHandler(WindowHandler* wh);
