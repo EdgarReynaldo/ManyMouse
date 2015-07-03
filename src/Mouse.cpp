@@ -181,7 +181,7 @@ bool Mouse::SetImage(ALLEGRO_BITMAP* mouse_image) {
 
 
 void Mouse::SetPos(int newx , int newy) {
-/*   if(newx < bounds.left){
+   if(newx < bounds.left){
       newx = bounds.left;
    }
    if(newy < bounds.top){
@@ -192,7 +192,7 @@ void Mouse::SetPos(int newx , int newy) {
    }
    if(newy > bounds.bottom){
       newy = bounds.bottom;
-   }*/
+   }
    ldx = newx - x;
    ldy = newy - y;
    x = newx;
@@ -445,6 +445,14 @@ bool MouseController::CreateMouse(HANDLE hDevice) {
 
    POINT p;
    GetCursorPos(&p);
+
+   RECT r;
+   if (GetWindowRect(GetDesktopWindow() , &r)) {
+      newmouse->SetBounds(r);
+   }
+   else {
+      log.Log("Failed to SetBounds for new mouse. GetLastError says %d\n" , GetLastError());
+   }
 
    newmouse->SetPos(p.x , p.y);
 

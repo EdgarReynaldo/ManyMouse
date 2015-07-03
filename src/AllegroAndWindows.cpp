@@ -18,7 +18,9 @@ int SetupAllegro(int (*atexit_ptr)(void (*)(void))) {
    
    // setup allegro system
 ///   if (!al_init()) {return 1;}/// Can't use al_init directly inside our dll
-   if (!al_install_system(ALLEGRO_VERSION_INT , atexit_ptr));
+   if (!al_install_system(ALLEGRO_VERSION_INT , atexit_ptr)) {
+      return 1;
+   }
    if (!al_init()) {return 1;}
    
    // setup allegro addons
