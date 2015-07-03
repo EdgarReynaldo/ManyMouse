@@ -9,7 +9,7 @@ __declspec(dllexport) LRESULT CALLBACK LowLevelMouseHook(int nCode, WPARAM wPara
 __declspec(dllexport) void StopMouse();
 
 __declspec(dllexport) void StartMouse();
-
+__declspec(dllexport) LRESULT CALLBACK
 
 
 
