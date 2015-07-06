@@ -93,6 +93,7 @@ HWND FindTopMostChild(HWND parent , POINT abs_coords) {
    
    if (!parent) {return NULL;}
    
+/*
    RECT clrect;
    if (GetClientRect(parent , &clrect)) {
       abs_coords.x -= clrect.left;
@@ -101,11 +102,20 @@ HWND FindTopMostChild(HWND parent , POINT abs_coords) {
    else {
       log.Log("FindTopMostChild::Failed to get client rect for window %p\n" , parent);
    }
+*/
+   if (!ScreenToClient(parent , &abs_coords)) {
+      log.Log("FindTopMostChild() - ScreenToClient failed.\n");
+   }
+
 
    HWND direct_child = parent;
    do {
          parent = direct_child;
-         direct_child = RealChildWindowFromPoint(parent , abs_coords);
+         direct_child = ChildWindowFromPoint(parent , abs_coords);
+         if (direct_child == parent) {
+            return parent;//break out of loop
+         }
+///         direct_child = RealChildWindowFromPoint(parent , abs_coords);
    } while (direct_child);
    
    return parent;

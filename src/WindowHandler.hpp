@@ -73,6 +73,8 @@ class WindowHandler {
    deque<HWND> disabled_windows;
 //   bool windows_disabled;
 
+   HWND active_window;
+
    Mutex mutex;
    
 
@@ -103,6 +105,7 @@ public :
          all_windows(),
          all_other_windows(),
          disabled_windows(),
+         active_window(GetForegroundWindow()),
          mutex()
    {
       assert(mouse_controller);
@@ -157,6 +160,12 @@ public :
       const int nmx = m->X();
       const int nmy = m->Y();
       hwnd = GetWindowAtPos(nmx , nmy);
+      
+      POINT p;
+      p.x = nmx;
+      p.y = nmy;
+      ScreenToClient(hwnd , &p);
+      hwnd = FindTopMostChild(hwnd , p);
       if (hwnd) {
 /// EnableWindow is dangerous - if you disable a window and never re-enable it it can't get input anymore
 ///         EnableWindow(hwnd , system_mouse_on);
@@ -171,10 +180,7 @@ public :
             }
          }
 
-         POINT p;
-         p.x = nmx;
-         p.y = nmy;
-         assert(ScreenToClient(hwnd , &p));
+///         assert(ScreenToClient(hwnd , &p));
 ///         nmx = p.x;
 ///         nmy = p.y;
 
@@ -184,10 +190,11 @@ public :
 //         nmy -= clrect.top;
 
          WPARAM wp = 0;// TODO : Encode modifier flags, see WM_LBUTTONDOWN
-         LPARAM lp = MAKELPARAM((short)nmx , (short)nmy);
+         LPARAM lp = MAKELPARAM((short)p.x , (short)p.y);
 
 
          PostMessage(hwnd , WM_MOUSEMOVE , wp , lp);
+         PostMessage(hwnd , WM_MOUSEHOVER , wp , lp);
          
 //         RECT r;
 //         GetWindowRect(hwnd , &r)
@@ -245,6 +252,12 @@ public :
             WPARAM wp = 0;
             LPARAM lp = MAKELPARAM((short)bx , (short)by);
             if (hwnd) {
+
+               if (hwnd != active_window) {
+                  SetForegroundWindow(hwnd);
+               }
+               active_window = GetForegroundWindow();
+
                htmsg = SendMessage(hwnd , WM_NCHITTEST , wp , lp);
                int index = (nc?8:0) + (down?0:4) + btn;
                const char* str = strs[index];
@@ -290,9 +303,6 @@ public :
                   break;
                default : break;
                }
-
-
-               SetForegroundWindow(hwnd);
 
 /*
                /// TODO : Need MouseActivate and NCActivate or something
