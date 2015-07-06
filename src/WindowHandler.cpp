@@ -89,6 +89,36 @@ BOOL CALLBACK EnumerationProcess(HWND hwindow , LPARAM lp) {
    return true;
 }
 */
+HWND FindTopMostChild(HWND parent , POINT abs_coords) {
+   
+   if (!parent) {return NULL;}
+   
+   RECT clrect;
+   if (GetClientRect(parent , &clrect)) {
+      abs_coords.x -= clrect.left;
+      abs_coords.y -= clrect.top;
+   }
+   else {
+      log.Log("FindTopMostChild::Failed to get client rect for window %p\n" , parent);
+   }
+
+   HWND direct_child = parent;
+   do {
+         parent = direct_child;
+         direct_child = RealChildWindowFromPoint(parent , abs_coords);
+   } while (direct_child);
+   
+   return parent;
+   
+/*
+HWND WINAPI RealChildWindowFromPoint(
+  _In_ HWND  hwndParent,
+  _In_ POINT ptParentClientCoords
+);
+*/
+
+   return NULL;
+}
 
 
 

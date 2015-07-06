@@ -39,6 +39,7 @@ bool GetDesktopBounds(RECT* b);
 
 BOOL CALLBACK EnumerationProcess(HWND hwindow , LPARAM lp);
 
+HWND FindTopMostChild(HWND parent , POINT abs_coords);
 
 
 
@@ -212,7 +213,10 @@ public :
       p.y = by;
       
 ///      HWND childhwnd = ChildWindowFromPoint(hwnd , p);
-      HWND childhwnd = ChildWindowFromPointEx(hwnd , p , CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);
+///      HWND childhwnd = ChildWindowFromPointEx(hwnd , p , CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);
+
+      HWND childhwnd = FindTopMostChild(hwnd , p);
+      
 
       WindowInfo winfo;
       WindowInfo winfo2;
@@ -233,7 +237,7 @@ public :
          0 , "WM_NCLBUTTONDOWN" , "WM_NCMBUTTONDOWN" , "WM_NCRBUTTONDOWN" , 0 , "WM_NCLBUTTONUP" , "WM_NCMBUTTONUP" , "WM_NCRBUTTONUP"
       };
       
-//      hwnd = childhwnd;
+      hwnd = childhwnd;
       
       bool nc = false;
       if (btn >= 1 && btn <= 3) {
