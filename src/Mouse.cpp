@@ -579,7 +579,7 @@ void MouseController::HandleRawInput(RAWINPUT rawinput) {
          bool down = false;
          int button = FlagsToButtonIndex(flags , &down);
          if (button) {
-            window_handler->HandleButton(button , down , mouse->X() , mouse->Y());
+            window_handler->HandleButton(mouse , button , down , mouse->X() , mouse->Y());
          }
 
          if (mouse->MouseMoved()) {

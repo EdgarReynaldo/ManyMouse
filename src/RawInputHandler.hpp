@@ -9,7 +9,7 @@
 #include "Mouse.hpp"
 #include "WindowHandler.hpp"
 #include "TransparentWindow.hpp"
-
+#include "Hooks.hpp"
 
 #include <string>
 #include <vector>
@@ -101,9 +101,11 @@ public:
    HMODULE hMod_hook_dll;
    
    LRESULT CALLBACK (*ll_mouse_hook_func) (int , WPARAM , LPARAM);
+   LRESULT CALLBACK (*mouse_hook_func) (int , WPARAM , LPARAM);
    void (*start_mouse_func)();
    void (*stop_mouse_func)();
-   HHOOK hhook;
+   HHOOK ll_mouse_hook;
+   HHOOK mouse_hook;
    
    LRESULT CALLBACK (*shell_hook_func) (int , WPARAM , LPARAM);
    HHOOK shellhook;
@@ -155,9 +157,11 @@ public :
          registered(false),
          hMod_hook_dll(0),
          ll_mouse_hook_func(0),
+         mouse_hook_func(0),
          start_mouse_func(0),
          stop_mouse_func(0),
-         hhook(0),
+         ll_mouse_hook(0),
+         mouse_hook(0),
          shell_hook_func(0),
          shellhook(0)
    {
@@ -184,6 +188,15 @@ _Z10StartMousev
             log.Log("LowLevelMouseHook loaded successfully.\n");
          }
 
+         mouse_hook_func = (LRESULT CALLBACK (*) (int , WPARAM , LPARAM))GetProcAddress(hMod_hook_dll , "_Z9MouseHookijl@12");
+         if (!mouse_hook_func) {
+            log.Log("MouseHook failed to load. GetLastError reports %d\n" , GetLastError());
+         }
+         else {
+            log.Log("MouseHook loaded successfully.\n");
+         }
+
+
          start_mouse_func = (void (*) ())GetProcAddress(hMod_hook_dll , "_Z10StartMousev");
          if (!start_mouse_func) {
             log.Log("StartMouse failed to load. GetLastError reports %d\n" , GetLastError());
@@ -203,23 +216,44 @@ _Z10StartMousev
          
          
          
-         hhook = SetWindowsHookEx(WH_MOUSE_LL , ll_mouse_hook_func , hMod_hook_dll , 0);
-         if (!hhook) {
-            log.Log("SetWindowsHookEx failed. GetLastError says %d\n" , GetLastError());
+         ll_mouse_hook = SetWindowsHookEx(WH_MOUSE_LL , ll_mouse_hook_func , hMod_hook_dll , 0);
+         if (!ll_mouse_hook) {
+            log.Log("SetWindowsHookEx(WH_MOUSE_LL) failed. GetLastError says %d\n" , GetLastError());
          }
          else {
-            log.Log("SetWindowsHookEx succeeded.\n");
+            log.Log("SetWindowsHookEx(WH_MOUSE_LL) succeeded.\n");
          }
          
+         mouse_hook = SetWindowsHookEx(WH_MOUSE , mouse_hook_func , hMod_hook_dll , 0);
+         if (!mouse_hook) {
+            log.Log("SetWindowsHookEx(WH_MOUSE) failed. GetLastError says %d\n" , GetLastError());
+         }
+         else {
+            log.Log("SetWindowsHookEx(WH_MOUSE) succeeded.\n");
+         }
          /// Setup our hook to monitor shell commands like window creation, activation, and destruction
          /// Make sure to init window handler first
          
+         SetWindowHandler(&window_handler);
+         
          shell_hook_func = (LRESULT CALLBACK (*)(int , WPARAM , LPARAM))
-                           GetProcAddress(hMod_hook_dll , "");         
+                           GetProcAddress(hMod_hook_dll , "_Z9ShellHookijl@12");         
+         
+         if (!shell_hook_func) {
+            log.Log("ShellHook failed to load. GetLastError reports %d\n" , GetLastError());
+         }
+         else {
+            log.Log("ShellHook loaded successfully\n");
+         }
 
 
          shellhook = SetWindowsHookEx(WH_SHELL , shell_hook_func , hMod_hook_dll , 0);
-         
+         if (!shellhook) {
+            log.Log("SetWindowsHookEx(WH_SHELL) failed. GetLastError reports %d\n" , GetLastError());
+         }
+         else {
+            log.Log("SetWindowsHookEx(WH_SHELL) succeeded\n");
+         }
       }
    }
 
@@ -229,9 +263,9 @@ _Z10StartMousev
          log.Log("UnhookWindowsHookEx(shellhook) returned %s\n" , UnhookWindowsHookEx(shellhook)?"true":"false");
          shellhook = 0;
       }
-      if (hhook) {
-         log.Log("UnhookWindowsHookEx returned %s\n" , UnhookWindowsHookEx(hhook)?"true":"false");
-         hhook = 0;
+      if (ll_mouse_hook) {
+         log.Log("UnhookWindowsHookEx returned %s\n" , UnhookWindowsHookEx(ll_mouse_hook)?"true":"false");
+         ll_mouse_hook = 0;
       }
       if (hMod_hook_dll) {
          FreeLibrary(hMod_hook_dll);

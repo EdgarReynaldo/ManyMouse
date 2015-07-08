@@ -23,6 +23,7 @@ cbbuild/bin/libzlib.dll
 cbbuild/bin/OpenAl32.dll
 cbbuild/bin/allegro.log
 cbbuild/bin/RawLog.txt
+cbbuild/bin/RawLog2.txt
 MonitorTestWindow.depend
 cbbuild/bin/MonitorTestWindow.exe
 cbbuild/bin/Hooks.dll

@@ -118,11 +118,20 @@ public :
 
 ///   void HandleShellHookInfo(int code , WPARAM wp , LPARAM lp); 
    void HandleShellHookInfo(int code , WPARAM wp , LPARAM lp) {
-      mutex.Lock();
-      // Handle our hook information
       
-      
-      mutex.Unlock();
+      if ((code == HSHELL_WINDOWACTIVATED) ||
+         (code == HSHELL_WINDOWCREATED) ||
+         (code == HSHELL_WINDOWDESTROYED) ||
+         (code == HSHELL_GETMINRECT)) {
+         
+         mutex.Lock();
+         // Handle our hook information
+         log.Log("HandleShellHookInfo called\n");
+         
+         EnumerateWindows();
+         
+         mutex.Unlock();
+      }
    }
 
    
@@ -208,7 +217,7 @@ public :
 
    /// btn field : LMB = 1 , MMB = 2 , RMB = 3
 //   void HandleButton(int btn , bool down , int bx , int by);
-   void HandleButton(int btn , bool down , int bx , int by) {
+   void HandleButton(Mouse* m , int btn , bool down , int bx , int by) {
       oldhwnd = hwnd;
       hwnd = GetWindowAtPos(bx , by);
       if (!hwnd) {
@@ -255,6 +264,10 @@ public :
 
                if (hwnd != active_window) {
                   SetForegroundWindow(hwnd);
+                  
+                  assert(m);
+                  
+                  BringWindowToTop(m->GetMouseWindowHandle());
                }
                active_window = GetForegroundWindow();
 

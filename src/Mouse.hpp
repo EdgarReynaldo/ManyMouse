@@ -51,6 +51,9 @@ public :
    
    RECT bounds;
 
+   double time;
+   double lclicktime;
+
 public :
 
 //   Mouse();
@@ -65,7 +68,10 @@ Mouse() :
 ///      active(false),
       ready(false),
       ldx(0),
-      ldy(0)
+      ldy(0),
+      bounds(),
+      time(0.0),
+      lclicktime(0.0)
 {
    bounds.left = 0;
    bounds.right = 0;
@@ -101,6 +107,20 @@ Mouse() :
    bool MouseMoved() {return ldx || ldy;}
 
    HWND GetMouseWindowHandle();
+
+/*   
+   void UpdateClock(double t);
+   double GetTimeSinceLastLeftClick();
+
+   void UpdateClock(double t) {
+      time = t;
+   }
+   
+   double GetTimeSinceLastLeftClick() {
+      return time - lclicktime;
+   }
+*/
+   
 };
 
 
