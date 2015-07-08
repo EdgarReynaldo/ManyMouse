@@ -120,7 +120,7 @@ Mouse() :
       return time - lclicktime;
    }
 */
-   
+   void BringMouseToFront();
 };
 
 
@@ -219,6 +219,10 @@ public :
    vector<Mouse*> GetMice();
 
    void SetWindowHandler(WindowHandler* handler);
+
+   void BringMiceToFront();
+
+   bool IsMouseWindow(HWND hwnd);
 
 };
 

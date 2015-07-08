@@ -285,6 +285,12 @@ HWND Mouse::GetMouseWindowHandle() {
 
 
 
+void Mouse::BringMouseToFront() {
+   BringWindowToTop(GetMouseWindowHandle());
+}
+
+
+
 
 /// ------------------ MouseTracker class -----------------------------------------
 
@@ -649,6 +655,27 @@ vector<Mouse*> MouseController::GetMice() {
 
 void MouseController::SetWindowHandler(WindowHandler* handler) {
    window_handler = handler;
+}
+
+
+
+void MouseController::BringMiceToFront() {
+   vector<Mouse*> micevec = mouse_tracker.GetMouseVector();
+   for (unsigned int i = 0 ; i < micevec.size() ; ++i) {
+      Mouse* m = micevec[i];
+      m->BringMouseToFront();
+   }
+}
+
+
+
+bool MouseController::IsMouseWindow(HWND hwnd) {
+   vector<Mouse*> micevec = mouse_tracker.GetMouseVector();
+   for (unsigned int i = 0 ; i < micevec.size() ; ++i) {
+      Mouse* m = micevec[i];
+      if (m->GetMouseWindowHandle() == hwnd) {return true;}
+   }
+   return false;
 }
 
 

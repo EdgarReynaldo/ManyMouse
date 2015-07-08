@@ -235,6 +235,7 @@ _Z10StartMousev
          /// Make sure to init window handler first
          
          SetWindowHandler(&window_handler);
+         SetMouseController(&mouse_controller);
          
          shell_hook_func = (LRESULT CALLBACK (*)(int , WPARAM , LPARAM))
                            GetProcAddress(hMod_hook_dll , "_Z9ShellHookijl@12");         

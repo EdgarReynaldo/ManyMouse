@@ -3,9 +3,14 @@
 #include "WindowHandler.hpp"
 
 
+#include <cstdio>
+
 
 
 WindowHandler* whandler = 0;
+MouseController* mouse_controller = 0;
+
+
 
 bool swallowmouse = false;
 
@@ -16,13 +21,23 @@ void SetWindowHandler(WindowHandler* wh) {
 }
 
 
+void SetMouseController(MouseController* mc) {
+   mouse_controller = mc;
+}
+
+
+
 void StopMouse(){
    swallowmouse = true;
 }
 
+
+
 void StartMouse(){
    swallowmouse = false;
 }
+
+
 
 LRESULT CALLBACK LowLevelMouseHook(int nCode, WPARAM wParam, LPARAM lParam){
    LRESULT lr = 0;
@@ -70,6 +85,16 @@ LRESULT CALLBACK ShellHook(int nCode , WPARAM wParam , LPARAM lParam) {
    }
    
    lr = CallNextHookEx(0 , nCode , wParam , lParam);
+   
+   if (nCode == HSHELL_WINDOWACTIVATED) {
+      if (mouse_controller) {
+         HWND hwnd = (HWND)wParam;
+         if (!mouse_controller->IsMouseWindow(hwnd)) {
+            printf("Bringing mice to front.\n");
+            mouse_controller->BringMiceToFront();
+         }
+      }
+   }
    
    if (whandler) {
       whandler->HandleShellHookInfo(nCode , wParam , lParam);
