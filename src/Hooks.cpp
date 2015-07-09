@@ -85,7 +85,8 @@ LRESULT CALLBACK ShellHook(int nCode , WPARAM wParam , LPARAM lParam) {
    }
    
    lr = CallNextHookEx(0 , nCode , wParam , lParam);
-   
+
+/*   
    if (nCode == HSHELL_WINDOWACTIVATED) {
       if (mouse_controller) {
          HWND hwnd = (HWND)wParam;
@@ -95,7 +96,8 @@ LRESULT CALLBACK ShellHook(int nCode , WPARAM wParam , LPARAM lParam) {
          }
       }
    }
-   
+*/   
+
    if (whandler) {
       whandler->HandleShellHookInfo(nCode , wParam , lParam);
    }
