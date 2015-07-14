@@ -76,6 +76,7 @@
 		<Unit filename="src/WindowHandler.hpp" />
 		<Unit filename="src/WindowInfo.cpp" />
 		<Unit filename="src/WindowInfo.hpp" />
+		<Unit filename="src/WindowTree.cpp" />
 		<Unit filename="src/WindowTree.hpp" />
 		<Extensions>
 			<code_completion />
