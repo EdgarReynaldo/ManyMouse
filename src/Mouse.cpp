@@ -291,6 +291,18 @@ void Mouse::BringMouseToFront() {
 
 
 
+void Mouse::ShowMouse(bool show_mouse) {
+   shown = show_mouse;
+   HWND window = transparent_window.GetWindowHandle();
+   if (shown) {
+      ShowWindow(window , SW_SHOW);
+   }
+   else {
+      ShowWindow(window , SW_HIDE);
+   }
+}
+
+
 
 /// ------------------ MouseTracker class -----------------------------------------
 
@@ -462,7 +474,7 @@ bool MouseController::CreateMouse(HANDLE hDevice) {
 
    newmouse->SetPos(p.x , p.y);
 
-   ALLEGRO_BITMAP* ms_image = enabled?ms_enabled_image:ms_disabled_image;
+   ALLEGRO_BITMAP* ms_image = mouse_image_enabled?ms_enabled_image:ms_disabled_image;
 
    if (!newmouse->SetImage(ms_image)) {
       printf("MouseController::CreateMouse : Failed to set image %p.\n" , ms_image);
@@ -518,10 +530,17 @@ int MouseController::FlagsToButtonIndex(USHORT flags , bool* down) {
 
 
 MouseController::MouseController() :
+      normal_strategy(),
+//      collaborative_strategy(),
+      heavy_strategy(),
+      active_strategy(&normal_strategy),
       mouse_tracker(),
       ms_enabled_image(0),
       ms_disabled_image(0),
-      enabled(true),
+      mouse_image_enabled(true),
+      mice_active(true),
+//      mice_enabled(true),
+      mice_shown(true),
       window_handler(0)
 {
 
@@ -582,14 +601,16 @@ void MouseController::HandleRawInput(RAWINPUT rawinput) {
          RAWMOUSE rms = rawinput.data.mouse;
 
          USHORT flags = rms.usButtonFlags;
-         bool down = false;
-         int button = FlagsToButtonIndex(flags , &down);
-         if (button) {
-            window_handler->HandleButton(mouse , button , down , mouse->X() , mouse->Y());
-         }
+         if (mice_active) {
+            bool down = false;
+            int button = FlagsToButtonIndex(flags , &down);
+            if (button) {
+               window_handler->HandleButton(mouse , button , down , mouse->X() , mouse->Y());
+            }
 
-         if (mouse->MouseMoved()) {
-            window_handler->HandleMouseMove(mouse);
+            if (mouse->MouseMoved()) {
+               window_handler->HandleMouseMove(mouse);
+            }
          }
       }
    }
@@ -609,12 +630,12 @@ void MouseController::Draw() {
 
 
 
-void MouseController::ToggleMiceEnabled() {
-   enabled = !enabled;
+void MouseController::ToggleMouseImage() {
+   mouse_image_enabled = !mouse_image_enabled;
 
    ALLEGRO_BITMAP* ms_image = 0;
 
-   if (enabled) {
+   if (mouse_image_enabled) {
       ms_image = ms_enabled_image;
    }
    else {
@@ -625,11 +646,31 @@ void MouseController::ToggleMiceEnabled() {
    vector<Mouse*> micevec = mouse_tracker.GetMouseVector();
 
    for (unsigned int i = 0 ; i < micevec.size() ; ++i) {
-      if (!micevec[i]->SetImage(ms_image)) {
+      Mouse* m = micevec[i];
+      if (!m->SetImage(ms_image)) {
          log.Log("Failed to set mouse image for mouse %p and image %p\n" , micevec[i] , ms_image);
       }
    }
 
+}
+
+
+
+void MouseController::ActivateMice(bool activate_mice) {
+   mice_active = activate_mice;
+   ShowMice(mice_active);
+}
+
+
+
+void MouseController::ShowMice(bool show_mice) {
+   mice_shown = show_mice;
+
+   vector<Mouse*> mice = mouse_tracker.GetMouseVector();
+   for (unsigned int i = 0 ; i < mice.size() ; ++i) {
+      Mouse* m = mice[i];
+      m->ShowMouse(mice_shown);
+   }
 }
 
 

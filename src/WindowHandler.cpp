@@ -90,9 +90,9 @@ BOOL CALLBACK EnumerationProcess(HWND hwindow , LPARAM lp) {
 }
 */
 HWND FindTopMostChild(HWND parent , POINT abs_coords) {
-   
+
    if (!parent) {return NULL;}
-   
+
 /*
    RECT clrect;
    if (GetClientRect(parent , &clrect)) {
@@ -117,9 +117,9 @@ HWND FindTopMostChild(HWND parent , POINT abs_coords) {
          }
 ///         direct_child = RealChildWindowFromPoint(parent , abs_coords);
    } while (direct_child);
-   
+
    return parent;
-   
+
 /*
 HWND WINAPI RealChildWindowFromPoint(
   _In_ HWND  hwndParent,
@@ -133,11 +133,14 @@ HWND WINAPI RealChildWindowFromPoint(
 
 
 void WindowHandler::PrintAllWindows() {
-   
+
+   window_tree.Print();
+
+/*
    FILE* logfile = log.GetLogFile();
-   
+
    if (!logfile) {printf("Failed to get log file.\n");}
-   
+
    deque<HWND>::iterator itwin = all_windows.begin();
    while (itwin != all_windows.end()) {
       HWND hwindow = *itwin;
@@ -152,22 +155,23 @@ void WindowHandler::PrintAllWindows() {
          buf[i] = ' ';
       }
       buf[depth] = '\0';
-      
+
       WindowInfo info;
       info.SetWindowHandle(hwindow);
-      
+
       string infostr = info.GetWindowInfoString();
-      
+
       vector<string> lines = SplitByNewLines(infostr);
-      
+
       fprintf(logfile , "\n");
       for (unsigned int i = 0 ; i < lines.size() ; ++i) {
          fprintf(logfile , "%s%s\n" , buf , lines[i].c_str());
       }
-      
+
       delete buf;
       ++itwin;
    }
+*/
 }
 
 
@@ -182,28 +186,30 @@ void WindowHandler::GetMiceWindows() {
 
 
 void WindowHandler::EnumerateWindows() {
-   
+
+   window_tree.EnumerateTree();
+
    ClearWindowInfo();
-   
+
    GetMiceWindows();
-   
+
    desktop_window = GetDesktopWindow();
    shell_window = GetShellWindow();
    taskbar_window = FindWindow("Shell_TrayWnd" , NULL);
-   
+
    EnumWindows(EnumerateWindowsProcess , (LPARAM)(this));
    EnumWindows(EnumerateVisibleWindowsProcess , (LPARAM)&hwnds_zorder);
 
    log.Log("Desktop window handle = %p\n" , desktop_window);
    log.Log("Shell   window handle = %p\n" , shell_window);
    log.Log("Taskbar window handle = %p\n" , taskbar_window);
-   
+
    deque<HWND>::iterator dit = hwnds_zorder.begin();
    while (dit != hwnds_zorder.end()) {
       HWND hwndA = *dit;
-   
+
       WindowInfo* pwi = new WindowInfo();
-      
+
       pwi->SetWindowHandle(hwndA);
       if (hwndA == desktop_window) {
          pwi->SetWindowTypeString("The desktop window");
@@ -234,12 +240,12 @@ void WindowHandler::EnumerateWindows() {
       else {
          pwi->SetWindowTypeString("A user window");
       }
-      
+
       window_info_map[hwndA] = pwi;
-   
+
       ++dit;
    }
-   
+
 }
 
 
@@ -281,9 +287,9 @@ void WindowHandler::SetOurWindows(HWND program_window_handle , HWND log_window_h
    program_window = program_window_handle;
    log_window = log_window_handle;
    test_window = test_window_handle;
-   
+
    map<HWND , WindowInfo*>::iterator it;
-   
+
    if (program_window) {
       it = window_info_map.find(program_window);
       if (it != window_info_map.end()) {
@@ -305,24 +311,26 @@ void WindowHandler::SetOurWindows(HWND program_window_handle , HWND log_window_h
          pwi->SetWindowTypeString("The test window");
       }
    }
+
+   window_tree.SetOurWindow(program_window_handle);
 }
 
 
 
 void WindowHandler::PrintWindowInfo() {
-   
+
    deque<HWND>::iterator itwin = hwnds_zorder.begin();
    while (itwin != hwnds_zorder.end()) {
-      
+
       HWND hwndA = *itwin;
-      
+
       map<HWND , WindowInfo*>::iterator itinfo = window_info_map.find(hwndA);
       if (itinfo != window_info_map.end()) {
          WindowInfo* pwi = itinfo->second;
          log.Log(pwi->GetWindowInfoString());
          log.Log("\n");
       }
-      
+
       ++itwin;
    }
 }
@@ -388,21 +396,21 @@ HWND WindowHandler::GetWindowAtPos(int xpos , int ypos) {
 
    deque<HWND>::iterator it = hwnds_zorder.begin();
    while (it != hwnds_zorder.end()) {
-      
+
       HWND hwndA = *it;
-      
+
       /// Need to ignore mouse windows here
       if (IsMouseWindow(hwndA)) {
          ++it;
          continue;
       }
-      
+
       if (hwndA == program_window) {
          ++it;
          continue;
       }
-      
-      
+
+
       RECT r;
       if (!GetWindowRect(hwndA , &r)) {
          log.Log("Failed to get window rect for hwnd %p\n" , hwndA);
@@ -410,11 +418,11 @@ HWND WindowHandler::GetWindowAtPos(int xpos , int ypos) {
       else if (RectContains(r , xpos , ypos)) {
          return hwndA;
       }
-//      WindowInfo* pwi = 
-      
+//      WindowInfo* pwi =
+
       ++it;
    }
-   
+
    return (HWND)0;
 }
 
@@ -422,11 +430,11 @@ HWND WindowHandler::GetWindowAtPos(int xpos , int ypos) {
 
 
 WindowInfo WindowHandler::GetWindowInfoFromHandle(HWND hwndA) {
-   
+
    WindowInfo winfo;
    winfo.SetWindowHandle(hwndA);
    return winfo;
-   
+
 //   if (window_info_map.find(hwnd) != window_info_map.end()) {
 //      return *(window_info_map[hwndA]);
 //   }
@@ -479,7 +487,7 @@ void WindowHandler::EnumerateDesktopWindows() {
 // if( (IsWindowVisible(hwnd) || IsIconic(hwnd)) &&
 //       (GetWindowLong(hwnd, GWL_HWNDPARENT) == 0) &&
 //       ( (((GetWindowLong(hwnd, GWL_EXSTYLE) & WS_EX_TOOLWINDOW) == 0) &&
-//             GetWindow(hwnd, GW_OWNER) == 0) || 
+//             GetWindow(hwnd, GW_OWNER) == 0) ||
 //          ((GetWindowLong(hwnd, GWL_EXSTYLE) & WS_EX_APPWINDOW) && GetWindow(hwnd, GW_OWNER) != 0) ))
 
 void WindowHandler::Refresh() {
@@ -537,14 +545,14 @@ void WindowHandler::PrintWindows() {
    Refresh();
    for (UINT i = 0 ; i < desktop_windows.size() ; ++i) {
       HWND hwnd = desktop_windows[i];
-      
+
       RECT wrect;
       RECT clrect;
-      
+
       GetWindowRect(hwnd , &wrect);
       GetClientRect(hwnd , &clrect);
-      
-      
+
+
       if (IsProgramWindow(hwnd)) {
          log.Log("Program Window : %p : (%i,%i,%i,%i)\n" , (void*)hwnd , wrect.left , wrect.top , wrect.right , wrect.bottom);
       }

@@ -28,11 +28,11 @@ class RawInputDevice {
    RID_DEVICE_INFO rid_info;
 
    string dev_name;
-   
+
    bool error;
 
 public :
-   
+
 ///   RawInputDevice();
 RawInputDevice() :
       hdevice((HANDLE)0),
@@ -42,12 +42,12 @@ RawInputDevice() :
 {
    memset(&rid_info , -1 , sizeof(RID_DEVICE_INFO));
 }
-   
+
    void SetDeviceHandle(HANDLE hdev);
    void GetDeviceInfo();// SetDeviceHandle calls this automatically, call Error() to see if it fails
 
    bool Error() {return error;}
-   
+
    void PrintDeviceInfo();
 
    RID_DEVICE_INFO Info() {return rid_info;}
@@ -60,55 +60,60 @@ RawInputDevice() :
 class RawInputHandler {
 
 protected :
-public:   
+public:
    int tww;// transparent window width
    int twh;// transparent window height
-   
+
    ALLEGRO_DISPLAY* display;
    ALLEGRO_TIMER* timer;
    ALLEGRO_FONT* font;
    ALLEGRO_EVENT_QUEUE* queue;
    ALLEGRO_MUTEX* mutex;
    HWND winhandle;
-   
+
    ALLEGRO_BITMAP* allegro_buffer;
    DIBbuffer dib_buffer;
-   
+
    ALLEGRO_DISPLAY* log_display;
    int lww;// log window width
    int lwh;// log window height
-   
+
    map<HANDLE , RawInputDevice> dev_info_map;
 
    UINT device_count;// total number of raw input devices on system
-   
+
    vector<RAWINPUTDEVICELIST> mice;
    vector<RAWINPUTDEVICELIST> keyboards;
    vector<RAWINPUTDEVICELIST> hids;
-   
+
    vector<RAWINPUTDEVICE> rids;
 //   RAWINPUTDEVICE rids[2];
-   
-   MouseController mouse_controller;   
-   
+
+   MouseController mouse_controller;
+
    WindowHandler window_handler;
-   
+
    bool registered;
 
 
 
 
    HMODULE hMod_hook_dll;
-   
+
    LRESULT CALLBACK (*ll_mouse_hook_func) (int , WPARAM , LPARAM);
    LRESULT CALLBACK (*mouse_hook_func) (int , WPARAM , LPARAM);
    void (*start_mouse_func)();
    void (*stop_mouse_func)();
    HHOOK ll_mouse_hook;
    HHOOK mouse_hook;
-   
+
    LRESULT CALLBACK (*shell_hook_func) (int , WPARAM , LPARAM);
    HHOOK shellhook;
+
+
+
+///   WindowTree window_tree;
+
 
 
 /*
@@ -124,12 +129,12 @@ void StopMouse();
 
 void StartMouse();
 
-*/   
+*/
 
 
    void DrawHandlerToDIB();
-   
-   
+
+
 public :
 //   RawInputHandler();
    RawInputHandler() :
@@ -164,140 +169,43 @@ public :
          mouse_hook(0),
          shell_hook_func(0),
          shellhook(0)
+///         window_tree()
    {
       mouse_controller.SetWindowHandler(&window_handler);
-/*
-      HMODULE WINAPI LoadLibrary(
-        _In_ LPCTSTR lpFileName
-      );      
-LRESULT CALLBACK LowLevelMouseHook(int nCode, WPARAM wParam, LPARAM lParam);
-
-void StopMouse();
-
-void StartMouse();
-_Z10StartMousev
-*/
-      hMod_hook_dll = LoadLibrary("Hooks.dll");
-      log.Log("Hook dll %s\n" , hMod_hook_dll?"loaded successfully":"failed to load");
-      if (hMod_hook_dll) {
-         ll_mouse_hook_func = (LRESULT CALLBACK (*)(int , WPARAM , LPARAM))GetProcAddress(hMod_hook_dll , "_Z17LowLevelMouseHookijl@12");
-         if (!ll_mouse_hook_func) {
-            log.Log("LowLevelMouseHook failed to load. GetLastError reports %d\n" , GetLastError());
-         }
-         else {
-            log.Log("LowLevelMouseHook loaded successfully.\n");
-         }
-
-         mouse_hook_func = (LRESULT CALLBACK (*) (int , WPARAM , LPARAM))GetProcAddress(hMod_hook_dll , "_Z9MouseHookijl@12");
-         if (!mouse_hook_func) {
-            log.Log("MouseHook failed to load. GetLastError reports %d\n" , GetLastError());
-         }
-         else {
-            log.Log("MouseHook loaded successfully.\n");
-         }
-
-
-         start_mouse_func = (void (*) ())GetProcAddress(hMod_hook_dll , "_Z10StartMousev");
-         if (!start_mouse_func) {
-            log.Log("StartMouse failed to load. GetLastError reports %d\n" , GetLastError());
-         }
-         else {
-            log.Log("StartMouse loaded successfully.\n");
-         }
-
-         stop_mouse_func = (void (*) ())GetProcAddress(hMod_hook_dll , "_Z9StopMousev");
-         if (!stop_mouse_func) {
-            log.Log("StopMouse failed to load. GetLastError reports %d\n" , GetLastError());
-         }
-         else {
-            log.Log("StopMouse loaded successfully.\n");
-         }
-         
-         
-         
-         
-         ll_mouse_hook = SetWindowsHookEx(WH_MOUSE_LL , ll_mouse_hook_func , hMod_hook_dll , 0);
-         if (!ll_mouse_hook) {
-            log.Log("SetWindowsHookEx(WH_MOUSE_LL) failed. GetLastError says %d\n" , GetLastError());
-         }
-         else {
-            log.Log("SetWindowsHookEx(WH_MOUSE_LL) succeeded.\n");
-         }
-         
-         mouse_hook = SetWindowsHookEx(WH_MOUSE , mouse_hook_func , hMod_hook_dll , 0);
-         if (!mouse_hook) {
-            log.Log("SetWindowsHookEx(WH_MOUSE) failed. GetLastError says %d\n" , GetLastError());
-         }
-         else {
-            log.Log("SetWindowsHookEx(WH_MOUSE) succeeded.\n");
-         }
-         /// Setup our hook to monitor shell commands like window creation, activation, and destruction
-         /// Make sure to init window handler first
-         
-         SetWindowHandler(&window_handler);
-         SetMouseController(&mouse_controller);
-         
-         shell_hook_func = (LRESULT CALLBACK (*)(int , WPARAM , LPARAM))
-                           GetProcAddress(hMod_hook_dll , "_Z9ShellHookijl@12");         
-         
-         if (!shell_hook_func) {
-            log.Log("ShellHook failed to load. GetLastError reports %d\n" , GetLastError());
-         }
-         else {
-            log.Log("ShellHook loaded successfully\n");
-         }
-
-
-         shellhook = SetWindowsHookEx(WH_SHELL , shell_hook_func , hMod_hook_dll , 0);
-         if (!shellhook) {
-            log.Log("SetWindowsHookEx(WH_SHELL) failed. GetLastError reports %d\n" , GetLastError());
-         }
-         else {
-            log.Log("SetWindowsHookEx(WH_SHELL) succeeded\n");
-         }
-      }
+      SetupHooks();
    }
 
    ~RawInputHandler() {
       CloseWindows();
-      if (shellhook) {
-         log.Log("UnhookWindowsHookEx(shellhook) returned %s\n" , UnhookWindowsHookEx(shellhook)?"true":"false");
-         shellhook = 0;
-      }
-      if (ll_mouse_hook) {
-         log.Log("UnhookWindowsHookEx returned %s\n" , UnhookWindowsHookEx(ll_mouse_hook)?"true":"false");
-         ll_mouse_hook = 0;
-      }
-      if (hMod_hook_dll) {
-         FreeLibrary(hMod_hook_dll);
-         hMod_hook_dll = 0;
-      }
+      FreeHooks();
    }
 
+   void SetupHooks();
+   void FreeHooks();
    int SetupWindows();
    void CloseWindows();
-   
+
    void InputLoop();
 
    void FreeRawInfo();
    bool InitRawInfo();
-   
+
    void PrintDeviceInfo();
-   
+
    void SetupDefaultDevices(bool swallow_mouse);
    bool RegisterDevices(bool swallow_mouse);
    void UnRegisterDevices();
-   
+
    void QueuePaintMessage();
 
    bool HandleWindowMessage(UINT message , WPARAM wparam , LPARAM lparam , LRESULT* result);
-      
+
    void PrintRawHeader(RAWINPUTHEADER hdr);
 
    void PrintRawMouse(RAWINPUTHEADER hdr , RAWMOUSE* rms);
    void PrintRawKeyboard(RAWINPUTHEADER hdr , RAWKEYBOARD* rkb);
    void PrintRawHid(RAWINPUTHEADER hdr , RAWHID* rhid);
-   
+
    void HandleRawInput(RAWINPUT rinput);
 };
 

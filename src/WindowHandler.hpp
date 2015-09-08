@@ -14,6 +14,9 @@ class MouseController;
 ///#include "String.hpp"
 #include "VisualLogger.hpp"
 #include "WindowInfo.hpp"
+#include "WindowTree.hpp"
+
+
 
 using namespace ManyMouse;
 
@@ -76,7 +79,11 @@ class WindowHandler {
    HWND active_window;
 
    Mutex mutex;
-   
+
+   WindowTree window_tree;
+
+   WindowNode* base_node;
+   WindowNode* child_node;
 
 
    friend BOOL CALLBACK EnumerateWindowsProcess(HWND hwindow , LPARAM lp);
@@ -106,7 +113,10 @@ public :
          all_other_windows(),
          disabled_windows(),
          active_window(GetForegroundWindow()),
-         mutex()
+         mutex(),
+         window_tree(mouse_controller),
+         base_node(0),
+         child_node(0)
    {
       assert(mouse_controller);
       if (!mutex.Init()) {
@@ -116,25 +126,30 @@ public :
 
    ~WindowHandler();
 
-///   void HandleShellHookInfo(int code , WPARAM wp , LPARAM lp); 
+   WindowNode* BaseNode(POINT p) {return window_tree.GetBaseWindowNode(p);}
+   WindowNode* ChildNode(POINT p) {return window_tree.GetTopChildWindowNode(p);}
+
+///   void HandleShellHookInfo(int code , WPARAM wp , LPARAM lp);
    void HandleShellHookInfo(int code , WPARAM wp , LPARAM lp) {
-      
+
+   int codes[4] = {HSHELL_WINDOWACTIVATED , HSHELL_WINDOWCREATED
+
       if ((code == HSHELL_WINDOWACTIVATED) ||
          (code == HSHELL_WINDOWCREATED) ||
          (code == HSHELL_WINDOWDESTROYED) ||
          (code == HSHELL_GETMINRECT)) {
-         
+
          mutex.Lock();
          // Handle our hook information
          log.Log("HandleShellHookInfo called\n");
-         
+
          EnumerateWindows();
-         
+
          mutex.Unlock();
       }
    }
 
-   
+
    void PrintAllWindows();
 
 
@@ -157,6 +172,10 @@ public :
    void ToggleSystemMouseOnOff(bool on);
    bool SystemMouseOn() {return system_mouse_on;}
 
+
+
+
+
 //   void HandleMouseMove(Mouse* m);//int nmx , int nmy
    void HandleMouseMove(Mouse* m) {
       if (!m) {
@@ -168,13 +187,23 @@ public :
       }
       const int nmx = m->X();
       const int nmy = m->Y();
-      hwnd = GetWindowAtPos(nmx , nmy);
-      
       POINT p;
       p.x = nmx;
       p.y = nmy;
-      ScreenToClient(hwnd , &p);
-      hwnd = FindTopMostChild(hwnd , p);
+
+///      hwnd = GetWindowAtPos(nmx , nmy);
+      base_node = window_tree.GetBaseWindowNode(p);
+      if (!base_node) {
+         return;
+      }
+      hwnd = base_node->hwindow;
+
+      child_node = window_tree.GetTopChildWindowNode(p);
+///      hwnd = FindTopMostChild(hwnd , p);
+      if (child_node) {
+         hwnd = child_node->hwindow;
+      }
+
       if (hwnd) {
 /// EnableWindow is dangerous - if you disable a window and never re-enable it it can't get input anymore
 ///         EnableWindow(hwnd , system_mouse_on);
@@ -198,16 +227,19 @@ public :
 //         nmx -= clrect.left;
 //         nmy -= clrect.top;
 
+
+         ScreenToClient(hwnd , &p);
+
          WPARAM wp = 0;// TODO : Encode modifier flags, see WM_LBUTTONDOWN
          LPARAM lp = MAKELPARAM((short)p.x , (short)p.y);
 
 
          PostMessage(hwnd , WM_MOUSEMOVE , wp , lp);
          PostMessage(hwnd , WM_MOUSEHOVER , wp , lp);
-         
+
 //         RECT r;
 //         GetWindowRect(hwnd , &r)
-         
+
       }
 
       oldhwnd = hwnd;
@@ -227,20 +259,20 @@ public :
       POINT p;
       p.x = bx;
       p.y = by;
-      
+
 ///      HWND childhwnd = ChildWindowFromPoint(hwnd , p);
 ///      HWND childhwnd = ChildWindowFromPointEx(hwnd , p , CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);
 
       HWND childhwnd = FindTopMostChild(hwnd , p);
-      
+
 
       WindowInfo winfo;
       WindowInfo winfo2;
       winfo.SetWindowHandle(hwnd);
       winfo2.SetWindowHandle(childhwnd);
-      
+
       log.Log("\n");
-      
+
       log.Log(winfo.GetWindowInfoString());
       log.Log(winfo2.GetWindowInfoString());
 
@@ -252,9 +284,9 @@ public :
          0 , "WM_LBUTTONDOWN" , "WM_MBUTTONDOWN" , "WM_RBUTTONDOWN" , 0 , "WM_LBUTTONUP" , "WM_MBUTTONUP" , "WM_RBUTTONUP" ,
          0 , "WM_NCLBUTTONDOWN" , "WM_NCMBUTTONDOWN" , "WM_NCRBUTTONDOWN" , 0 , "WM_NCLBUTTONUP" , "WM_NCMBUTTONUP" , "WM_NCRBUTTONUP"
       };
-      
+
       hwnd = childhwnd;
-      
+
       bool nc = false;
       if (btn >= 1 && btn <= 3) {
          if (down) {
@@ -264,9 +296,9 @@ public :
 
                if (hwnd != active_window) {
                   SetForegroundWindow(hwnd);
-                  
+
                   assert(m);
-                  
+
                   BringWindowToTop(m->GetMouseWindowHandle());
                }
                active_window = GetForegroundWindow();

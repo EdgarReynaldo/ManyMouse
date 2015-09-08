@@ -23,6 +23,17 @@ using std::vector;
 ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active);
 
 
+enum MOUSE_STATE {
+   MOUSE_INACTIVE = 0,
+   MOUSE_ACTIVE = 1,
+   MOUSE_GRABBING = 2,
+   MOUSE_NEEDS_HELPER = 3,
+   MOUSE_HELPER_READY = 4,
+   MOUSE_DRAGGING = 5
+};
+
+#define NUM_MOUSE_STATES = 6
+
 
 class Mouse {
 
@@ -43,16 +54,19 @@ public :
    int focusx;
    int focusy;
 
-///   bool active;
+   bool shown;
    bool ready;
 
    int ldx;// last delta x
    int ldy;// last delta y
-   
+
    RECT bounds;
 
-   double time;
-   double lclicktime;
+   MOUSE_STATE mouse_state;
+   ALLEGRO_BITMAP* mouse_images[NUM_MOUSE_STATES];
+
+//   double time;
+//   double lclicktime;
 
 public :
 
@@ -65,13 +79,15 @@ Mouse() :
       y(0),
       focusx(0),
       focusy(0),
-///      active(false),
+      shown(true),
       ready(false),
       ldx(0),
       ldy(0),
       bounds(),
-      time(0.0),
-      lclicktime(0.0)
+      mouse_state(MOUSE_INACTIVE),
+      mouse_images()
+//      time(0.0),
+//      lclicktime(0.0)
 {
    bounds.left = 0;
    bounds.right = 0;
@@ -108,19 +124,20 @@ Mouse() :
 
    HWND GetMouseWindowHandle();
 
-/*   
+/*
    void UpdateClock(double t);
    double GetTimeSinceLastLeftClick();
 
    void UpdateClock(double t) {
       time = t;
    }
-   
+
    double GetTimeSinceLastLeftClick() {
       return time - lclicktime;
    }
 */
    void BringMouseToFront();
+   void ShowMouse(bool show_mouse);
 };
 
 
@@ -178,16 +195,101 @@ public :
 };
 
 
+enum MOUSE_STRATEGY {
+   MOUSE_STRATEGY_NORMAL = 0,
+   MOUSE_STRATEGY_COLLABORATIVE = 1,
+   MOUSE_STRATEGY_HEAVYOBJECT = 2
+};
+
+enum HEAVY_MOUSE_STATES {
+   HEAVY_MOUSE_FREE = 0,
+   HEAVY_MOUSE_GRABBING = 1,
+   HEAVY_MOUSE_DRAGGING = 2
+};
+
+class MouseStrategy {
+
+   MouseTracker* mouse_tracker;
+   WindowHandler* window_handler;
+
+public :
+
+   MouseStrategy();
+   MouseStrategy() :
+         mouse_tracker(0),
+         window_handler(0)
+   {
+   }
+
+   void HandleInput(RAWINPUT input)=0;
+
+   MOUSE_STRATEGY GetStrategy()=0;
+
+};
+
+
+class NormalMouseStrategy : public MouseStrategy {
+
+public :
+   void HandleInput(RAWINPUT input);
+   void HandleInput(RAWINPUT input) {
+
+   }
+
+   MOUSE_STRATEGY GetStrategy() {return MOUSE_STRATEGY_NORMAL;}
+
+};
+
+
+
+class HeavyMouseStrategy : public MouseStrategy {
+
+   HEAVY_MOUSE_STATE heavy_mouse_state;
+
+public :
+
+   void HandleInput(RAWINPUT input);
+   void HandleInput(RAWINPUT input) {
+      Mouse* active_mouse = input.hid
+      switch (heavy_mouse_state) {
+      case HEAVY_MOUSE_FREE :
+
+         break;
+      case HEAVY_MOUSE_GRABBING :
+
+         break;
+      case HEAVY_MOUSE_DRAGGING :
+
+         break;
+      }
+   }
+
+   MOUSE_STRATEGY GetStrategy() {return MOUSE_STRATEGY_HEAVYOBJECT;}
+
+};
+
 
 class MouseController {
 public:
+
+   NormalMouseStrategy normal_strategy;
+//   CollaborativeMouseStrategy collaborative_strategy;
+   HeavyMouseStrategy heavy_strategy;
+
+   MouseStrategy* active_strategy;
+
 
    MouseTracker mouse_tracker;
 
    ALLEGRO_BITMAP* ms_enabled_image;
    ALLEGRO_BITMAP* ms_disabled_image;
 
-   bool enabled;
+   bool mouse_image_enabled;
+
+   bool mice_active;
+
+//   bool mice_enabled;
+   bool mice_shown;
 
    WindowHandler* window_handler;
 
@@ -213,7 +315,11 @@ public :
 
    void Draw();
 
-   void ToggleMiceEnabled();
+   void ToggleMouseImage();
+
+   void ActivateMice(bool activate_mice);
+   void ShowMice(bool show_mice);
+
 
    void GetMiceWindows(vector<HWND>* winvec);
    vector<Mouse*> GetMice();
