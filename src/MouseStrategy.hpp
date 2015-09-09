@@ -8,6 +8,9 @@
 
 #include "AllegroAndWindows.hpp"
 
+#include "VisualLogger.hpp"
+using ManyMouse::log;
+
 class MouseTracker;
 class WindowHandler;
 
@@ -50,15 +53,50 @@ public :
 class NormalMouseStrategy : public MouseStrategy {
 
 public :
-//   void HandleInput(RAWINPUT input);
+   void HandleInput(RAWINPUT input) {}
+/*
    void HandleInput(RAWINPUT input) {
 
+      RAWINPUTHEADER hdr = input.header;
+
+      /// If hDevice is NULL, this is from SendInput. ( These messages are currently filtered by
+      /// RawInputHandler::HandleRawInput )
+      if (!hdr.hDevice) {return;}
+
+      Mouse* mouse = mouse_tracker->GetMouseFromHandle(hdr.hDevice);
+      if (!mouse) {
+         log.Log("Creating new mouse. hDevice = %p\n" , hdr.hDevice);
+         if (!CreateMouse(hdr.hDevice)) {
+            log.Log("MouseController::HandleRawInput - Could not create mouse.\n");
+         }
+         mouse = mouse_tracker.GetMouseFromHandle(hdr.hDevice);
+      }
+
+      if (mouse) {
+         mouse->HandleRawInput(input);
+         if (window_handler && hdr.dwType == RIM_TYPEMOUSE) {
+            RAWMOUSE rms = input.data.mouse;
+
+            USHORT flags = rms.usButtonFlags;
+            if (mice_active) {
+               bool down = false;
+               int button = FlagsToButtonIndex(flags , &down);
+               if (button) {
+                  window_handler->HandleButton(mouse , button , down , mouse->X() , mouse->Y());
+               }
+
+               if (mouse->MouseMoved()) {
+                  window_handler->HandleMouseMove(mouse);
+               }
+            }
+         }
+      }
    }
+*/
 
    MOUSE_STRATEGY GetStrategy() {return MOUSE_STRATEGY_NORMAL;}
 
 };
-
 
 
 class HeavyMouseStrategy : public MouseStrategy {
