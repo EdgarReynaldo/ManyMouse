@@ -37,9 +37,9 @@ protected :
 public :
 
 //   MouseStrategy();
-   MouseStrategy() :
-         mouse_tracker(0),
-         window_handler(0)
+   MouseStrategy(MouseTracker* mt , WindowHandler* wh)  :
+         mouse_tracker(mt),
+         window_handler(wh)
    {
    }
 
@@ -53,6 +53,14 @@ public :
 class NormalMouseStrategy : public MouseStrategy {
 
 public :
+   NormalMouseStrategy(MouseTracker* mt , WindowHandler* wh) :
+      MouseStrategy(mt,wh)
+   {
+   }
+
+
+
+
    void HandleInput(RAWINPUT input);
 
 
@@ -66,6 +74,11 @@ class HeavyMouseStrategy : public MouseStrategy {
    HEAVY_MOUSE_STATE heavy_mouse_state;
 
 public :
+
+   HeavyMouseStrategy(MouseTracker* mt , WindowHandler* wh) :
+      MouseStrategy(mt,wh)
+   {
+   }
 
    void HandleInput(RAWINPUT input) {}
 /*

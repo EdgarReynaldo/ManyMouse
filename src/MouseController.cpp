@@ -65,12 +65,12 @@ void MouseController::DestroyMice() {
 
 
 
-MouseController::MouseController() :
-      normal_strategy(),
-//      collaborative_strategy(),
-      heavy_strategy(),
-      active_strategy(&normal_strategy),
+MouseController::MouseController(WindowHandler* wh) :
       mouse_tracker(),
+      normal_strategy(&mouse_tracker , wh),
+//      collaborative_strategy(),
+      heavy_strategy(&mouse_tracker , wh),
+      active_strategy(&normal_strategy),
       ms_enabled_image(0),
       ms_disabled_image(0),
       mouse_image_enabled(true),

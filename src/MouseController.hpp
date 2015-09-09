@@ -73,6 +73,8 @@ public :
 class MouseController {
 public:
 
+   MouseTracker mouse_tracker;
+
    NormalMouseStrategy normal_strategy;
 //   CollaborativeMouseStrategy collaborative_strategy;
    HeavyMouseStrategy heavy_strategy;
@@ -80,7 +82,6 @@ public:
    MouseStrategy* active_strategy;
 
 
-   MouseTracker mouse_tracker;
 
    ALLEGRO_BITMAP* ms_enabled_image;
    ALLEGRO_BITMAP* ms_disabled_image;
@@ -103,7 +104,7 @@ public:
 
 
 public :
-   MouseController();
+   MouseController(WindowHandler* wh);
 
    ~MouseController();
 

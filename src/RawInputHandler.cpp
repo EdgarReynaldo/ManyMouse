@@ -3,6 +3,8 @@
 
 #include "ManyMouse.hpp"
 
+//#include "allegro5/allegro_direct3d.h"
+
 
 #include "RawInputHandler.hpp"
 
@@ -11,7 +13,6 @@
 using namespace ManyMouse;
 
 
-#include "allegro5/allegro_direct3d.h"
 
 
 bool lograwinput = false;
@@ -705,8 +706,8 @@ void RawInputHandler::InputLoop() {
             else {
                ManyMouse::log.Log("Successfully captured the mouse.\n");
             }
-            LPDIRECT3DDEVICE9 lpd3d9 = al_get_d3d_device(display);
-            while (lpd3d9->ShowCursor(false) > -1);
+//            LPDIRECT3DDEVICE9 lpd3d9 = al_get_d3d_device(display);
+//            while (lpd3d9->ShowCursor(false) > -1);
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_J) {
             ShowCursor(true);
