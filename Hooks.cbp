@@ -64,6 +64,12 @@
 		<Unit filename="src/ManyMouse.hpp" />
 		<Unit filename="src/Mouse.cpp" />
 		<Unit filename="src/Mouse.hpp" />
+		<Unit filename="src/MouseController.cpp" />
+		<Unit filename="src/MouseController.hpp" />
+		<Unit filename="src/MouseStrategy.cpp" />
+		<Unit filename="src/MouseStrategy.hpp" />
+		<Unit filename="src/MouseTracker.cpp" />
+		<Unit filename="src/MouseTracker.hpp" />
 		<Unit filename="src/Mutex.cpp" />
 		<Unit filename="src/Mutex.hpp" />
 		<Unit filename="src/String.cpp" />
