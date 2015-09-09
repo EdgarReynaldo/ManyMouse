@@ -4,7 +4,7 @@
 #include "Mouse.hpp"
 
 #include "WindowHandler.hpp"
-
+#include "MouseController.hpp"
 #include "VisualLogger.hpp"
 
 #include "String.hpp"

@@ -9,7 +9,7 @@
 #include "WindowInfo.hpp"
 #include "Mouse.hpp"
 #include "VisualLogger.hpp"
-
+#include "MouseController.hpp"
 
 #include <vector>
 using std::vector;
