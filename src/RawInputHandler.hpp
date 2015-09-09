@@ -10,6 +10,7 @@
 #include "WindowHandler.hpp"
 #include "TransparentWindow.hpp"
 #include "Hooks.hpp"
+#include "KeyboardHandler.hpp"
 
 #include <string>
 #include <vector>
