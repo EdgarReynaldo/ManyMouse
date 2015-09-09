@@ -61,6 +61,8 @@
 		<Unit filename="src/DIBbuffer.hpp" />
 		<Unit filename="src/Hooks.cpp" />
 		<Unit filename="src/Hooks.hpp" />
+		<Unit filename="src/KeyboardHandler.cpp" />
+		<Unit filename="src/KeyboardHandler.hpp" />
 		<Unit filename="src/ManyMouse.hpp" />
 		<Unit filename="src/Mouse.cpp" />
 		<Unit filename="src/Mouse.hpp" />

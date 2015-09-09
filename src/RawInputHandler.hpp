@@ -93,7 +93,7 @@ public:
 
    WindowHandler window_handler;
 
-
+   KeyboardHandler keyboard_handler;
 
    bool registered;
 
@@ -161,6 +161,7 @@ public :
          rids(),
          mouse_controller(&window_handler),
          window_handler(&mouse_controller),
+         keyboard_handler(),
          registered(false),
          hMod_hook_dll(0),
          ll_mouse_hook_func(0),

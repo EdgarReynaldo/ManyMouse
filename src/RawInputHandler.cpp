@@ -1346,6 +1346,11 @@ void RawInputHandler::HandleRawInput(RAWINPUT rinput) {
       mouse_controller.HandleRawInput(rinput);
 ///      window_handler.GetMiceWindows();
    }
+
+   else if (rinput.header.dwType == RIM_TYPEKEYBOARD) {
+      keyboard_handler.HandleRawInput(rinput);
+   }
+
 }
 
 
