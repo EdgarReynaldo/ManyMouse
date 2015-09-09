@@ -101,7 +101,6 @@ public:
 
    void DestroyMice();
 
-   int FlagsToButtonIndex(USHORT flags , bool* down);
 
 public :
    MouseController();

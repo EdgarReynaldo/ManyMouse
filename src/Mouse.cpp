@@ -146,6 +146,41 @@ ALLEGRO_BITMAP* DrawMouseImage(bool active){
 }
 
 
+
+
+int FlagsToButtonIndex(USHORT flags , bool* down) {
+   assert(down);
+   int btn = 0;
+   if (flags & RI_MOUSE_LEFT_BUTTON_DOWN) {
+      btn = 1;
+      *down = true;
+   }
+   if (flags & RI_MOUSE_MIDDLE_BUTTON_DOWN) {
+      btn = 2;
+      *down = true;
+   }
+   if (flags & RI_MOUSE_RIGHT_BUTTON_DOWN) {
+      btn = 3;
+      *down = true;
+   }
+   if (flags & RI_MOUSE_LEFT_BUTTON_UP) {
+      btn = 1;
+      *down = false;
+   }
+   if (flags & RI_MOUSE_MIDDLE_BUTTON_UP) {
+      btn = 2;
+      *down = false;
+   }
+   if (flags & RI_MOUSE_RIGHT_BUTTON_UP) {
+      btn = 3;
+      *down = false;
+   }
+   return btn;
+}
+
+
+
+
 Mouse::~Mouse() {
    CloseOurWindow();
 }

@@ -63,36 +63,6 @@ void MouseController::DestroyMice() {
 
 
 
-int MouseController::FlagsToButtonIndex(USHORT flags , bool* down) {
-   assert(down);
-   int btn = 0;
-   if (flags & RI_MOUSE_LEFT_BUTTON_DOWN) {
-      btn = 1;
-      *down = true;
-   }
-   if (flags & RI_MOUSE_MIDDLE_BUTTON_DOWN) {
-      btn = 2;
-      *down = true;
-   }
-   if (flags & RI_MOUSE_RIGHT_BUTTON_DOWN) {
-      btn = 3;
-      *down = true;
-   }
-   if (flags & RI_MOUSE_LEFT_BUTTON_UP) {
-      btn = 1;
-      *down = false;
-   }
-   if (flags & RI_MOUSE_MIDDLE_BUTTON_UP) {
-      btn = 2;
-      *down = false;
-   }
-   if (flags & RI_MOUSE_RIGHT_BUTTON_UP) {
-      btn = 3;
-      *down = false;
-   }
-   return btn;
-}
-
 
 
 MouseController::MouseController() :
@@ -161,6 +131,13 @@ void MouseController::HandleRawInput(RAWINPUT rawinput) {
       mouse = mouse_tracker.GetMouseFromHandle(hdr.hDevice);
    }
 
+   if (active_strategy) {
+      active_strategy->HandleInput(rawinput);
+   }
+
+
+
+/*
    if (mouse) {
       mouse->HandleRawInput(rawinput);
       if (window_handler && hdr.dwType == RIM_TYPEMOUSE) {
@@ -180,6 +157,7 @@ void MouseController::HandleRawInput(RAWINPUT rawinput) {
          }
       }
    }
+*/
 }
 
 

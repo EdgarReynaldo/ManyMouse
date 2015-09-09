@@ -23,6 +23,11 @@ using std::vector;
 ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active);
 
 
+int FlagsToButtonIndex(USHORT flags , bool* down);
+
+
+
+
 enum MOUSE_STATE {
    MOUSE_INACTIVE = 0,
    MOUSE_ACTIVE = 1,
