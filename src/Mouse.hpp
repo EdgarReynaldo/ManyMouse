@@ -32,7 +32,7 @@ enum MOUSE_STATE {
    MOUSE_DRAGGING = 5
 };
 
-#define NUM_MOUSE_STATES = 6
+#define NUM_MOUSE_STATES 6
 
 
 class Mouse {
@@ -201,7 +201,7 @@ enum MOUSE_STRATEGY {
    MOUSE_STRATEGY_HEAVYOBJECT = 2
 };
 
-enum HEAVY_MOUSE_STATES {
+enum HEAVY_MOUSE_STATE {
    HEAVY_MOUSE_FREE = 0,
    HEAVY_MOUSE_GRABBING = 1,
    HEAVY_MOUSE_DRAGGING = 2
@@ -209,21 +209,22 @@ enum HEAVY_MOUSE_STATES {
 
 class MouseStrategy {
 
+protected :
    MouseTracker* mouse_tracker;
    WindowHandler* window_handler;
 
 public :
 
-   MouseStrategy();
+//   MouseStrategy();
    MouseStrategy() :
          mouse_tracker(0),
          window_handler(0)
    {
    }
 
-   void HandleInput(RAWINPUT input)=0;
+   virtual void HandleInput(RAWINPUT input)=0;
 
-   MOUSE_STRATEGY GetStrategy()=0;
+   virtual MOUSE_STRATEGY GetStrategy()=0;
 
 };
 
@@ -231,7 +232,7 @@ public :
 class NormalMouseStrategy : public MouseStrategy {
 
 public :
-   void HandleInput(RAWINPUT input);
+//   void HandleInput(RAWINPUT input);
    void HandleInput(RAWINPUT input) {
 
    }
@@ -248,9 +249,9 @@ class HeavyMouseStrategy : public MouseStrategy {
 
 public :
 
-   void HandleInput(RAWINPUT input);
+//   void HandleInput(RAWINPUT input);
    void HandleInput(RAWINPUT input) {
-      Mouse* active_mouse = input.hid
+      Mouse* active_mouse = mouse_tracker->GetMouseFromHandle(input.header.hDevice);
       switch (heavy_mouse_state) {
       case HEAVY_MOUSE_FREE :
 

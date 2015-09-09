@@ -132,7 +132,7 @@ public :
 ///   void HandleShellHookInfo(int code , WPARAM wp , LPARAM lp);
    void HandleShellHookInfo(int code , WPARAM wp , LPARAM lp) {
 
-   int codes[4] = {HSHELL_WINDOWACTIVATED , HSHELL_WINDOWCREATED
+//   int codes[4] = {HSHELL_WINDOWACTIVATED , HSHELL_WINDOWCREATED
 
       if ((code == HSHELL_WINDOWACTIVATED) ||
          (code == HSHELL_WINDOWCREATED) ||
