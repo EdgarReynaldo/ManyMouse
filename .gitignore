@@ -35,3 +35,4 @@ libHooks.dll.a
 cbbuild/bin/libHooks.def
 cbbuild/bin/RawLog2.txt
 MonitorTestWindow_build_log.html
+cbbuild/bin/WorkingImages

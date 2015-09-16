@@ -18,6 +18,25 @@ using std::vector;
 
 
 
+enum HEAVY_MOUSE_STATE {
+   MOUSE_INACTIVE = 0,
+   MOUSE_ACTIVE = 1,
+   MOUSE_GRABBING = 2,
+   MOUSE_NEEDS_HELPER = 3,
+   MOUSE_HELPER_READY = 4,
+   MOUSE_DRAGGING = 5
+};
+
+#define NUM_HEAVY_MOUSE_STATES 6
+
+extern const char* heavy_mouse_paths[NUM_HEAVY_MOUSE_STATES];
+
+extern ALLEGRO_BITMAP* heavy_mouse_images[NUM_HEAVY_MOUSE_STATES];
+
+void FreeMiceImages();
+
+bool LoadMiceImages();
+
 
 /* Pass -1 for w or h to use default size */
 ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active);
@@ -27,17 +46,6 @@ int FlagsToButtonIndex(USHORT flags , bool* down);
 
 
 
-
-enum MOUSE_STATE {
-   MOUSE_INACTIVE = 0,
-   MOUSE_ACTIVE = 1,
-   MOUSE_GRABBING = 2,
-   MOUSE_NEEDS_HELPER = 3,
-   MOUSE_HELPER_READY = 4,
-   MOUSE_DRAGGING = 5
-};
-
-#define NUM_MOUSE_STATES 6
 
 
 class Mouse {
@@ -67,9 +75,6 @@ public :
 
    RECT bounds;
 
-   MOUSE_STATE mouse_state;
-   ALLEGRO_BITMAP* mouse_images[NUM_MOUSE_STATES];
-
 //   double time;
 //   double lclicktime;
 
@@ -89,8 +94,6 @@ Mouse() :
       ldx(0),
       ldy(0),
       bounds(),
-      mouse_state(MOUSE_INACTIVE),
-      mouse_images()
 //      time(0.0),
 //      lclicktime(0.0)
 {

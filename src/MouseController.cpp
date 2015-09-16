@@ -79,14 +79,18 @@ MouseController::MouseController(WindowHandler* wh) :
       mice_shown(true),
       window_handler(0)
 {
-
+   if (!LoadMiceImages()) {
+      log.Log("Failed to load mice images.\n");
+      ALLEGRO_ASSERT(0);// failed to load mice images
+   }
 }
 
 
 
 MouseController::~MouseController() {
    DestroyMice();
-   FreeMouseImages();
+   FreeMiceImages();
+   MouseController::FreeMouseImages();
 }
 
 

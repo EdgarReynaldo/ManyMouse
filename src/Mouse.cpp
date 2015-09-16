@@ -10,6 +10,52 @@
 #include <cstdio>
 
 
+const char* heavy_mouse_paths[NUM_HEAVY_MOUSE_STATES] = {
+   "NewImages/MouseInactive.png",
+   "NewImages/MouseActive.png",
+   "NewImages/MouseGrabbing.png",
+   "NewImages/MouseNeedsHelper.png",
+   "NewImages/MouseHelperReady.png",
+   "NewImages/MouseDragging.png"
+};
+
+
+
+ALLEGRO_BITMAP* heavy_mouse_images[NUM_HEAVY_MOUSE_STATES] = {
+   0,0,0,0,0,0
+};
+
+
+
+void FreeMiceImages() {
+   for (int i = 0 ; i < NUM_HEAVY_MOUSE_STATES ; ++i) {
+      ALLEGRO_BITMAP*& image = heavy_mouse_images[i];
+      if (image) {
+         al_destroy_bitmap(image);
+         image = 0;
+      }
+   }
+}
+
+
+
+bool LoadMiceImages() {
+   FreeMiceImages();
+   bool success = true;
+   for (int i = 0 ; i < NUM_HEAVY_MOUSE_STATES ; ++i) {
+      ALLEGRO_BITMAP* image = al_load_bitmap(heavy_mouse_paths[i]);
+      if (!image) {
+         success = false;
+         log.Log("Failed to load mouse image \"%s\"\n" , heavy_mouse_paths[i]);
+      }
+      heavy_mouse_images[i] = image;
+   }
+   if (!success) {
+      FreeMiceImages();
+   }
+   return success;
+}
+
 
 
 ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active) {

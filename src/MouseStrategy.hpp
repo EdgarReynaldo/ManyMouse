@@ -22,7 +22,7 @@ enum MOUSE_STRATEGY {
    MOUSE_STRATEGY_HEAVYOBJECT = 2
 };
 
-enum HEAVY_MOUSE_STATE {
+enum HEAVY_MOUSE_STRATEGY {
    HEAVY_MOUSE_FREE = 0,
    HEAVY_MOUSE_GRABBING = 1,
    HEAVY_MOUSE_DRAGGING = 2
@@ -71,12 +71,13 @@ public :
 
 class HeavyMouseStrategy : public MouseStrategy {
 
-   HEAVY_MOUSE_STATE heavy_mouse_state;
+   HEAVY_MOUSE_STRATEGY heavy_mouse_strategy;
 
 public :
 
    HeavyMouseStrategy(MouseTracker* mt , WindowHandler* wh) :
-      MouseStrategy(mt,wh)
+      MouseStrategy(mt,wh),
+      heavy_mouse_strategy(HEAVY_MOUSE_FREE)
    {
    }
 
