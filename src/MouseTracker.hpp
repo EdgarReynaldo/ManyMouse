@@ -65,6 +65,8 @@ public :
    Mouse* GetMouseByIndex(unsigned int index);// call NMice() to find out which indices are valid first
 
    vector<Mouse*> GetMouseVector();
+   vector<Mouse*> GetOtherMouseVector(Mouse* exclude);
+   
 
 };
 

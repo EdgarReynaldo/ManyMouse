@@ -142,3 +142,16 @@ vector<Mouse*> MouseTracker::GetMouseVector() {
 }
 
 
+
+vector<Mouse*> MouseTracker::GetOtherMouseVector(Mouse* exclude) {
+   vector<Mouse*> micevec;
+   for (unsigned int i = 0 ; i < mtinfo.size() ; ++i) {
+      Mouse* m = mtinfo[i].mouse;
+      if (m && m != exclude) {
+         micevec.push_back(m);
+      }
+   }
+   return micevec;
+}
+
+

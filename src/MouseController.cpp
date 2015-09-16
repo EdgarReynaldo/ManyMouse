@@ -83,6 +83,7 @@ MouseController::MouseController(WindowHandler* wh) :
       log.Log("Failed to load mice images.\n");
       ALLEGRO_ASSERT(0);// failed to load mice images
    }
+   heavy_strategy.Reset();
 }
 
 
