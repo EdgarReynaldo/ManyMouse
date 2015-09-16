@@ -410,7 +410,7 @@ int RawInputHandler::SetupWindows() {
 
    al_register_event_source(queue , al_get_display_event_source(display));
    al_register_event_source(queue , al_get_display_event_source(log_display));
-   al_register_event_source(queue , al_get_keyboard_event_source());
+//   al_register_event_source(queue , al_get_keyboard_event_source());
    al_register_event_source(queue , keyboard_handler.GetEventSource());
    al_register_event_source(queue , al_get_mouse_event_source());
    al_register_event_source(queue , al_get_timer_event_source(timer));
@@ -975,7 +975,7 @@ void RawInputHandler::SetupDefaultDevices(bool swallow_mouse) {
    default_devices[0].hwndTarget = winhandle;
 //   default_devices[0].hwndTarget = 0;
 
-/*
+//*
    // adds HID keyboard and also ignores legacy keyboard messages
    default_devices[1].usUsagePage = 0x01; // generic desktop controls
    default_devices[1].usUsage = 0x06; // keyboard
@@ -988,9 +988,9 @@ void RawInputHandler::SetupDefaultDevices(bool swallow_mouse) {
    default_devices[1].hwndTarget = winhandle;
 //   default_devices[1].hwndTarget = 0;
 
-*/
+//*/
    rids.push_back(default_devices[0]);
-///   rids.push_back(default_devices[1]);
+   rids.push_back(default_devices[1]);
 
 }
 

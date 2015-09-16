@@ -6,6 +6,10 @@
 
 #include "AllegroAndWindows.hpp"
 
+#include "VisualLogger.hpp"
+using ManyMouse::log;
+
+int GetAllegroKeyFromVKey(unsigned char vkey);
 
 class KeyboardHandler {
 
@@ -58,18 +62,21 @@ typedef struct tagRAWKEYBOARD {
       ev.keyboard.type = ALLEGRO_EVENT_KEY_DOWN;
       ev.keyboard.unichar = 0;
 
+
       switch(rkb.Message) {
       case WM_KEYDOWN :
          if (!vkeys[rkb.VKey]) {
-            ev.keyboard.keycode = 0;/// ???
+            ev.keyboard.keycode = GetAllegroKeyFromVKey(rkb.VKey);/// ???
             al_emit_user_event(&event_source , &ev , 0);
+            log.Log("VKey key release %x received\n" , (int)rkb.VKey);
          }
          vkeys[rkb.VKey] = true;
          break;
       case WM_KEYUP :
          if (vkeys[rkb.VKey]) {
             ev.keyboard.type = ALLEGRO_EVENT_KEY_UP;
-            ev.keyboard.keycode = 0;/// ???
+            ev.keyboard.keycode = GetAllegroKeyFromVKey(rkb.VKey);/// ???
+            log.Log("VKey key press %x received\n" , (int)rkb.VKey);
             al_emit_user_event(&event_source , &ev , 0);
          }
          vkeys[rkb.VKey] = false;

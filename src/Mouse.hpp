@@ -93,7 +93,7 @@ Mouse() :
       ready(false),
       ldx(0),
       ldy(0),
-      bounds(),
+      bounds()
 //      time(0.0),
 //      lclicktime(0.0)
 {
