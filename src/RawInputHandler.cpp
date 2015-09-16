@@ -410,8 +410,11 @@ int RawInputHandler::SetupWindows() {
 
    al_register_event_source(queue , al_get_display_event_source(display));
    al_register_event_source(queue , al_get_display_event_source(log_display));
-//   al_register_event_source(queue , al_get_keyboard_event_source());
+#ifdef DEBUG
+   al_register_event_source(queue , al_get_keyboard_event_source());
+#else
    al_register_event_source(queue , keyboard_handler.GetEventSource());
+#endif
    al_register_event_source(queue , al_get_mouse_event_source());
    al_register_event_source(queue , al_get_timer_event_source(timer));
 
@@ -1349,7 +1352,9 @@ void RawInputHandler::HandleRawInput(RAWINPUT rinput) {
    }
 
    else if (rinput.header.dwType == RIM_TYPEKEYBOARD) {
+#ifndef DEBUG
       keyboard_handler.HandleRawInput(rinput);
+#endif
    }
 
 }

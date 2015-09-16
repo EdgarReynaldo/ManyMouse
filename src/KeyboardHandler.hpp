@@ -68,7 +68,7 @@ typedef struct tagRAWKEYBOARD {
          if (!vkeys[rkb.VKey]) {
             ev.keyboard.keycode = GetAllegroKeyFromVKey(rkb.VKey);/// ???
             al_emit_user_event(&event_source , &ev , 0);
-            log.Log("VKey key release %x received\n" , (int)rkb.VKey);
+            log.Log("VKey key press %x received\n" , (int)rkb.VKey);
          }
          vkeys[rkb.VKey] = true;
          break;
@@ -76,7 +76,7 @@ typedef struct tagRAWKEYBOARD {
          if (vkeys[rkb.VKey]) {
             ev.keyboard.type = ALLEGRO_EVENT_KEY_UP;
             ev.keyboard.keycode = GetAllegroKeyFromVKey(rkb.VKey);/// ???
-            log.Log("VKey key press %x received\n" , (int)rkb.VKey);
+            log.Log("VKey key release %x received\n" , (int)rkb.VKey);
             al_emit_user_event(&event_source , &ev , 0);
          }
          vkeys[rkb.VKey] = false;
