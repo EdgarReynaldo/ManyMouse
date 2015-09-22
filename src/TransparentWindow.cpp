@@ -115,6 +115,7 @@ bool TransparentWindow::CreateTheWindow(ALLEGRO_BITMAP* img , COLORREF transpare
    
    image = img;
    
+   al_hold_bitmap_drawing(false);
    al_set_target_bitmap(NULL);
    al_set_new_display_flags(ALLEGRO_FRAMELESS | ALLEGRO_WINDOWED);
 ///   al_set_new_display_flags(ALLEGRO_FRAMELESS | ALLEGRO_WINDOWED | ALLEGRO_OPENGL);

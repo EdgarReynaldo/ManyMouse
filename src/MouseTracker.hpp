@@ -4,11 +4,11 @@
 #ifndef MouseTracker_HPP
 #define MouseTracker_HPP
 
+//#error WhatsUpWithThisShiznit
 
 #include "AllegroAndWindows.hpp"
 
 #include "Mouse.hpp"
-#include "MouseStrategy.hpp"
 
 
 #include <vector>
@@ -64,8 +64,8 @@ public :
    unsigned int NMice();// Number of mice present
    Mouse* GetMouseByIndex(unsigned int index);// call NMice() to find out which indices are valid first
 
-   vector<Mouse*> GetMouseVector();
-   vector<Mouse*> GetOtherMouseVector(Mouse* exclude);
+   vector<Mouse*> MiceVector();
+   vector<Mouse*> OtherMiceVector(Mouse* exclude);
    
 
 };

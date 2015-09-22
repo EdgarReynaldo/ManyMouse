@@ -42,35 +42,11 @@ public :
 
 public :
 //   WindowInfo();
-   WindowInfo() :
-         hwnd((HWND)0),
-         parent((HWND)0),
-         pid(-1),
-         window_process((WNDPROC)0),
-         window_rect(),
-         client_rect(),
-         window_title("Unknown window title"),
-         window_class("Unknown class name"),
-         window_type("Unknown window type")
-   {
-      InitRects();
-   }
+   WindowInfo();
+   WindowInfo(HWND window);
+   WindowInfo(const WindowInfo& rhs);
 
 
-   WindowInfo(HWND window) :
-         hwnd((HWND)0),
-         parent((HWND)0),
-         pid(-1),
-         window_process((WNDPROC)0),
-         window_rect(),
-         client_rect(),
-         window_title("Unknown window title"),
-         window_class("Unknown class name"),
-         window_type("Unknown window type")
-   {
-      InitRects();
-      SetWindowHandle(window);
-   }
 
 
 

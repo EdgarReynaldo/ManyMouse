@@ -120,7 +120,7 @@ public :
    {
       assert(mouse_controller);
       if (!mutex.Init()) {
-         log.Log("WindowHandler::WindowHandler - Failed to init mutex.\n");
+         ManyMouse::log.Log("WindowHandler::WindowHandler - Failed to init mutex.\n");
       }
    }
 
@@ -141,7 +141,7 @@ public :
 
          mutex.Lock();
          // Handle our hook information
-         log.Log("HandleShellHookInfo called\n");
+         ManyMouse::log.Log("HandleShellHookInfo called\n");
 
          EnumerateWindows();
 
@@ -179,7 +179,7 @@ public :
 //   void HandleMouseMove(Mouse* m);//int nmx , int nmy
    void HandleMouseMove(Mouse* m) {
       if (!m) {
-         log.Log("WindowHandler::HandleMouseMove - Mouse* m is NULL\n");
+         ManyMouse::log.Log("WindowHandler::HandleMouseMove - Mouse* m is NULL\n");
          return;
       }
       if (!m->MouseMoved()) {
@@ -214,7 +214,7 @@ public :
             htmsg = SendMessage(hwnd , WM_NCHITTEST , wp , lp);
 ///            log.Log("htmsg = %d\n" , htmsg);
             if ((htmsg != oldhtmsg) || (hwnd != oldhwnd)) {
-               log.Log("htmsg = %d , window title = '%s'\n" , htmsg , info.WindowTitle().c_str());
+               ManyMouse::log.Log("htmsg = %d , window title = '%s'\n" , htmsg , info.WindowTitle().c_str());
             }
          }
 
@@ -271,10 +271,10 @@ public :
       winfo.SetWindowHandle(hwnd);
       winfo2.SetWindowHandle(childhwnd);
 
-      log.Log("\n");
+      ManyMouse::log.Log("\n");
 
-      log.Log(winfo.GetWindowInfoString());
-      log.Log(winfo2.GetWindowInfoString());
+      ManyMouse::log.Log(winfo.GetWindowInfoString());
+      ManyMouse::log.Log(winfo2.GetWindowInfoString());
 
       unsigned int msg[16] = {
          0 , WM_LBUTTONDOWN , WM_MBUTTONDOWN , WM_RBUTTONDOWN , 0 , WM_LBUTTONUP , WM_MBUTTONUP , WM_RBUTTONUP ,
@@ -307,7 +307,7 @@ public :
                int index = (nc?8:0) + (down?0:4) + btn;
                const char* str = strs[index];
                if (str) {
-                  log.Log("%s sent to hwnd %p\n" , str , hwnd);
+                  ManyMouse::log.Log("%s sent to hwnd %p\n" , str , hwnd);
                }
                if (htmsg == HTCLOSE ||
                    htmsg == HTSIZE ||
@@ -368,8 +368,8 @@ public :
          p.x = bx;
          p.y = by;
          if (!ScreenToClient(hwnd , &p)) {
-            log.Log("WindowHandler::HandleButton() - ScreenToClient failed\n");
-            log.Log("GetLastError reports error %i\n" , GetLastError());
+            ManyMouse::log.Log("WindowHandler::HandleButton() - ScreenToClient failed\n");
+            ManyMouse::log.Log("GetLastError reports error %i\n" , GetLastError());
          }
          else {
             bx = p.x;

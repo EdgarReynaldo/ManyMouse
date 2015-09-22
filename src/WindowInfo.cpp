@@ -24,6 +24,55 @@ string RectString(RECT rect) {
 
 
 
+WindowInfo::WindowInfo() :
+      hwnd((HWND)0),
+      parent((HWND)0),
+      pid(-1),
+      window_process((WNDPROC)0),
+      window_rect(),
+      client_rect(),
+      window_title("Unknown window title"),
+      window_class("Unknown class name"),
+      window_type("Unknown window type")
+{
+   InitRects();
+}
+
+
+WindowInfo::WindowInfo(HWND window) :
+      hwnd((HWND)0),
+      parent((HWND)0),
+      pid(-1),
+      window_process((WNDPROC)0),
+      window_rect(),
+      client_rect(),
+      window_title("Unknown window title"),
+      window_class("Unknown class name"),
+      window_type("Unknown window type")
+{
+   InitRects();
+   SetWindowHandle(window);
+}
+
+
+
+WindowInfo::WindowInfo(const WindowInfo& rhs) :
+      hwnd(rhs.hwnd),
+      parent(rhs.parent),
+      pid(rhs.pid),
+      window_process(rhs.window_process),
+      window_rect(),
+      client_rect(),
+      window_title(rhs.window_title),
+      window_class(rhs.window_class),
+      window_type(rhs.window_type)
+{
+   window_rect = rhs.window_rect;
+   client_rect = rhs.client_rect;
+}
+
+
+
 void WindowInfo::InitRects() {
    window_rect.left = -1;
    window_rect.right = -1;

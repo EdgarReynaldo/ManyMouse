@@ -130,7 +130,7 @@ Mouse* MouseTracker::GetMouseByIndex(unsigned int index) {
 
 
 
-vector<Mouse*> MouseTracker::GetMouseVector() {
+vector<Mouse*> MouseTracker::MiceVector() {
    vector<Mouse*> micevec;
    for (unsigned int i = 0 ; i < mtinfo.size() ; ++i) {
       Mouse* m = mtinfo[i].mouse;
@@ -143,7 +143,7 @@ vector<Mouse*> MouseTracker::GetMouseVector() {
 
 
 
-vector<Mouse*> MouseTracker::GetOtherMouseVector(Mouse* exclude) {
+vector<Mouse*> MouseTracker::OtherMiceVector(Mouse* exclude) {
    vector<Mouse*> micevec;
    for (unsigned int i = 0 ; i < mtinfo.size() ; ++i) {
       Mouse* m = mtinfo[i].mouse;

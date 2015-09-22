@@ -598,7 +598,7 @@ void RawInputHandler::InputLoop() {
                y += 16;
             }
             if (child_node) {
-               WindowInfo info = base_node->info;
+               WindowInfo info = child_node->info;
                al_draw_textf(font , al_map_rgb(0,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT , "Child Node :");
                y += 16;
                al_draw_textf(font , al_map_rgb(0,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT ,
@@ -658,11 +658,12 @@ void RawInputHandler::InputLoop() {
          if (ev.type == ALLEGRO_EVENT_TIMER) {
             redraw = true;
          }
-         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_G) {
+//*
+         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_T) {
             mouse_controller.ToggleMouseImage();
             printf("Mice image toggled.\n");
          }
-
+//*/
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_S) {
             window_handler.ToggleSystemMouseOnOff(!window_handler.SystemMouseOn());
 
@@ -703,13 +704,21 @@ void RawInputHandler::InputLoop() {
             }
             */
          }
+         
+         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_G) {
+            mouse_controller.SetMouseStrategy(MOUSE_STRATEGY_NORMAL);
+         }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_H) {
+
+            mouse_controller.SetMouseStrategy(MOUSE_STRATEGY_HEAVYOBJECT);
+/*
             if (!SetCapture(al_get_win_window_handle(display))) {
                ManyMouse::log.Log("Failed to capture the mouse.\n");
             }
             else {
                ManyMouse::log.Log("Successfully captured the mouse.\n");
             }
+//*/
 //            LPDIRECT3DDEVICE9 lpd3d9 = al_get_d3d_device(display);
 //            while (lpd3d9->ShowCursor(false) > -1);
          }

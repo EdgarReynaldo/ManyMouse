@@ -27,7 +27,27 @@ ALLEGRO_BITMAP* heavy_mouse_images[NUM_HEAVY_MOUSE_STATES] = {
 
 
 
+const char* normal_mouse_paths[NUM_NORMAL_MOUSE_STATES] = {
+   "Images/DaltonRedCursor2.png",
+   "Images/DaltonGreenCursor2.png"
+};
+
+
+
+ALLEGRO_BITMAP* normal_mouse_images[NUM_NORMAL_MOUSE_STATES] = {
+   0,0
+};
+
+
+
 void FreeMiceImages() {
+   for (int i = 0 ; i < NUM_NORMAL_MOUSE_STATES ; ++i) {
+      ALLEGRO_BITMAP*& image = normal_mouse_images[i];
+      if (image) {
+         al_destroy_bitmap(image);
+         image = 0;
+      }
+   }
    for (int i = 0 ; i < NUM_HEAVY_MOUSE_STATES ; ++i) {
       ALLEGRO_BITMAP*& image = heavy_mouse_images[i];
       if (image) {
@@ -42,6 +62,14 @@ void FreeMiceImages() {
 bool LoadMiceImages() {
    FreeMiceImages();
    bool success = true;
+   for (int i = 0 ; i < NUM_NORMAL_MOUSE_STATES ; ++i) {
+      ALLEGRO_BITMAP* image = al_load_bitmap(normal_mouse_paths[i]);
+      if (!image) {
+         success = false;
+         log.Log("Failed to load mouse image \"%s\"\n" , normal_mouse_paths[i]);
+      }
+      normal_mouse_images[i] = image;
+   }
    for (int i = 0 ; i < NUM_HEAVY_MOUSE_STATES ; ++i) {
       ALLEGRO_BITMAP* image = al_load_bitmap(heavy_mouse_paths[i]);
       if (!image) {

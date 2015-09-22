@@ -7,11 +7,14 @@
 
 #include "Mouse.hpp"
 #include "MouseStrategy.hpp"
-
+#include "MouseTracker.hpp"
 
 #include <vector>
 using std::vector;
 
+class MouseTracker;
+
+/*
 class MouseTrackingInfo {
 public :
    bool used;
@@ -63,7 +66,7 @@ public :
    vector<Mouse*> GetMouseVector();
 
 };
-
+*/
 
 
 /// ----------------------------------------------   MouseController class  ------------------------------------------------------------------
@@ -130,6 +133,8 @@ public :
    void BringMiceToFront();
 
    bool IsMouseWindow(HWND hwnd);
+
+   void SetMouseStrategy(MOUSE_STRATEGY strategy);
 
 };
 

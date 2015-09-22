@@ -4,6 +4,9 @@
 #include "MouseController.hpp"
 #include "WindowHandler.hpp"
 #include "VisualLogger.hpp"
+#include "MouseTracker.hpp"
+
+
 
 #include <cstdio>
 
@@ -83,6 +86,7 @@ MouseController::MouseController(WindowHandler* wh) :
       log.Log("Failed to load mice images.\n");
       ALLEGRO_ASSERT(0);// failed to load mice images
    }
+   normal_strategy.Reset();
    heavy_strategy.Reset();
 }
 
@@ -169,7 +173,7 @@ void MouseController::HandleRawInput(RAWINPUT rawinput) {
 
 void MouseController::Draw() {
 
-   vector<Mouse*> micevec = mouse_tracker.GetMouseVector();
+   vector<Mouse*> micevec = mouse_tracker.MiceVector();
 
    for (unsigned int i = 0 ; i < micevec.size() ; ++i) {
       micevec[i]->Draw();
@@ -180,19 +184,19 @@ void MouseController::Draw() {
 
 
 void MouseController::ToggleMouseImage() {
+   
+   if (active_strategy->GetStrategy() != MOUSE_STRATEGY_NORMAL) {
+      return;
+   }
    mouse_image_enabled = !mouse_image_enabled;
 
    ALLEGRO_BITMAP* ms_image = 0;
 
-   if (mouse_image_enabled) {
-      ms_image = ms_enabled_image;
-   }
-   else {
-      ms_image = ms_disabled_image;
-   }
+   normal_strategy.ToggleEnabled();
 
+   ms_image = normal_mouse_images[normal_strategy.GetState()];
 
-   vector<Mouse*> micevec = mouse_tracker.GetMouseVector();
+   vector<Mouse*> micevec = mouse_tracker.MiceVector();
 
    for (unsigned int i = 0 ; i < micevec.size() ; ++i) {
       Mouse* m = micevec[i];
@@ -215,7 +219,7 @@ void MouseController::ActivateMice(bool activate_mice) {
 void MouseController::ShowMice(bool show_mice) {
    mice_shown = show_mice;
 
-   vector<Mouse*> mice = mouse_tracker.GetMouseVector();
+   vector<Mouse*> mice = mouse_tracker.MiceVector();
    for (unsigned int i = 0 ; i < mice.size() ; ++i) {
       Mouse* m = mice[i];
       m->ShowMouse(mice_shown);
@@ -226,7 +230,7 @@ void MouseController::ShowMice(bool show_mice) {
 
 void MouseController::GetMiceWindows(vector<HWND>* winvec) {
 
-   vector<Mouse*> micevec = mouse_tracker.GetMouseVector();
+   vector<Mouse*> micevec = mouse_tracker.MiceVector();
 
    for (unsigned int i = 0 ; i < micevec.size() ; ++i) {
       Mouse* m = micevec[i];
@@ -238,7 +242,7 @@ void MouseController::GetMiceWindows(vector<HWND>* winvec) {
 
 
 vector<Mouse*> MouseController::GetMice() {
-   return mouse_tracker.GetMouseVector();
+   return mouse_tracker.MiceVector();
 }
 
 
@@ -250,7 +254,7 @@ void MouseController::SetWindowHandler(WindowHandler* handler) {
 
 
 void MouseController::BringMiceToFront() {
-   vector<Mouse*> micevec = mouse_tracker.GetMouseVector();
+   vector<Mouse*> micevec = mouse_tracker.MiceVector();
    for (unsigned int i = 0 ; i < micevec.size() ; ++i) {
       Mouse* m = micevec[i];
       m->BringMouseToFront();
@@ -260,12 +264,26 @@ void MouseController::BringMiceToFront() {
 
 
 bool MouseController::IsMouseWindow(HWND hwnd) {
-   vector<Mouse*> micevec = mouse_tracker.GetMouseVector();
+   vector<Mouse*> micevec = mouse_tracker.MiceVector();
    for (unsigned int i = 0 ; i < micevec.size() ; ++i) {
       Mouse* m = micevec[i];
       if (m->GetMouseWindowHandle() == hwnd) {return true;}
    }
    return false;
 }
+
+
+
+void MouseController::SetMouseStrategy(MOUSE_STRATEGY strategy) {
+   MouseStrategy* strategies[NUM_MOUSE_STRATEGIES] = {
+      &normal_strategy,
+      0,
+      &heavy_strategy
+   };
+   active_strategy = strategies[strategy];
+   ALLEGRO_ASSERT(active_strategy);
+   active_strategy->Reset();
+}
+
 
 
