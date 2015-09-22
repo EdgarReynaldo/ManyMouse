@@ -14,6 +14,9 @@
 #include <vector>
 using std::vector;
 
+extern Mutex tree_mutex;
+
+bool InitTree();
 
 
 BOOL CALLBACK EnumerateWindowTree(HWND hwindow , LPARAM lp);
@@ -50,12 +53,13 @@ public :
 };
 
 
-WindowNode* GetTopChild(WindowNode* root_node , POINT pscreen);
+bool GetTopChild(WindowNode& root_node , POINT pscreen , WindowNode& store_node);
 
-void SetParent(vector<WindowNode>* children , WindowNode* node_parent);
-void PrintTree(FILE* outfile , vector<WindowNode>* nodevec , int depth = 0);
-void PrintNodeToFile(FILE* outfile , WindowNode* node);
-string PrintNode(WindowNode* node , int depth = 0);
+
+void PrintWindowTree(FILE* outfile , vector<WindowNode>& nodevec , int depth = 0);
+
+
+
 
 int MaxDepth(vector<WindowNode>* nodevec);
 
@@ -81,6 +85,7 @@ public :
 
 ///   WindowTree(MouseController* mouse_controller);
    WindowTree(MouseController* mouse_controller) :
+         mutex()
          root_windows(),
          desktop_window(0),
          shell_window(0),
@@ -90,7 +95,9 @@ public :
          mice_windows(),
          mc(mouse_controller)
    {
-
+      if (!mutex.Init()) {
+         log.Log("Failed to init mutex in WindowTree constructor.\n");
+      }
    }
 
 
@@ -101,7 +108,7 @@ public :
       PrintTree(ManyMouse::log.GetLogFile() ,  &root_windows);
    }
 
-   WindowNode* GetBaseWindowNode(POINT pscreen);
+   bool GetBaseWindowNode(POINT pscreen , WindowNode& store_node);
    HWND           GetBaseWindow(POINT pscreen);
    WindowNode* GetTopChildWindowNode(POINT pscreen);
 

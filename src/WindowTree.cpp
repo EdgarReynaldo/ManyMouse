@@ -10,6 +10,13 @@ using ManyMouse::log;
 
 #include <cstdio>
 
+Mutex tree_mutex;
+
+bool InitTree() {
+   return tree_mutex.Init();
+}
+
+
 /// ---------------------------------------    Window tree enumeration functions   ---------------------------------------------
 
 
@@ -47,6 +54,9 @@ BOOL CALLBACK EnumerateWindowTreeChildren(HWND hwindow , LPARAM lp) {
 
 
 void WindowTree::EnumerateTree() {
+
+   tree_mutex.Lock();
+
    root_windows.clear();
    EnumWindows(EnumerateWindowTree , (LPARAM)(&root_windows));
    SetParent(&root_windows , NULL);
@@ -95,10 +105,16 @@ void WindowTree::EnumerateTree() {
       ++vit;
 
    }
+
+   tree_mutex.Unlock();
+
 }
 
 
-WindowNode* WindowTree::GetBaseWindowNode(POINT pscreen) {
+bool WindowTree::GetBaseWindowNode(POINT pscreen , WindowNode& store_node) {
+
+   tree_mutex.Lock();
+
    for (unsigned int i = 0 ; i < root_windows.size() ; ++i) {
       WindowNode& node = root_windows[i];
       HWND window = node.hwindow;
@@ -122,10 +138,19 @@ WindowNode* WindowTree::GetBaseWindowNode(POINT pscreen) {
           pc.y >= rc.top &&
           pc.x < rc.right &&
           pc.y < rc.bottom) {
-         return &node;
+
+
+         store_node = node;
+
+         tree_mutex.Unlock();
+
+         return true;
       }
    }
-   return 0;
+
+   tree_mutex.Unlock();
+
+   return false;
 }
 
 
@@ -134,19 +159,25 @@ WindowNode* WindowTree::GetBaseWindowNode(POINT pscreen) {
 
 
 HWND WindowTree::GetBaseWindow(POINT pscreen) {
-   WindowNode* root_node = GetBaseWindowNode(pscreen);
-   if (root_node) {
-      return root_node->hwindow;
+   WindowNode store_node;
+   if (GetBaseWindowNode(pscreen , store_node)) {
+      return store_node.hwindow;
    }
    return 0;
 }
 
 
 
-WindowNode* WindowTree::GetTopChildWindowNode(POINT pscreen) {
+bool WindowTree::GetTopChildWindowNode(POINT pscreen , WindowNode& store_node) {
 
-   return GetTopChild(GetBaseWindowNode(pscreen) , pscreen);
+   WindowNode base_node;
+   WindowNode child_node;
 
+   if (!GetBaseWindowNode(pscreen , base_node)) {
+      return false;
+   }
+
+   return GetTopChild(base_node , pscreen , child_node);
 }
 
 
@@ -188,14 +219,21 @@ void WindowTree::GetMiceWindows() {
 /// -------------------------------------------------------   Global functions   ------------------------------------------------------------
 
 
-WindowNode* GetTopChild(WindowNode* root_node , POINT pscreen) {
-   if (!root_node) {return 0;}
+/// Private
+void SetParent(vector<WindowNode>* children , WindowNode* node_parent);
+void PrintTree(FILE* outfile , vector<WindowNode>* nodevec , int depth = 0);
+void PrintNodeToFile(FILE* outfile , WindowNode* node);
+string PrintNode(WindowNode* node , int depth = 0);
+
+
+
+bool GetTopChild(WindowNode& root_node , POINT pscreen , WindowNode& store_node) {
 
    vector<WindowNode>& children = root_node->child_windows;
 
    for (unsigned int i = 0 ; i < children.size() ; ++i) {
-      WindowNode* child_node = &children[i];
-      HWND window = child_node->hwindow;
+      WindowNode& child_node = children[i];
+      HWND window = child_node.hwindow;
       POINT pc = pscreen;
       RECT rc;
       if (!GetWindowRect(window , &rc)) {
@@ -207,10 +245,11 @@ WindowNode* GetTopChild(WindowNode* root_node , POINT pscreen) {
           pc.x < rc.right &&
           pc.y < rc.bottom) {
 ///         over_child = true;
-         return GetTopChild(child_node , pscreen);
+         return GetTopChild(child_node , pscreen , store_node);
       }
    }
-   return root_node;
+   store_node = root_node;
+   return true;
 }
 
 
@@ -308,6 +347,14 @@ int MaxDepth(vector<WindowNode>* nodevec) {
       if (depth > maxdepth) {maxdepth = depth;}
    }
    return maxdepth - 1;
+}
+
+
+
+void PrintWindowTree(FILE* outfile , vector<WindowNode>& nodevec , int depth = 0) {
+   tree_mutex.Lock();
+   PrintTree(outfile , &nodevec , depth);
+   tree_mutex.Unlock();
 }
 
 

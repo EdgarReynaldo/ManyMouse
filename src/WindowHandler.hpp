@@ -126,8 +126,8 @@ public :
 
    ~WindowHandler();
 
-   WindowNode* BaseNode(POINT p) {return window_tree.GetBaseWindowNode(p);}
-   WindowNode* ChildNode(POINT p) {return window_tree.GetTopChildWindowNode(p);}
+   bool GetBaseNode(POINT p , WindowNode& store_node);
+   bool GetChildNode(POINT p , WindowNode& store_node);
 
 ///   void HandleShellHookInfo(int code , WPARAM wp , LPARAM lp);
    void HandleShellHookInfo(int code , WPARAM wp , LPARAM lp) {

@@ -257,6 +257,18 @@ WindowHandler::~WindowHandler() {
 
 
 
+bool WindowHandler::GetBaseNode(POINT p , WindowNode& store_node) {
+   return window_tree.GetBaseWindowNode(p , store_node);
+}
+
+
+
+bool WindowHandler::GetChildNode(POINT p , WindowNode& store_node) {
+   return window_tree.GetTopChildWindowNode(p , store_node);
+}
+
+
+
 void WindowHandler::ClearWindowInfo() {
    map<HWND , WindowInfo*>::iterator it = window_info_map.begin();
    while (it != window_info_map.end()) {

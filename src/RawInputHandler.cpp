@@ -348,6 +348,10 @@ int RawInputHandler::SetupWindows() {
    bool mtx = ManyMouse::log.InitMutex();
    ManyMouse::log.Log("log.InitMutex() returned %s\n" , mtx?"true":"false");
 
+   bool mtx2 = InitTree();
+   ManyMouse::log.Log("InitTree() returned %s\n" , mtx2?"true":"false");
+
+
 //   if (!al_install_timer()) {return 2;}
 
 
@@ -580,6 +584,10 @@ void RawInputHandler::InputLoop() {
             p.x = mx;
             p.y = my;
 
+            WindowNode base_node;
+            WindowNode child_node;
+
+            bool found_base_node = window_handler.
             WindowNode* base_node = window_handler.BaseNode(p);
             if (i == 0) {root_node = base_node;}
 
