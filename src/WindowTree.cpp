@@ -180,13 +180,12 @@ HWND WindowTree::GetBaseWindow(POINT pscreen) {
 bool WindowTree::GetTopChildWindowNode(POINT pscreen , WindowNode& store_node) {
 
    WindowNode base_node;
-   WindowNode child_node;
 
    if (!GetBaseWindowNode(pscreen , base_node)) {
       return false;
    }
 
-   return GetTopChild(base_node , pscreen , child_node);
+   return GetTopChild(base_node , pscreen , store_node);
 }
 
 
