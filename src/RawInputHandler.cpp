@@ -558,7 +558,7 @@ void RawInputHandler::InputLoop() {
 
       string infostr;
 
-      WindowNode* root_node = 0;
+      WindowNode root_node;
 
       if (redraw) {
 
@@ -587,26 +587,24 @@ void RawInputHandler::InputLoop() {
             WindowNode base_node;
             WindowNode child_node;
 
-            bool found_base_node = window_handler.
-            WindowNode* base_node = window_handler.BaseNode(p);
+            bool found_base_node = window_handler.GetBaseNode(p , base_node);
             if (i == 0) {root_node = base_node;}
 
-            WindowNode* child_node = window_handler.ChildNode(p);
-
+            bool found_child_node = window_handler.GetChildNode(p , child_node);
 
             al_draw_textf(font , al_map_rgb(255,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT , "Mouse # %u at %i , %i" , i , mx , my);
             y += 16;
 
-            if (base_node) {
-               WindowInfo info = base_node->info;
-               al_draw_textf(font , al_map_rgb(0,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT , "Base Node (%d) children :" , base_node->NumChildren());
+            if (found_base_node) {
+               WindowInfo info = base_node.info;
+               al_draw_textf(font , al_map_rgb(0,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT , "Base Node (%d) children :" , base_node.NumChildren());
                y += 16;
                al_draw_textf(font , al_map_rgb(0,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT ,
                              "Title = '%s' , Class = '%s'" , info.window_title.c_str() , info.window_class.c_str());
                y += 16;
             }
-            if (child_node) {
-               WindowInfo info = child_node->info;
+            if (found_child_node) {
+               WindowInfo info = child_node.info;
                al_draw_textf(font , al_map_rgb(0,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT , "Child Node :");
                y += 16;
                al_draw_textf(font , al_map_rgb(0,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT ,
@@ -693,7 +691,7 @@ void RawInputHandler::InputLoop() {
 
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_O) {
-            PrintNodeToFile(ManyMouse::log.GetLogFile() , root_node);
+            PrintWindowTree(ManyMouse::log.GetLogFile() , root_node.child_windows);
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_K) {
             /*

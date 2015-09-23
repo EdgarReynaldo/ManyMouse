@@ -49,6 +49,15 @@ BOOL CALLBACK EnumerateWindowTreeChildren(HWND hwindow , LPARAM lp) {
 
 
 
+/// Private global function declarations
+void SetParent(vector<WindowNode>* children , WindowNode* node_parent);
+void PrintTree(FILE* outfile , vector<WindowNode>* nodevec , int depth = 0);
+void PrintNodeToFile(FILE* outfile , WindowNode* node);
+string PrintNode(WindowNode* node , int depth = 0);
+
+
+
+
 /// -------------------------------------------   WindowTree class   -------------------------------------------------------
 
 
@@ -219,17 +228,11 @@ void WindowTree::GetMiceWindows() {
 /// -------------------------------------------------------   Global functions   ------------------------------------------------------------
 
 
-/// Private
-void SetParent(vector<WindowNode>* children , WindowNode* node_parent);
-void PrintTree(FILE* outfile , vector<WindowNode>* nodevec , int depth = 0);
-void PrintNodeToFile(FILE* outfile , WindowNode* node);
-string PrintNode(WindowNode* node , int depth = 0);
-
 
 
 bool GetTopChild(WindowNode& root_node , POINT pscreen , WindowNode& store_node) {
 
-   vector<WindowNode>& children = root_node->child_windows;
+   vector<WindowNode>& children = root_node.child_windows;
 
    for (unsigned int i = 0 ; i < children.size() ; ++i) {
       WindowNode& child_node = children[i];
@@ -351,7 +354,7 @@ int MaxDepth(vector<WindowNode>* nodevec) {
 
 
 
-void PrintWindowTree(FILE* outfile , vector<WindowNode>& nodevec , int depth = 0) {
+void PrintWindowTree(FILE* outfile , vector<WindowNode>& nodevec , int depth) {
    tree_mutex.Lock();
    PrintTree(outfile , &nodevec , depth);
    tree_mutex.Unlock();

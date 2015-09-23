@@ -192,17 +192,20 @@ public :
       p.y = nmy;
 
 ///      hwnd = GetWindowAtPos(nmx , nmy);
-      base_node = window_tree.GetBaseWindowNode(p);
-      if (!base_node) {
+      WindowNode base_node;
+      WindowNode child_node;
+   
+      if (!window_tree.GetBaseWindowNode(p , base_node)) {
          return;
       }
-      hwnd = base_node->hwindow;
 
-      child_node = window_tree.GetTopChildWindowNode(p);
-///      hwnd = FindTopMostChild(hwnd , p);
-      if (child_node) {
-         hwnd = child_node->hwindow;
+      hwnd = base_node.hwindow;
+
+      if (!window_tree.GetTopChildWindowNode(p , child_node)) {
+          return;
       }
+
+      hwnd = child_node.hwindow;
 
       if (hwnd) {
 /// EnableWindow is dangerous - if you disable a window and never re-enable it it can't get input anymore

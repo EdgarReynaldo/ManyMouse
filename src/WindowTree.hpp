@@ -40,6 +40,14 @@ public :
 public :
 
 ///   WindowNode(HWND hwnd);
+   WindowNode() :
+         hwindow(0),
+         parent(0),
+         child_windows(),
+         info()
+   {
+
+   }
    WindowNode(HWND hwnd) :
          hwindow(hwnd),
          parent(0),
@@ -85,7 +93,6 @@ public :
 
 ///   WindowTree(MouseController* mouse_controller);
    WindowTree(MouseController* mouse_controller) :
-         mutex()
          root_windows(),
          desktop_window(0),
          shell_window(0),
@@ -95,8 +102,8 @@ public :
          mice_windows(),
          mc(mouse_controller)
    {
-      if (!mutex.Init()) {
-         log.Log("Failed to init mutex in WindowTree constructor.\n");
+      if (!tree_mutex.Init()) {
+         ManyMouse::log.Log("Failed to init mutex in WindowTree constructor.\n");
       }
    }
 
@@ -105,12 +112,12 @@ public :
 
 //   void Print();
    void Print() {
-      PrintTree(ManyMouse::log.GetLogFile() ,  &root_windows);
+      PrintWindowTree(ManyMouse::log.GetLogFile() ,  root_windows);
    }
 
    bool GetBaseWindowNode(POINT pscreen , WindowNode& store_node);
    HWND           GetBaseWindow(POINT pscreen);
-   WindowNode* GetTopChildWindowNode(POINT pscreen);
+   bool GetTopChildWindowNode(POINT pscreen , WindowNode& store_node);
 
 ///   void SetOurWindow(HWND program_window_handle);
    void SetOurWindow(HWND program_window_handle) {
