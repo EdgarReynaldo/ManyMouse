@@ -115,16 +115,6 @@ void HeavyMouseStrategy::HandleInput(RAWINPUT input) {
    USHORT flags = rms.usButtonFlags;
    bool down = false;
    int button = FlagsToButtonIndex(flags , &down);
-/*
-            if (button) {
-               window_handler->HandleButton(mouse , button , down , mouse->X() , mouse->Y());
-            }
-
-            if (mouse->MouseMoved()) {
-               window_handler->HandleMouseMove(mouse);
-            }
-*/
-
 
    switch (heavy_mouse_strategy_state) {
    case HEAVY_MOUSE_STATE_FREE :
@@ -137,6 +127,8 @@ void HeavyMouseStrategy::HandleInput(RAWINPUT input) {
       }
       break;
    case HEAVY_MOUSE_STATE_GRABBING :
+      /// Mouse up gives the click that starts dragging
+      
       if ((button == 1) && !down && active_mouse == grabbing_mouse) {
          if (OtherMiceNear()) {
             window_handler->HandleButton(grabbing_mouse , button , true , grabbing_mouse->X() , grabbing_mouse->Y());

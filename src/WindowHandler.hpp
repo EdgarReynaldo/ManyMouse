@@ -253,6 +253,9 @@ public :
    /// btn field : LMB = 1 , MMB = 2 , RMB = 3
 //   void HandleButton(int btn , bool down , int bx , int by);
    void HandleButton(Mouse* m , int btn , bool down , int bx , int by) {
+      if (!m) {
+         return;
+      }
       oldhwnd = hwnd;
       hwnd = GetWindowAtPos(bx , by);
       if (!hwnd) {
@@ -305,6 +308,10 @@ public :
                   BringWindowToTop(m->GetMouseWindowHandle());
                }
                active_window = GetForegroundWindow();
+
+               if (active_window == m->GetMouseWindowHandle()) {
+                  printf("Active window is mouse.\n");
+               }
 
                htmsg = SendMessage(hwnd , WM_NCHITTEST , wp , lp);
                int index = (nc?8:0) + (down?0:4) + btn;
@@ -389,6 +396,8 @@ public :
             LPARAM lp = MAKELPARAM((short)bx , (short)by);// this is a little clearer than and'ing and or'ing
 
             PostMessage(hwnd , msg[nc?8:0 + (down?0:4) + btn] , wp , lp);
+            
+//            window_tree.EnumerateTree();
          }
       }
    }

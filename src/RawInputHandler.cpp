@@ -315,6 +315,7 @@ void RawInputHandler::SetupHooks() {
 
 
       shellhook = SetWindowsHookEx(WH_SHELL , shell_hook_func , hMod_hook_dll , 0);
+///      shellhook = SetWindowsHookEx(WH_SHELL , shell_hook_func , hMod_hook_dll , GetCurrentThreadId());
       if (!shellhook) {
          ManyMouse::log.Log("SetWindowsHookEx(WH_SHELL) failed. GetLastError reports %d\n" , GetLastError());
       }

@@ -58,6 +58,32 @@ string PrintNode(WindowNode* node , int depth = 0);
 
 
 
+/// -------------------------------------------   WindowNode class   -------------------------------------------------------
+
+
+WindowNode::WindowNode() :
+      hwindow(0),
+      parent(0),
+      child_windows(),
+      info()
+{
+
+}
+
+
+
+WindowNode::WindowNode(HWND hwnd) :
+      hwindow(hwnd),
+      parent(0),
+      child_windows(),
+      info(hwnd)
+{
+
+}
+
+
+
+
 /// -------------------------------------------   WindowTree class   -------------------------------------------------------
 
 

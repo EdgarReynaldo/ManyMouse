@@ -94,6 +94,8 @@ void WindowInfo::RefreshRects() {
 
 
 void WindowInfo::RefreshWindowTitle() {
+   /// TODO : remove next line
+   return;
    window_title = "";
    if (hwnd) {
       const unsigned int BUFSIZE = 512;

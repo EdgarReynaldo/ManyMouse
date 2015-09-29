@@ -18,7 +18,7 @@
 					<Add option="-DDEBUG" />
 				</Compiler>
 				<Linker>
-					<Add option="-lHooks.dll" />
+					<Add option="-lHooksDebug.dll" />
 					<Add option="-lallegro_monolith-debug.dll" />
 					<Add option="-lopengl32" />
 					<Add option="-lglu32" />

@@ -132,6 +132,10 @@ HWND WINAPI RealChildWindowFromPoint(
 
 
 
+/// ---------------------------------------------------    WindowHandler    -------------------------------------------------
+
+
+
 void WindowHandler::PrintAllWindows() {
 
    window_tree.Print();
@@ -187,7 +191,10 @@ void WindowHandler::GetMiceWindows() {
 
 void WindowHandler::EnumerateWindows() {
 
+
    window_tree.EnumerateTree();
+
+   printf("WindowHandler::EnumerateWindows After EnumerateTree\n");
 
    ClearWindowInfo();
 

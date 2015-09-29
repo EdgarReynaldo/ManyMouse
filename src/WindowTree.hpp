@@ -14,6 +14,20 @@
 #include <vector>
 using std::vector;
 
+class FakeMutex {
+   
+public :   
+   FakeMutex() {}
+   ~FakeMutex() {}
+   
+   void Free() {}
+   bool Init() {return true;}
+   void Lock() {}
+   void Unlock() {}
+   
+};
+
+
 extern Mutex tree_mutex;
 
 bool InitTree();
@@ -40,22 +54,8 @@ public :
 public :
 
 ///   WindowNode(HWND hwnd);
-   WindowNode() :
-         hwindow(0),
-         parent(0),
-         child_windows(),
-         info()
-   {
-
-   }
-   WindowNode(HWND hwnd) :
-         hwindow(hwnd),
-         parent(0),
-         child_windows(),
-         info(hwnd)
-   {
-
-   }
+   WindowNode();
+   WindowNode(HWND hwnd);
 
    int NumChildren() {return child_windows.size();}
 };
