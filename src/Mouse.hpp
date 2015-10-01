@@ -17,12 +17,22 @@ class WindowHandler;
 using std::vector;
 
 
+
+#define NUM_MOUSE_BUTTONS 5
+
+
 enum NORMAL_MOUSE_STATE {
    NORMAL_MOUSE_INACTIVE = 0,
    NORMAL_MOUSE_ACTIVE = 1
 };
 
 #define NUM_NORMAL_MOUSE_STATES 2
+
+extern const char* normal_mouse_paths[NUM_NORMAL_MOUSE_STATES];
+
+extern ALLEGRO_BITMAP* normal_mouse_images[NUM_NORMAL_MOUSE_STATES];
+
+
 
 enum HEAVY_MOUSE_STATE {
    HEAVY_MOUSE_INACTIVE = 0,
@@ -34,12 +44,6 @@ enum HEAVY_MOUSE_STATE {
 };
 
 #define NUM_HEAVY_MOUSE_STATES 6
-
-extern const char* normal_mouse_paths[NUM_NORMAL_MOUSE_STATES];
-
-extern ALLEGRO_BITMAP* normal_mouse_images[NUM_NORMAL_MOUSE_STATES];
-
-
 
 extern const char* heavy_mouse_paths[NUM_HEAVY_MOUSE_STATES];
 
@@ -88,9 +92,8 @@ public :
    int ldy;// last delta y
 
    RECT bounds;
-
-//   double time;
-//   double lclicktime;
+   
+   bool buttons_down[NUM_MOUSE_BUTTONS];
 
 public :
 
@@ -107,14 +110,16 @@ Mouse() :
       ready(false),
       ldx(0),
       ldy(0),
-      bounds()
-//      time(0.0),
-//      lclicktime(0.0)
+      bounds(),
+      buttons_down()
 {
    bounds.left = 0;
    bounds.right = 0;
    bounds.top = 0;
    bounds.bottom = 0;
+   for (unsigned int i = 0 ; i < NUM_MOUSE_BUTTONS ; ++i) {
+      buttons_down[i] = false;
+   }
 }
 
    ~Mouse();
@@ -148,6 +153,11 @@ Mouse() :
 
    void BringMouseToFront();
    void ShowMouse(bool show_mouse);
+   
+   bool GetButtonState(int button) {
+      ALLEGRO_ASSERT(button > 0 && button < NUM_MOUSE_BUTTONS + 1);
+      return buttons_down[button - 1];
+   }
 };
 
 

@@ -140,7 +140,7 @@ void MouseController::HandleRawInput(RAWINPUT rawinput) {
       mouse = mouse_tracker.GetMouseFromHandle(hdr.hDevice);
    }
 
-   if (active_strategy) {
+   if (mice_active && active_strategy) {
       active_strategy->HandleInput(rawinput);
    }
 

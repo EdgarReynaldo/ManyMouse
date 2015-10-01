@@ -366,6 +366,13 @@ void Mouse::HandleRawInput(RAWINPUT rawinput) {
 */
    USHORT flags = rms.usButtonFlags;
 
+   bool button_down = false;
+   int button_state = FlagsToButtonIndex(flags , &button_down);
+   
+   if (button_state) {
+      buttons_down[button_state - 1] = button_down;
+   }
+
    if (flags & RI_MOUSE_LEFT_BUTTON_DOWN) {
       log.Log("Mouse %p : LMB down\n" , hdr.hDevice);
    }
