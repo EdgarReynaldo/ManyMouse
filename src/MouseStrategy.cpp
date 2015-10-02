@@ -32,20 +32,18 @@ void NormalMouseStrategy::HandleInput(RAWINPUT input) {
    if (mouse) {
       mouse->HandleRawInput(input);
       if (window_handler && hdr.dwType == RIM_TYPEMOUSE) {
+         if (mouse->MouseMoved()) {
+            window_handler->HandleMouseMove(mouse);
+         }
+
          RAWMOUSE rms = input.data.mouse;
-
          USHORT flags = rms.usButtonFlags;
-///            if (mice_active) {
-            bool down = false;
-            int button = FlagsToButtonIndex(flags , &down);
-            if (button) {
-               window_handler->HandleButton(mouse , button , down , mouse->X() , mouse->Y());
-            }
 
-            if (mouse->MouseMoved()) {
-               window_handler->HandleMouseMove(mouse);
-            }
-///            }
+         bool down = false;
+         int button = FlagsToButtonIndex(flags , &down);
+         if (button) {
+            window_handler->HandleButton(mouse , button , down , mouse->X() , mouse->Y());
+         }
       }
    }
 }
@@ -140,27 +138,27 @@ void HeavyMouseStrategy::HandleInput(RAWINPUT input , bool process_input) {
       }
       break;
    case HEAVY_MOUSE_STATE_DETERMINING_CLICK :
+      /// Allow all mice to move
+      if (active_mouse->MouseMoved()) {
+         window_handler->HandleMouseMove(active_mouse);
+      }
       grabbing_mouse_held_duration = al_get_time() - grabbing_mouse_starting_time;
       /// If mouse is held for certain duration, then we are initiating a drag
       if (grabbing_mouse_held_duration > mouse_drag_duration_threshold) {
          /// Don't send mouse down to window handler now - send it later when group agrees
 ///         window_handler->HandleButton(grabbing_mouse , 1 , true , grabbing_mouse->X() , grabbing_mouse->Y());
          SetHeavyMouseStrategyState(HEAVY_MOUSE_STATE_GRABBING);
-         HandleInput(input , false);/// Process input for new state without reprocessing mouse input
+//         HandleInput(input , false);/// Process input for new state without reprocessing mouse input
          break;
       }
       else {
          /// If grabbing mouse's primary mouse button comes up before drag threshold reached, send click and release and reset state
-         if (button == 1 && !down && active_mouse == grabbing_mouse) {
+         if ((button == 1) && !down && (active_mouse == grabbing_mouse)) {
             window_handler->HandleButton(grabbing_mouse , 1 , true , grabbing_mouse->X() , grabbing_mouse->Y());
             window_handler->HandleButton(grabbing_mouse , 1 , false , grabbing_mouse->X() , grabbing_mouse->Y());
             SetHeavyMouseStrategyState(HEAVY_MOUSE_STATE_FREE);
             break;
          }
-      }
-      /// Allow all mice to move
-      if (active_mouse->MouseMoved()) {
-         window_handler->HandleMouseMove(active_mouse);
       }
       break;
    case HEAVY_MOUSE_STATE_GRABBING :

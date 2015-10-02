@@ -504,6 +504,9 @@ BOOL WINAPI SetWindowPos(
 */
    al_win_add_window_callback(display , WindowProcCallback , this);
 
+   /// Prime the window tree
+   window_handler.EnumerateWindows();
+
    return 0;
 }
 
@@ -1111,6 +1114,7 @@ bool RawInputHandler::HandleWindowMessage(UINT message , WPARAM wparam , LPARAM 
 
    if (message == WM_INPUT) {
       ret = true;// we handle all WM_INPUT messages
+      ret = false;
 
 ///      printf("WM_INPUT received. ");
 
@@ -1182,7 +1186,8 @@ bool RawInputHandler::HandleWindowMessage(UINT message , WPARAM wparam , LPARAM 
 
    }// end if (message == WM_INPUT)
 
-   return ret;
+   /// Let allegro see all the other windows messages
+   return false;
 
 }
 /*

@@ -37,6 +37,9 @@ using std::deque;
 */
 
 
+
+const char* HTCODE_to_str(int htcode);
+
 bool GetDesktopBounds(RECT* b);
 
 
@@ -208,16 +211,26 @@ public :
       hwnd = child_node.hwindow;
 
       if (hwnd) {
-/// EnableWindow is dangerous - if you disable a window and never re-enable it it can't get input anymore
+
+// EnableWindow is dangerous - if you disable a window and never re-enable it it can't get input anymore
 ///         EnableWindow(hwnd , system_mouse_on);
+ 
+         bool nc = false;/// indicates non-client area
          {
             WindowInfo info = GetWindowInfoFromHandle(hwnd);
             WPARAM wp = 0;
             LPARAM lp = MAKELPARAM((short)nmx , (short)nmy);
             htmsg = SendMessage(hwnd , WM_NCHITTEST , wp , lp);
+            if (htmsg == HTCLOSE ||
+                htmsg == HTSIZE ||
+                htmsg == HTMAXBUTTON ||
+                htmsg == HTMINBUTTON ||
+                htmsg == HTCAPTION) {
+               nc = true;
+            }
 ///            log.Log("htmsg = %d\n" , htmsg);
             if ((htmsg != oldhtmsg) || (hwnd != oldhwnd)) {
-               ManyMouse::log.Log("htmsg = %d , window title = '%s'\n" , htmsg , info.WindowTitle().c_str());
+               ManyMouse::log.Log("htmsg = %s (%d) , window title = '%s'\n" , HTCODE_to_str(htmsg) , htmsg , info.WindowTitle().c_str());
             }
          }
 
@@ -236,13 +249,14 @@ public :
          WPARAM wp = 0;// TODO : Encode modifier flags, see WM_LBUTTONDOWN
          LPARAM lp = MAKELPARAM((short)p.x , (short)p.y);
 
-
-         PostMessage(hwnd , WM_MOUSEMOVE , wp , lp);
-         PostMessage(hwnd , WM_MOUSEHOVER , wp , lp);
-
-//         RECT r;
-//         GetWindowRect(hwnd , &r)
-
+         if (nc) {
+            PostMessage(hwnd , WM_NCMOUSEMOVE , wp , lp);
+            PostMessage(hwnd , WM_NCMOUSEHOVER , wp , lp);
+         }
+         else {
+            PostMessage(hwnd , WM_MOUSEMOVE , wp , lp);
+            PostMessage(hwnd , WM_MOUSEHOVER , wp , lp);
+         }
       }
 
       oldhwnd = hwnd;
@@ -303,7 +317,7 @@ public :
                if (hwnd != active_window) {
                   SetForegroundWindow(hwnd);
 
-                  assert(m);
+                  ALLEGRO_ASSERT(m);
 
                   BringWindowToTop(m->GetMouseWindowHandle());
                }
@@ -314,17 +328,18 @@ public :
                }
 
                htmsg = SendMessage(hwnd , WM_NCHITTEST , wp , lp);
-               int index = (nc?8:0) + (down?0:4) + btn;
-               const char* str = strs[index];
-               if (str) {
-                  ManyMouse::log.Log("%s sent to hwnd %p\n" , str , hwnd);
-               }
                if (htmsg == HTCLOSE ||
                    htmsg == HTSIZE ||
                    htmsg == HTMAXBUTTON ||
                    htmsg == HTMINBUTTON ||
                    htmsg == HTCAPTION) {
                   nc = true;
+               }
+
+               int index = (nc?8:0) + (down?0:4) + btn;
+               const char* str = strs[index];
+               if (str) {
+                  ManyMouse::log.Log("%s sent to hwnd %p\n" , str , hwnd);
                }
 
                switch (htmsg) {
@@ -336,17 +351,17 @@ public :
                case HTMAXBUTTON :
                   wp = SC_MAXIMIZE;
                   ShowWindow(hwnd , SW_MAXIMIZE);
-///                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
+                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
                   break;
                case HTMINBUTTON :
                   wp = SC_MINIMIZE;
                   ShowWindow(hwnd , SW_MINIMIZE);
-///                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
+                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
                   break;
                case HTSIZE :
                   wp = SC_SIZE;
                   ShowWindow(hwnd , SW_RESTORE);
-///                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
+                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
                   break;
 //               case HTREDUCE :/// Same as HTMINBUTTON
 //                  wp = SC_RESTORE;
@@ -356,7 +371,8 @@ public :
                   wp = SC_MOVE;
                   PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
                   break;
-               default : break;
+               default :
+                  break;
                }
 
 /*
@@ -408,135 +424,84 @@ WM_NCHITTEST return value
 
 Return code/value	Description
 
-HTBORDER
-18
-
-In the border of a window that does not have a sizing border.
-
-HTBOTTOM
-15
-
-In the lower-horizontal border of a resizable window (the user can click the mouse to resize the window vertically).
-
-HTBOTTOMLEFT
-16
-
-In the lower-left corner of a border of a resizable window (the user can click the mouse to resize the window diagonally).
-
-HTBOTTOMRIGHT
-17
-
-In the lower-right corner of a border of a resizable window (the user can click the mouse to resize the window diagonally).
-
-HTCAPTION
-2
-
-In a title bar.
-
-HTCLIENT
-1
-
-In a client area.
-
-HTCLOSE
-20
-
-In a Close button.
-
-HTERROR
--2
-
+HTERROR -2
 On the screen background or on a dividing line between windows (same as HTNOWHERE, except that the DefWindowProc function produces a system beep to indicate an error).
 
-HTGROWBOX
-4
-
-In a size box (same as HTSIZE).
-
-HTHELP
-21
-
-In a Help button.
-
-HTHSCROLL
-6
-
-In a horizontal scroll bar.
-
-HTLEFT
-10
-
-In the left border of a resizable window (the user can click the mouse to resize the window horizontally).
-
-HTMENU
-5
-
-In a menu.
-
-HTMAXBUTTON
-9
-
-In a Maximize button.
-
-HTMINBUTTON
-8
-
-In a Minimize button.
-
-HTNOWHERE
-0
-
-On the screen background or on a dividing line between windows.
-
-HTREDUCE
-8
-
-In a Minimize button.
-
-HTRIGHT
-11
-
-In the right border of a resizable window (the user can click the mouse to resize the window horizontally).
-
-HTSIZE
-4
-
-In a size box (same as HTGROWBOX).
-
-HTSYSMENU
-3
-
-In a window menu or in a Close button in a child window.
-
-HTTOP
-12
-
-In the upper-horizontal border of a window.
-
-HTTOPLEFT
-13
-
-In the upper-left corner of a window border.
-
-HTTOPRIGHT
-14
-
-In the upper-right corner of a window border.
-
-HTTRANSPARENT
--1
-
+HTTRANSPARENT -1
 In a window currently covered by another window in the same thread (the message will be sent to underlying windows in the same thread until one of them returns a code that is not HTTRANSPARENT).
 
-HTVSCROLL
-7
+HTNOWHERE 0
+On the screen background or on a dividing line between windows.
 
+HTCLIENT 1
+In a client area.
+
+HTCAPTION 2
+In a title bar.
+
+HTSYSMENU 3
+In a window menu or in a Close button in a child window.
+
+HTSIZE 4
+In a size box (same as HTGROWBOX).
+
+HTGROWBOX 4
+In a size box (same as HTSIZE).
+
+HTMENU 5
+In a menu.
+
+HTHSCROLL 6
+In a horizontal scroll bar.
+
+HTVSCROLL 7
 In the vertical scroll bar.
 
-HTZOOM
-9
+HTREDUCE 8
+In a Minimize button.
 
+HTMINBUTTON 8
+In a Minimize button.
+
+HTMAXBUTTON 9
 In a Maximize button.
+
+HTZOOM 9
+In a Maximize button.
+
+HTLEFT 10
+In the left border of a resizable window (the user can click the mouse to resize the window horizontally).
+
+
+HTRIGHT 11
+In the right border of a resizable window (the user can click the mouse to resize the window horizontally).
+
+HTTOP 12
+In the upper-horizontal border of a window.
+
+HTTOPLEFT 13
+In the upper-left corner of a window border.
+
+HTTOPRIGHT 14
+In the upper-right corner of a window border.
+
+HTBOTTOM 15
+In the lower-horizontal border of a resizable window (the user can click the mouse to resize the window vertically).
+
+HTBOTTOMLEFT 16
+In the lower-left corner of a border of a resizable window (the user can click the mouse to resize the window diagonally).
+
+HTBOTTOMRIGHT 17
+In the lower-right corner of a border of a resizable window (the user can click the mouse to resize the window diagonally).
+
+HTBORDER 18
+In the border of a window that does not have a sizing border.
+
+HTCLOSE 20
+In a Close button.
+
+HTHELP 21
+In a Help button.
 
 */
 
@@ -545,147 +510,73 @@ Parameters
 
 wParam
 
-    The type of system command requested. This parameter can be one of the following values.
-    Value	Meaning
+The type of system command requested. This parameter can be one of the following values.
+Value	Meaning
 
-    SC_CLOSE
-    0xF060
+SC_CLOSE 0xF060
+Closes the window.
 
+SC_CONTEXTHELP 0xF180
+Changes the cursor to a question mark with a pointer. If the user then clicks a control in the dialog box, the control receives a WM_HELP message.
 
+SC_DEFAULT 0xF160
+Selects the default item; the user double-clicked the window menu.
 
-    Closes the window.
+SC_HOTKEY 0xF150
+Activates the window associated with the application-specified hot key. The lParam parameter identifies the window to activate.
 
-    SC_CONTEXTHELP
-    0xF180
+SC_HSCROLL 0xF080
+Scrolls horizontally.
 
+SCF_ISSECURE 0x00000001
+Indicates whether the screen saver is secure.
 
+SC_KEYMENU 0xF100
+Retrieves the window menu as a result of a keystroke. For more information, see the Remarks section.
 
-    Changes the cursor to a question mark with a pointer. If the user then clicks a control in the dialog box, the control receives a WM_HELP message.
+SC_MAXIMIZE 0xF030
+Maximizes the window.
 
-    SC_DEFAULT
-    0xF160
+SC_MINIMIZE 0xF020
+Minimizes the window.
 
+SC_MONITORPOWER 0xF170
+Sets the state of the display. This command supports devices that have power-saving features, such as a battery-powered personal computer.
 
+The lParam parameter can have the following values:
 
-    Selects the default item; the user double-clicked the window menu.
+  -1 (the display is powering on)
+  1 (the display is going to low power)
+  2 (the display is being shut off)
 
-    SC_HOTKEY
-    0xF150
+SC_MOUSEMENU 0xF090
+Retrieves the window menu as a result of a mouse click.
 
+SC_MOVE 0xF010
+Moves the window.
 
+SC_NEXTWINDOW 0xF040
+Moves to the next window.
 
-    Activates the window associated with the application-specified hot key. The lParam parameter identifies the window to activate.
+SC_PREVWINDOW 0xF050
+Moves to the previous window.
 
-    SC_HSCROLL
-    0xF080
+SC_RESTORE 0xF120
+Restores the window to its normal position and size.
 
+SC_SCREENSAVE 0xF140
+Executes the screen saver application specified in the [boot] section of the System.ini file.
 
+SC_SIZE 0xF000
+Sizes the window.
 
-    Scrolls horizontally.
+SC_TASKLIST 0xF130
+Activates the Start menu.
 
-    SCF_ISSECURE
-    0x00000001
-
-
-
-    Indicates whether the screen saver is secure.
-
-    SC_KEYMENU
-    0xF100
-
-
-
-    Retrieves the window menu as a result of a keystroke. For more information, see the Remarks section.
-
-    SC_MAXIMIZE
-    0xF030
-
-
-
-    Maximizes the window.
-
-    SC_MINIMIZE
-    0xF020
-
-
-
-    Minimizes the window.
-
-    SC_MONITORPOWER
-    0xF170
-
-
-
-    Sets the state of the display. This command supports devices that have power-saving features, such as a battery-powered personal computer.
-
-    The lParam parameter can have the following values:
-
-        -1 (the display is powering on)
-        1 (the display is going to low power)
-        2 (the display is being shut off)
-
-    SC_MOUSEMENU
-    0xF090
-
-
-
-    Retrieves the window menu as a result of a mouse click.
-
-    SC_MOVE
-    0xF010
-
-
-
-    Moves the window.
-
-    SC_NEXTWINDOW
-    0xF040
-
-
-
-    Moves to the next window.
-
-    SC_PREVWINDOW
-    0xF050
-
-
-
-    Moves to the previous window.
-
-    SC_RESTORE
-    0xF120
-
-
-
-    Restores the window to its normal position and size.
-
-    SC_SCREENSAVE
-    0xF140
-
-
-
-    Executes the screen saver application specified in the [boot] section of the System.ini file.
-
-    SC_SIZE
-    0xF000
-
-
-
-    Sizes the window.
-
-    SC_TASKLIST
-    0xF130
-
-
-
-    Activates the Start menu.
-
-    SC_VSCROLL
-    0xF070
-
-
-
-    Scrolls vertically.*/
+SC_VSCROLL 0xF070
+Scrolls vertically.
+ 
+ //*/
 
 
 #endif // WindowHandler_HPP

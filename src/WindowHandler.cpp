@@ -357,6 +357,13 @@ void WindowHandler::PrintWindowInfo() {
 
 
 bool WindowHandler::NotOurWindow(HWND hwindow) {
+
+   if ((hwindow != program_window) &&
+       !IsMouseWindow(hwindow)) {
+      return true;
+    }
+
+/**
    if ((hwindow != desktop_window) &&
        (hwindow != shell_window) &&
        (hwindow != taskbar_window) &&
@@ -366,7 +373,9 @@ bool WindowHandler::NotOurWindow(HWND hwindow) {
        !(IsMouseWindow(hwindow)) ) {
       return true;
    }
+//*/
    return false;
+
 /*
       if (hwndA == desktop_window) {
          pwi->SetWindowTypeString("The desktop window");
@@ -584,3 +593,42 @@ void WindowHandler::PrintWindows() {
    }
 }
 */
+
+const char* HTCODE_to_str(int htcode) {
+   if (htcode < -2) {htcode = 0;}
+   if (htcode > 21) {htcode = 0;}
+   
+   static const char* htcodestrs[24] = {
+      "HTERROR", // -2
+      "HTTRANSPARENT", // -1
+      "HTNOWHERE", // 0
+      "HTCLIENT", // 1
+      "HTCAPTION", // 2
+      "HTSYSMENU", // 3
+      "HTSIZE", // 4
+      //"HTGROWBOX", // 4
+      "HTMENU", // 5
+      "HTHSCROLL", // 6
+      "HTVSCROLL", // 7
+      //"HTREDUCE", // 8
+      "HTMINBUTTON", // 8
+      "HTMAXBUTTON", // 9
+      //"HTZOOM", // 9
+      "HTLEFT", // 10
+      "HTRIGHT", // 11
+      "HTTOP", // 12
+      "HTTOPLEFT", // 13
+      "HTTOPRIGHT", // 14
+      "HTBOTTOM", // 15
+      "HTBOTTOMLEFT", // 16
+      "HTBOTTOMRIGHT", // 17
+      "HTBORDER", // 18
+      "HTUNUSED", // 19
+      "HTCLOSE", // 20
+      "HTHELP" // 21
+   };
+   return htcodestrs[htcode + 2];
+}
+
+
+

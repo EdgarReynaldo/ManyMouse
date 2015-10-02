@@ -45,6 +45,11 @@ LRESULT CALLBACK LowLevelMouseHook(int nCode, WPARAM wParam, LPARAM lParam){
       lr = CallNextHookEx(0,nCode,wParam,lParam);
       return lr;
    }
+   if(nCode == HC_ACTION && swallowmouse) {
+      return 1;
+   }
+   return CallNextHookEx(0,nCode,wParam,lParam);
+/*
    if(nCode == HC_ACTION){
       if(swallowmouse){
          return 1;
@@ -54,6 +59,7 @@ LRESULT CALLBACK LowLevelMouseHook(int nCode, WPARAM wParam, LPARAM lParam){
       }
    }
    return 1;
+*/
 }
 
 
@@ -64,6 +70,11 @@ LRESULT CALLBACK MouseHook(int nCode, WPARAM wParam, LPARAM lParam){
       lr = CallNextHookEx(0,nCode,wParam,lParam);
       return lr;
    }
+   if(nCode == HC_ACTION && swallowmouse) {
+      return 1;
+   }
+   return CallNextHookEx(0,nCode,wParam,lParam);
+/*
    if(nCode == HC_ACTION){
       if(swallowmouse){
          return 1;
@@ -73,6 +84,7 @@ LRESULT CALLBACK MouseHook(int nCode, WPARAM wParam, LPARAM lParam){
       }
    }
    return 1;
+*/
 }
 
 
@@ -93,7 +105,16 @@ LRESULT CALLBACK ShellHook(int nCode , WPARAM wParam , LPARAM lParam) {
          if (!mouse_controller->IsMouseWindow(hwnd)) {
             printf("Bringing mice to front.\n");
             mouse_controller->BringMiceToFront();
-         }
+         }   if(nCode == HC_ACTION){
+      if(swallowmouse){
+         return 1;
+      }
+      else{
+         return CallNextHookEx(0,nCode,wParam,lParam);
+      }
+   }
+   return 1;
+
       }
    }
 */   
