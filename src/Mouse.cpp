@@ -10,6 +10,36 @@
 #include <cstdio>
 
 
+ALLEGRO_FONT* mouse_font = 0;
+
+const char* mouse_font_path = "verdana.ttf";
+
+const char* normal_mouse_paths[NUM_NORMAL_MOUSE_STATES] = {
+   "Images/DaltonRedCursor2.png",
+   "Images/DaltonGreenCursor2.png"
+};
+
+
+
+ALLEGRO_BITMAP* normal_mouse_images[NUM_NORMAL_MOUSE_STATES] = {
+   0,0
+};
+
+
+
+const char* fcfs_mouse_paths[NUM_FCFS_MOUSE_STATES] = {
+   "NewImages/MouseInactive.png",
+   "NewImages/MouseActive.png",
+   "NewImages/MouseGrabbing.png",
+   "NewImages/MouseDragging.png"
+};
+
+ALLEGRO_BITMAP* fcfs_mouse_images[NUM_FCFS_MOUSE_STATES] = {
+   0,0,0,0
+};
+
+
+
 const char* heavy_mouse_paths[NUM_HEAVY_MOUSE_STATES] = {
    "NewImages/MouseInactive.png",
    "NewImages/MouseActive.png",
@@ -27,22 +57,16 @@ ALLEGRO_BITMAP* heavy_mouse_images[NUM_HEAVY_MOUSE_STATES] = {
 
 
 
-const char* normal_mouse_paths[NUM_NORMAL_MOUSE_STATES] = {
-   "Images/DaltonRedCursor2.png",
-   "Images/DaltonGreenCursor2.png"
-};
-
-
-
-ALLEGRO_BITMAP* normal_mouse_images[NUM_NORMAL_MOUSE_STATES] = {
-   0,0
-};
-
-
-
 void FreeMiceImages() {
    for (int i = 0 ; i < NUM_NORMAL_MOUSE_STATES ; ++i) {
       ALLEGRO_BITMAP*& image = normal_mouse_images[i];
+      if (image) {
+         al_destroy_bitmap(image);
+         image = 0;
+      }
+   }
+   for (int i = 0 ; i < NUM_FCFS_MOUSE_STATES ; ++i) {
+      ALLEGRO_BITMAP*& image = fcfs_mouse_images[i];
       if (image) {
          al_destroy_bitmap(image);
          image = 0;
@@ -54,6 +78,10 @@ void FreeMiceImages() {
          al_destroy_bitmap(image);
          image = 0;
       }
+   }
+   if (mouse_font) {
+      al_destroy_font(mouse_font);
+      mouse_font = 0;
    }
 }
 
@@ -70,6 +98,14 @@ bool LoadMiceImages() {
       }
       normal_mouse_images[i] = image;
    }
+   for (int i = 0 ; i < NUM_FCFS_MOUSE_STATES ; ++i) {
+      ALLEGRO_BITMAP* image = al_load_bitmap(fcfs_mouse_paths[i]);
+      if (!image) {
+         success = false;
+         log.Log("Failed to load mouse image \"%s\"\n" , fcfs_mouse_paths[i]);
+      }
+      fcfs_mouse_images[i] = image;
+   }
    for (int i = 0 ; i < NUM_HEAVY_MOUSE_STATES ; ++i) {
       ALLEGRO_BITMAP* image = al_load_bitmap(heavy_mouse_paths[i]);
       if (!image) {
@@ -78,6 +114,13 @@ bool LoadMiceImages() {
       }
       heavy_mouse_images[i] = image;
    }
+   mouse_font = al_load_ttf_font(mouse_font_path , 20 , 0);
+   if (!mouse_font) {
+      log.Log("Failed to load mouse font at '%s'\n" , mouse_font_path);
+      success = false;
+   }
+   
+   
    if (!success) {
       FreeMiceImages();
    }
@@ -417,5 +460,24 @@ void Mouse::ShowMouse(bool show_mouse) {
       ShowWindow(window , SW_HIDE);
    }
 }
+
+
+
+void Mouse::SetDeviceNumber(int dev_num) {
+   if (dev_num < -1) {
+         dev_num = -1;
+   }
+   mouse_device_number = dev_num;
+}
+
+
+
+bool Mouse::GetButtonState(int button) {
+   ALLEGRO_ASSERT(button > 0 && button < NUM_MOUSE_BUTTONS + 1);
+   return buttons_down[button - 1];
+}
+
+
+
 
 

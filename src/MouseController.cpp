@@ -45,11 +45,17 @@ bool MouseController::CreateMouse(HANDLE hDevice) {
 
    ALLEGRO_BITMAP* ms_image = mouse_image_enabled?ms_enabled_image:ms_disabled_image;
 
+   ++mouse_device_count;
+   printf("Adding mouse device #%d\n" , mouse_device_count);
+   
+   newmouse->SetDeviceNumber(mouse_device_count);
+   
    if (!newmouse->SetImage(ms_image)) {
       printf("MouseController::CreateMouse : Failed to set image %p.\n" , ms_image);
       return false;
    }
    newmouse->SetHandle(hDevice);
+
 
    mouse_tracker.TrackNewMouse(newmouse , hDevice);
 
@@ -71,8 +77,9 @@ void MouseController::DestroyMice() {
 MouseController::MouseController(WindowHandler* wh) :
       mouse_tracker(),
       normal_strategy(&mouse_tracker , wh),
-//      collaborative_strategy(),
+      fcfs_strategy(&mouse_tracker , wh),
       heavy_strategy(&mouse_tracker , wh),
+//      collaborative_strategy(),
       active_strategy(&normal_strategy),
       ms_enabled_image(0),
       ms_disabled_image(0),
@@ -80,13 +87,15 @@ MouseController::MouseController(WindowHandler* wh) :
       mice_active(true),
 //      mice_enabled(true),
       mice_shown(true),
-      window_handler(0)
+      window_handler(0),
+      mouse_device_count(0)
 {
    if (!LoadMiceImages()) {
       log.Log("Failed to load mice images.\n");
       ALLEGRO_ASSERT(0);// failed to load mice images
    }
    normal_strategy.Reset();
+   fcfs_strategy.Reset();
    heavy_strategy.Reset();
 }
 
@@ -277,8 +286,9 @@ bool MouseController::IsMouseWindow(HWND hwnd) {
 void MouseController::SetMouseStrategy(MOUSE_STRATEGY strategy) {
    MouseStrategy* strategies[NUM_MOUSE_STRATEGIES] = {
       &normal_strategy,
-      0,
-      &heavy_strategy
+      &fcfs_strategy,
+      &heavy_strategy,
+      0
    };
    active_strategy = strategies[strategy];
    ALLEGRO_ASSERT(active_strategy);

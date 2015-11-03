@@ -12,6 +12,7 @@
 #include "Mouse.hpp"
 
 //using ManyMouse::log;
+using std::pair;
 
 class MouseTracker;
 class WindowHandler;
@@ -20,12 +21,17 @@ class WindowHandler;
 
 enum MOUSE_STRATEGY {
    MOUSE_STRATEGY_NORMAL = 0,
-   MOUSE_STRATEGY_COLLABORATIVE = 1,
-   MOUSE_STRATEGY_HEAVYOBJECT = 2
+   MOUSE_STRATEGY_FCFS = 1,
+   MOUSE_STRATEGY_HEAVYOBJECT = 2,
+   MOUSE_STRATEGY_COLLABORATIVE = 3
 };
+#define NUM_MOUSE_STRATEGIES 4
 
-#define NUM_MOUSE_STRATEGIES 3
-
+enum FCFS_STRATEGY_STATE {
+   FCFS_STATE_FREE = 0,
+   FCFS_STATE_PROCESSING_CLICK = 1,
+   FCFS_STATE_DRAG = 2
+};
 
 enum HEAVY_MOUSE_STRATEGY_STATE {
    HEAVY_MOUSE_STATE_FREE = 0,
@@ -70,9 +76,43 @@ public :
    void Reset();
    void ResetImages();
    void ToggleEnabled();
+
    MOUSE_STRATEGY GetStrategy();
    NORMAL_MOUSE_STATE GetState();
 };
+
+
+class FCFSMouseStrategy : public MouseStrategy {
+
+   FCFS_STRATEGY_STATE fcfs_state;
+
+   ALLEGRO_BITMAP* fcfs_mouse_buffer;
+
+   Mouse* grabbing_mouse;
+
+   double mouse_drag_duration_threshold;
+   double grabbing_mouse_starting_time;
+   
+public :
+   FCFSMouseStrategy(MouseTracker* mt , WindowHandler* wh);
+   ~FCFSMouseStrategy();
+
+   void FreeBuffer();
+
+   void HandleInput(RAWINPUT input);
+   void HandleInput(RAWINPUT input , bool process_input);
+
+   void Reset();
+   void ResetImages();
+   void DrawPointers(FCFS_STRATEGY_STATE strategy_state);
+   
+   void ToggleEnabled();
+
+   void SetFCFSStrategyState(FCFS_STRATEGY_STATE new_state);
+
+   MOUSE_STRATEGY GetStrategy();
+};
+
 
 
 class HeavyMouseStrategy : public MouseStrategy {
@@ -85,6 +125,8 @@ class HeavyMouseStrategy : public MouseStrategy {
    double mouse_drag_duration_threshold;
    double grabbing_mouse_starting_time;
 
+   vector<pair<Mouse* , pair<int , int> > >other_mice_offsets;
+
 public :
 
    HeavyMouseStrategy(MouseTracker* mt , WindowHandler* wh) :
@@ -93,7 +135,8 @@ public :
       grabbing_mouse(0),
       helper_distance_threshold(25.0),
       mouse_drag_duration_threshold(0.5),
-      grabbing_mouse_starting_time(0.0)
+      grabbing_mouse_starting_time(0.0),
+      other_mice_offsets()
    {
    }
 

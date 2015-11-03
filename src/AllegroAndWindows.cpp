@@ -169,7 +169,8 @@ void DrawBitmapToDIB(const DIBbuffer& dib_buf , ALLEGRO_BITMAP* bmp) {
 //      memcpy(dib_data , fakedata , 4*maxw);
 //      memcpy(dib_data , pdata , abs(stride));
       pdata += stride;// bitmap data may have negative pitch
-      dib_data += abs(stride);// dib data is top down
+///      dib_data += abs(stride);// dib data is top down
+      dib_data += abs(dibw*4);
    }
 //*/   
    al_unlock_bitmap(bmp);

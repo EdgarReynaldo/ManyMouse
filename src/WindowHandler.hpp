@@ -85,8 +85,8 @@ class WindowHandler {
 
    WindowTree window_tree;
 
-   WindowNode* base_node;
-   WindowNode* child_node;
+   WindowNode base_node;
+   WindowNode child_node;
 
 
    friend BOOL CALLBACK EnumerateWindowsProcess(HWND hwindow , LPARAM lp);
@@ -118,8 +118,8 @@ public :
          active_window(GetForegroundWindow()),
          mutex(),
          window_tree(mouse_controller),
-         base_node(0),
-         child_node(0)
+         base_node(),
+         child_node()
    {
       assert(mouse_controller);
       if (!mutex.Init()) {
@@ -252,6 +252,8 @@ public :
          if (nc) {
             PostMessage(hwnd , WM_NCMOUSEMOVE , wp , lp);
             PostMessage(hwnd , WM_NCMOUSEHOVER , wp , lp);
+            PostMessage(hwnd , WM_MOUSEMOVE , wp , lp);
+            PostMessage(hwnd , WM_MOUSEHOVER , wp , lp);
          }
          else {
             PostMessage(hwnd , WM_MOUSEMOVE , wp , lp);
@@ -270,21 +272,34 @@ public :
       if (!m) {
          return;
       }
-      oldhwnd = hwnd;
-      hwnd = GetWindowAtPos(bx , by);
-      if (!hwnd) {
-         // No window under the button press location
-         return;
-      }
+
+      
       POINT p;
       p.x = bx;
       p.y = by;
 
+      if (!GetBaseNode(p , base_node)) {
+         return;
+      }
+      if (!GetChildNode(p , child_node)) {
+         return;
+      }
+
+      oldhwnd = hwnd;
+
+      hwnd = base_node.hwindow;
+///      hwnd = GetWindowAtPos(bx , by);
+
+      if (!hwnd) {
+         // No window under the button press location
+         return;
+      }
+
 ///      HWND childhwnd = ChildWindowFromPoint(hwnd , p);
 ///      HWND childhwnd = ChildWindowFromPointEx(hwnd , p , CWP_SKIPINVISIBLE | CWP_SKIPTRANSPARENT);
 
-      HWND childhwnd = FindTopMostChild(hwnd , p);
-
+///      HWND childhwnd = FindTopMostChild(hwnd , p);
+      HWND childhwnd = child_node.hwindow;
 
       WindowInfo winfo;
       WindowInfo winfo2;
@@ -346,30 +361,30 @@ public :
                case HTCLOSE :
                   wp = SC_CLOSE;
                   DestroyWindow(hwnd);
-                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
+                  SendMessage(hwnd , WM_SYSCOMMAND , wp , lp);
                   break;
                case HTMAXBUTTON :
                   wp = SC_MAXIMIZE;
                   ShowWindow(hwnd , SW_MAXIMIZE);
-                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
+                  SendMessage(hwnd , WM_SYSCOMMAND , wp , lp);
                   break;
                case HTMINBUTTON :
                   wp = SC_MINIMIZE;
                   ShowWindow(hwnd , SW_MINIMIZE);
-                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
+                  SendMessage(hwnd , WM_SYSCOMMAND , wp , lp);
                   break;
                case HTSIZE :
                   wp = SC_SIZE;
                   ShowWindow(hwnd , SW_RESTORE);
-                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
+                  SendMessage(hwnd , WM_SYSCOMMAND , wp , lp);
                   break;
 //               case HTREDUCE :/// Same as HTMINBUTTON
 //                  wp = SC_RESTORE;
-//                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
+//                  SendMessage(hwnd , WM_SYSCOMMAND , wp , lp);
 //                  break;
                case HTCAPTION :
                   wp = SC_MOVE;
-                  PostMessage(hwnd , WM_SYSCOMMAND , wp , lp);
+                  SendMessage(hwnd , WM_SYSCOMMAND , wp , lp);
                   break;
                default :
                   break;
@@ -411,9 +426,13 @@ public :
    ///         lp = (((by << 16)&0xffff0000) | (((short)bx)&0xffff));
             LPARAM lp = MAKELPARAM((short)bx , (short)by);// this is a little clearer than and'ing and or'ing
 
-            PostMessage(hwnd , msg[nc?8:0 + (down?0:4) + btn] , wp , lp);
+            SendMessage(hwnd , msg[nc?8:0 + (down?0:4) + btn] , wp , lp);
+///            PostMessage(hwnd , msg[nc?8:0 + (down?0:4) + btn] , wp , lp);
             
-//            window_tree.EnumerateTree();
+            mc->BringMiceToFront();
+            
+            EnumerateWindows();
+///            window_tree.EnumerateTree();
          }
       }
    }

@@ -17,7 +17,6 @@ class WindowHandler;
 using std::vector;
 
 
-
 #define NUM_MOUSE_BUTTONS 5
 
 
@@ -32,6 +31,17 @@ extern const char* normal_mouse_paths[NUM_NORMAL_MOUSE_STATES];
 
 extern ALLEGRO_BITMAP* normal_mouse_images[NUM_NORMAL_MOUSE_STATES];
 
+enum FCFS_MOUSE_STATES {
+   FCFS_MOUSE_INACTIVE = 0,
+   FCFS_MOUSE_ACTIVE = 1,
+   FCFS_MOUSE_GRABBING = 2,
+   FCFS_MOUSE_DRAGGING = 3
+};
+
+#define NUM_FCFS_MOUSE_STATES 4
+
+extern const char* fcfs_mouse_paths[NUM_FCFS_MOUSE_STATES];
+extern ALLEGRO_BITMAP* fcfs_mouse_images[NUM_FCFS_MOUSE_STATES];
 
 
 enum HEAVY_MOUSE_STATE {
@@ -44,6 +54,13 @@ enum HEAVY_MOUSE_STATE {
 };
 
 #define NUM_HEAVY_MOUSE_STATES 6
+
+
+extern ALLEGRO_FONT* mouse_font;
+
+extern const char* mouse_font_path;
+
+
 
 extern const char* heavy_mouse_paths[NUM_HEAVY_MOUSE_STATES];
 
@@ -78,7 +95,7 @@ public :
    // Mouse info
    HANDLE device_handle;
 
-   ALLEGRO_BITMAP* ms_image;
+   int mouse_device_number;
 
    int x;
    int y;
@@ -101,7 +118,7 @@ public :
 Mouse() :
       transparent_window(),
       device_handle(0),
-      ms_image(0),
+      mouse_device_number(-1),
       x(0),
       y(0),
       focusx(0),
@@ -154,10 +171,11 @@ Mouse() :
    void BringMouseToFront();
    void ShowMouse(bool show_mouse);
    
-   bool GetButtonState(int button) {
-      ALLEGRO_ASSERT(button > 0 && button < NUM_MOUSE_BUTTONS + 1);
-      return buttons_down[button - 1];
-   }
+   void SetDeviceNumber(int dev_num);
+
+   int MouseDeviceNumber() {return mouse_device_number;}
+
+   bool GetButtonState(int button);
 };
 
 

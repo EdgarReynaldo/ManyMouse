@@ -75,6 +75,11 @@ void TransparentWindow::CloseTheWindow() {
    
    dib_buffer.Free();
    
+   if (image) {
+      al_destroy_bitmap(image);
+      image = 0;
+   }
+   
    if (display) {
       al_destroy_display(display);
       display = 0;
@@ -113,9 +118,8 @@ bool TransparentWindow::CreateTheWindow(ALLEGRO_BITMAP* img , COLORREF transpare
       return false;
    }
    
-   image = img;
-   
    al_hold_bitmap_drawing(false);
+   
    al_set_target_bitmap(NULL);
    al_set_new_display_flags(ALLEGRO_FRAMELESS | ALLEGRO_WINDOWED);
 ///   al_set_new_display_flags(ALLEGRO_FRAMELESS | ALLEGRO_WINDOWED | ALLEGRO_OPENGL);
@@ -125,6 +129,17 @@ bool TransparentWindow::CreateTheWindow(ALLEGRO_BITMAP* img , COLORREF transpare
       CloseTheWindow();
       return false;
    }
+   
+   image = al_create_bitmap(al_get_bitmap_width(img) , al_get_bitmap_height(img));
+   
+   if (!image) {
+      CloseTheWindow();
+      return false;
+   }
+   
+   al_set_blender(ALLEGRO_ADD , ALLEGRO_ONE , ALLEGRO_ZERO);
+   al_set_target_bitmap(image);
+   al_draw_bitmap(img , 0 , 0 , 0);
    
    al_get_window_position(display , &x , &y);
    
@@ -215,6 +230,12 @@ void TransparentWindow::PaintTheWindow() {
 
 bool TransparentWindow::SetWindowImage(ALLEGRO_BITMAP* img) {
    
+/*
+   if (image) {
+      al_destroy_bitmap(image);
+      image = 0;
+   }
+*/   
    if (img) {
       int nw = al_get_bitmap_width(img);
       int nh = al_get_bitmap_height(img);
@@ -223,11 +244,26 @@ bool TransparentWindow::SetWindowImage(ALLEGRO_BITMAP* img) {
             return false;
          }
       }
-      image = img;
+      else {
+         al_set_target_backbuffer(display);
+         al_set_blender(ALLEGRO_ADD , ALLEGRO_ONE , ALLEGRO_ZERO);
+         al_set_target_bitmap(image);
+         al_draw_bitmap(img , 0 , 0 , 0);
+      }
+/*
+      al_set_target_backbuffer(display);
+      image = al_create_display(nw,nh);
+      al_set_blender(ALLEGRO_ADD , ALLEGRO_ONE , ALLEGRO_ZERO);
+      al_set_target_bitmap(image);
+      al_draw_bitmap(img , 0 , 0);
+*/
       DrawImageToDIB();
    }
    else {
-      image = 0;
+      if (image) {
+         al_destroy_bitmap(image);
+         image = 0;
+      }
       dib_buffer.ClearToColor(trans_color);
    }
    

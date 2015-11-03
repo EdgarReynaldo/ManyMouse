@@ -79,8 +79,9 @@ public:
    MouseTracker mouse_tracker;
 
    NormalMouseStrategy normal_strategy;
-//   CollaborativeMouseStrategy collaborative_strategy;
+   FCFSMouseStrategy fcfs_strategy;
    HeavyMouseStrategy heavy_strategy;
+//   CollaborativeMouseStrategy collaborative_strategy;
 
    MouseStrategy* active_strategy;
 
@@ -98,6 +99,7 @@ public:
 
    WindowHandler* window_handler;
 
+   int mouse_device_count;
 
 
    void DestroyMouse(HANDLE hDevice);

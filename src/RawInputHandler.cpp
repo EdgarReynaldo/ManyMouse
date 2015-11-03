@@ -597,26 +597,26 @@ void RawInputHandler::InputLoop() {
             bool found_child_node = window_handler.GetChildNode(p , child_node);
 
             al_draw_textf(font , al_map_rgb(255,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT , "Mouse # %u at %i , %i" , i , mx , my);
-            y += 16;
+            y += 12;
 
             if (found_base_node) {
                WindowInfo info = base_node.info;
                al_draw_textf(font , al_map_rgb(0,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT , "Base Node (%d) children :" , base_node.NumChildren());
-               y += 16;
+               y += 12;
                al_draw_textf(font , al_map_rgb(0,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT ,
                              "Title = '%s' , Class = '%s'" , info.window_title.c_str() , info.window_class.c_str());
-               y += 16;
+               y += 12;
             }
             if (found_child_node) {
                WindowInfo info = child_node.info;
                al_draw_textf(font , al_map_rgb(0,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT , "Child Node :");
-               y += 16;
+               y += 12;
                al_draw_textf(font , al_map_rgb(0,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT ,
                              "Title = '%s' , Class = '%s'" , info.window_title.c_str() , info.window_class.c_str());
-               y += 16;
+               y += 12;
             }
 
-            y += 16;
+            y += 12;
 
 
 
@@ -629,13 +629,33 @@ void RawInputHandler::InputLoop() {
             WindowInfo winfo;
             if (hwnd) {
                winfo = window_handler.GetWindowInfoFromHandle(hwnd);
+               al_draw_textf(font , al_map_rgb(255,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT ,
+                             "Title = '%s' , Class = '%s'" , winfo.window_title.c_str() , winfo.window_class.c_str());
+               y += 12;
+               al_draw_textf(font , al_map_rgb(255,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT ,
+                             "Type = '%s'" , winfo.window_type.c_str());
+               y += 12;
             }
-            al_draw_textf(font , al_map_rgb(255,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT ,
-                          "Title = '%s' , Class = '%s'" , winfo.window_title.c_str() , winfo.window_class.c_str());
-            y += 16;
-            al_draw_textf(font , al_map_rgb(255,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT ,
-                          "Type = '%s'" , winfo.window_type.c_str());
-            y += 16;
+
+//            POINT p;
+            p.x = mx;
+            p.y = my;
+            HWND childhwnd = FindTopMostChild(hwnd , p);
+//void al_draw_textf(const ALLEGRO_FONT *font, ALLEGRO_COLOR color,
+//   float x, float y, int flags,
+//   const char *format, ...)
+
+            if (childhwnd) {
+               winfo = window_handler.GetWindowInfoFromHandle(hwnd);
+               al_draw_textf(font , al_map_rgb(255,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT ,
+                             "Title = '%s' , Class = '%s'" , winfo.window_title.c_str() , winfo.window_class.c_str());
+               y += 12;
+               al_draw_textf(font , al_map_rgb(255,255,0) , lww - 10 , y , ALLEGRO_ALIGN_RIGHT ,
+                             "Type = '%s'" , winfo.window_type.c_str());
+               y += 12;
+            }
+
+
          }
 
 
@@ -713,6 +733,9 @@ void RawInputHandler::InputLoop() {
                 ClipCursor(NULL);
             }
             */
+         }
+         if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_F) {
+            mouse_controller.SetMouseStrategy(MOUSE_STRATEGY_FCFS);
          }
          
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_G) {
