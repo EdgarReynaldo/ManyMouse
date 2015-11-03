@@ -50,10 +50,10 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add directory="A5111distro/include" />
+			<Add directory="A5112distro/include" />
 		</Compiler>
 		<Linker>
-			<Add directory="A5111distro/lib" />
+			<Add directory="A5112distro/lib" />
 		</Linker>
 		<Unit filename="src/AllegroAndWindows.cpp" />
 		<Unit filename="src/AllegroAndWindows.hpp" />
