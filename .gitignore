@@ -1,4 +1,3 @@
-A5111distro
 RawInputTest.depend
 RawInputTest.layout
 RawInputTest_build_log.html
@@ -36,3 +35,4 @@ cbbuild/bin/libHooks.def
 cbbuild/bin/RawLog2.txt
 MonitorTestWindow_build_log.html
 cbbuild/bin/WorkingImages
+/A5112distro
