@@ -48,17 +48,17 @@ bool AllegroReady() {
 void DrawBitmapToHDC(HDC hdc , ALLEGRO_BITMAP* bmp) {
    assert(0);
    if (!hdc) {
-      log.Log("DrawBitmapToHDC() : hdc is NULL\n");
+      ManyMouse::log.Log("DrawBitmapToHDC() : hdc is NULL\n");
       return;
    }
    if (!bmp) {
-      log.Log("DrawBitmapToHDC() : bmp is NULL\n");
+      ManyMouse::log.Log("DrawBitmapToHDC() : bmp is NULL\n");
       return;
    }
 
    ALLEGRO_LOCKED_REGION* alr = al_lock_bitmap(bmp , ALLEGRO_PIXEL_FORMAT_ARGB_8888 , ALLEGRO_LOCK_READONLY);
    if (!alr) {
-      log.Log("DrawBitmapToHDC() - Failed to lock bitmap %p.\n" , bmp);
+      ManyMouse::log.Log("DrawBitmapToHDC() - Failed to lock bitmap %p.\n" , bmp);
       return;
    }
    
@@ -85,7 +85,7 @@ void DrawBitmapToHDC(HDC hdc , ALLEGRO_BITMAP* bmp) {
 //            printf("Drawing RGB(%i,%i,%i) at %i,%i\n" , (int)r , (int)g , (int)b , x , y);
 //         }
          if (rgb != SetPixel(hdc , x , y , rgb)) {
-            log.Log("DrawBitmapToHDC() - Failed to set exact color value with SetPixel\n");
+            ManyMouse::log.Log("DrawBitmapToHDC() - Failed to set exact color value with SetPixel\n");
          }
       }
    }
@@ -108,24 +108,24 @@ void DrawBitmapToDIB(const DIBbuffer& dib_buf , ALLEGRO_BITMAP* bmp) {
    assert(bmihdr.biBitCount == 32);
    
    if (!dib_data) {
-      log.Log("DrawBitmapToDIB() : dib_data is NULL\n");
+      ManyMouse::log.Log("DrawBitmapToDIB() : dib_data is NULL\n");
       return;
    }
    if (!bmp) {
-      log.Log("DrawBitmapToDIB() : bmp is NULL\n");
+      ManyMouse::log.Log("DrawBitmapToDIB() : bmp is NULL\n");
       return;
    }
 
    ALLEGRO_LOCKED_REGION* alr = al_lock_bitmap(bmp , ALLEGRO_PIXEL_FORMAT_ARGB_8888 , ALLEGRO_LOCK_READONLY);
    if (!alr) {
       lock_fail_count++;
-      log.Log("DrawBitmapToDIB() - Failed to lock bitmap %p. failcount = %d\n" , bmp , lock_fail_count);
+      ManyMouse::log.Log("DrawBitmapToDIB() - Failed to lock bitmap %p. failcount = %d\n" , bmp , lock_fail_count);
 ///      assert(0);
       return;
    }
    
    lock_success_count++;
-///   log.Log("DrawBitmapToDIB() - al_lock_bitmap succeeded. success count is %d\n" , lock_success_count);
+///   ManyMouse::log.Log("DrawBitmapToDIB() - al_lock_bitmap succeeded. success count is %d\n" , lock_success_count);
 ///   assert(0);
    
    int maxw = al_get_bitmap_width(bmp);
@@ -160,7 +160,7 @@ void DrawBitmapToDIB(const DIBbuffer& dib_buf , ALLEGRO_BITMAP* bmp) {
       for (int x = 0 ; x < 4*maxw ; x += 4) {
          int bmpdata = *(int*)&pdata[x];
 ///         if (
-///         log.Log(" 0x%x",bmpdata);
+///         ManyMouse::log.Log(" 0x%x",bmpdata);
          *(int*)&dib_data[x] = bmpdata;/// | 0x0000ff00;
 ///         *(int*)&dib_data[x] = bmpdata;/// | 0xff0000ff;
 ///         *(int*)&dib_data[x] = bmpdata | 0xffffffff;

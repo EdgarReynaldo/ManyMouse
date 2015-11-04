@@ -7,7 +7,7 @@
 
 
 #include "RawInputHandler.hpp"
-
+#include <tchar.h>
 
 
 using namespace ManyMouse;
@@ -243,19 +243,21 @@ void RawInputHandler::DrawHandlerToDIB() {
 
 
 void RawInputHandler::SetupHooks() {
-   hMod_hook_dll = LoadLibrary("Hooks.dll");
+   hMod_hook_dll = LoadLibrary(_T("Hooks.dll"));
    ManyMouse::log.Log("Hook dll %s\n" , hMod_hook_dll?"loaded successfully":"failed to load");
    if (hMod_hook_dll) {
-      ll_mouse_hook_func = (LRESULT CALLBACK (*)(int , WPARAM , LPARAM))GetProcAddress(hMod_hook_dll , "_Z17LowLevelMouseHookijl@12");
-      if (!ll_mouse_hook_func) {
+      ll_mouse_hook_func = (HOOKPROC)GetProcAddress(hMod_hook_dll , "_Z17LowLevelMouseHookijl@12");
+///	  ll_mouse_hook_func = (LRESULT CALLBACK(*)(int, WPARAM, LPARAM))GetProcAddress(hMod_hook_dll, "_Z17LowLevelMouseHookijl@12");
+	  if (!ll_mouse_hook_func) {
          ManyMouse::log.Log("LowLevelMouseHook failed to load. GetLastError reports %d\n" , GetLastError());
       }
       else {
          ManyMouse::log.Log("LowLevelMouseHook loaded successfully.\n");
       }
 
-      mouse_hook_func = (LRESULT CALLBACK (*) (int , WPARAM , LPARAM))GetProcAddress(hMod_hook_dll , "_Z9MouseHookijl@12");
-      if (!mouse_hook_func) {
+      mouse_hook_func = (HOOKPROC)GetProcAddress(hMod_hook_dll , "_Z9MouseHookijl@12");
+///	  mouse_hook_func = (LRESULT CALLBACK(*) (int, WPARAM, LPARAM))GetProcAddress(hMod_hook_dll, "_Z9MouseHookijl@12");
+	  if (!mouse_hook_func) {
          ManyMouse::log.Log("MouseHook failed to load. GetLastError reports %d\n" , GetLastError());
       }
       else {
@@ -303,8 +305,9 @@ void RawInputHandler::SetupHooks() {
       SetWindowHandler(&window_handler);
       SetMouseController(&mouse_controller);
 
-      shell_hook_func = (LRESULT CALLBACK (*)(int , WPARAM , LPARAM))
-                        GetProcAddress(hMod_hook_dll , "_Z9ShellHookijl@12");
+      shell_hook_func = (HOOKPROC)GetProcAddress(hMod_hook_dll , "_Z9ShellHookijl@12");
+///	  shell_hook_func = (LRESULT CALLBACK(*)(int, WPARAM, LPARAM))
+///		  GetProcAddress(hMod_hook_dll, "_Z9ShellHookijl@12");
 
       if (!shell_hook_func) {
          ManyMouse::log.Log("ShellHook failed to load. GetLastError reports %d\n" , GetLastError());
@@ -737,7 +740,7 @@ void RawInputHandler::InputLoop() {
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_F) {
             mouse_controller.SetMouseStrategy(MOUSE_STRATEGY_FCFS);
          }
-         
+
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_G) {
             mouse_controller.SetMouseStrategy(MOUSE_STRATEGY_NORMAL);
          }

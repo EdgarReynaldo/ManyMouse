@@ -126,13 +126,13 @@ bool DIBbuffer::Create(HWND window_handle) {
        !GetBitmapInfo(&bm_info , win_handle)) {
       Free();
       if (!winDC) {
-         log.Log("DIBbuffer::Create - Could not get window DC from hwnd %p\n" , window_handle);
+         ManyMouse::log.Log("DIBbuffer::Create - Could not get window DC from hwnd %p\n" , window_handle);
       }
       else if (!memDC) {
-         log.Log("DIBbuffer::Create - Could create compatible DC from winDC %p\n" , winDC);
+         ManyMouse::log.Log("DIBbuffer::Create - Could create compatible DC from winDC %p\n" , winDC);
       }
       else { // GetBitmapInfo failed
-         log.Log("DIBbuffer::Create - Could not get bitmap info from hwnd %p\n" , window_handle);
+         ManyMouse::log.Log("DIBbuffer::Create - Could not get bitmap info from hwnd %p\n" , window_handle);
       }
       return false;
    }
@@ -141,10 +141,10 @@ bool DIBbuffer::Create(HWND window_handle) {
    
    if (!hbm_DIBbuffer || !hbm_DIBdata) {
       if (!hbm_DIBbuffer) {
-         log.Log("DIBbuffer::Create - CreateDIBSection failed\n");
+         ManyMouse::log.Log("DIBbuffer::Create - CreateDIBSection failed\n");
       }
       if (!hbm_DIBdata) {
-         log.Log("DIBbuffer::Create - CreateDIBSection did not allocate data!\n");
+         ManyMouse::log.Log("DIBbuffer::Create - CreateDIBSection did not allocate data!\n");
       }
       Free();
       return false;
@@ -153,7 +153,7 @@ bool DIBbuffer::Create(HWND window_handle) {
    oldGDIobj = SelectObject(memDC , hbm_DIBbuffer);
    
    if (oldGDIobj == HGDI_ERROR) {
-      log.Log("HGDI_ERROR occurred while selecting object %p\n" , memDC);
+      ManyMouse::log.Log("HGDI_ERROR occurred while selecting object %p\n" , memDC);
       Free();
       return false;
    }
@@ -171,10 +171,10 @@ bool DIBbuffer::GetBitmapInfo(BITMAPINFO* pbi , HWND handle) {
    // Gets bitmap info suitable for creating a DIB the same size as the window specified by 'handle'.
    if (!pbi || !handle) {
       if (!pbi) {
-         log.Log("DIBbuffer::GetBitmapInfo - pbi is NULL.\n");
+         ManyMouse::log.Log("DIBbuffer::GetBitmapInfo - pbi is NULL.\n");
       }
       if (!handle) {
-         log.Log("DIBbuffer::GetBitmapInfo - handle is NULL.\n");
+         ManyMouse::log.Log("DIBbuffer::GetBitmapInfo - handle is NULL.\n");
       }
       return false;
    }
@@ -183,7 +183,7 @@ bool DIBbuffer::GetBitmapInfo(BITMAPINFO* pbi , HWND handle) {
    
    RECT clrect;
    if (!GetClientRect(handle , &clrect)) {
-      log.Log("DIBbuffer::GetBitmapInfo - failed to get client rect from hwnd %p\n" , handle);
+      ManyMouse::log.Log("DIBbuffer::GetBitmapInfo - failed to get client rect from hwnd %p\n" , handle);
       return false;
    }
    
@@ -211,7 +211,7 @@ bool DIBbuffer::GetBitmapInfo(BITMAPINFO* pbi , HWND handle) {
 
 void DIBbuffer::BlitBufferToWindowDC() {
    if (!ready) {
-      log.Log("DIBbuffer::BlitBufferToWindowDC - not ready.\n");
+      ManyMouse::log.Log("DIBbuffer::BlitBufferToWindowDC - not ready.\n");
       return;
    }
 //**   
@@ -287,9 +287,9 @@ BOOL AlphaBlend(
 
    GdiFlush();
    
-///   log.Log("Using AlphaBlend");
+///   ManyMouse::log.Log("Using AlphaBlend");
 ///   if (!AlphaBlend(winDC, dr.left, dr.top, dr.right - dr.left, dr.bottom - dr.top,  memDC, sr.left, sr.top, sr.right, sr.bottom, blend)) {
-///      log.Log("AlphaBlend failed. GetLastError reports %d.\n" , GetLastError());
+///      ManyMouse::log.Log("AlphaBlend failed. GetLastError reports %d.\n" , GetLastError());
 ///   }
    
    GdiFlush();
@@ -341,7 +341,7 @@ BOOL WINAPI UpdateLayeredWindow(
    blend.AlphaFormat = AC_SRC_ALPHA;
    
    if (!UpdateLayeredWindow(win_handle , winDC , &pd , &ssz , memDC , &ps , RGB(0,0,0) , &blend , ULW_ALPHA)) {
-      log.Log("Failed to update layered window. GetLastError reports %d.\n" , GetLastError());
+      ManyMouse::log.Log("Failed to update layered window. GetLastError reports %d.\n" , GetLastError());
    }
 
 //   ReleaseDC(NULL , screenDC);
@@ -379,9 +379,9 @@ BOOL WINAPI UpdateLayeredWindow(
       blend.SourceConstantAlpha = 64;
       blend.AlphaFormat = AC_SRC_ALPHA;
 
-      log.Log("Using AlphaBlend");
+      ManyMouse::log.Log("Using AlphaBlend");
       if (!AlphaBlend(winDC, dr.left, dr.top, dr.right - dr.left, dr.bottom - dr.top,  memDC, sr.left, sr.top, sr.right, sr.bottom, blend)) {
-         log.Log("AlphaBlend failed. GetLastError reports %d.\n" , GetLastError());
+         ManyMouse::log.Log("AlphaBlend failed. GetLastError reports %d.\n" , GetLastError());
       }
    }
    GdiFlush();
@@ -414,7 +414,7 @@ void DIBbuffer::ClearToColor(COLORREF c) {
 void DIBbuffer::ClearToColor(int red , int green , int blue , int alpha) {
    
    if (!ready) {
-      log.Log("DIBbuffer::ClearToColor(r,g,b,a) - not ready.\n");
+      ManyMouse::log.Log("DIBbuffer::ClearToColor(r,g,b,a) - not ready.\n");
       return;
    }
    

@@ -103,14 +103,17 @@ public:
 
    HMODULE hMod_hook_dll;
 
-   LRESULT CALLBACK (*ll_mouse_hook_func) (int , WPARAM , LPARAM);
-   LRESULT CALLBACK (*mouse_hook_func) (int , WPARAM , LPARAM);
+   HOOKPROC ll_mouse_hook_func;
+   HOOKPROC mouse_hook_func;
+   ///   LRESULT CALLBACK (*ll_mouse_hook_func) (int , WPARAM , LPARAM);
+///   LRESULT CALLBACK (*mouse_hook_func) (int , WPARAM , LPARAM);
    void (*start_mouse_func)();
    void (*stop_mouse_func)();
    HHOOK ll_mouse_hook;
    HHOOK mouse_hook;
 
-   LRESULT CALLBACK (*shell_hook_func) (int , WPARAM , LPARAM);
+   HOOKPROC shell_hook_func;
+///   LRESULT CALLBACK (*shell_hook_func) (int , WPARAM , LPARAM);
    HHOOK shellhook;
 
 

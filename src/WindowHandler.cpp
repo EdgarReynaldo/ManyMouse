@@ -9,7 +9,7 @@
 
 #include "String.hpp"
 
-
+#include <tchar.h>
 #include <cstdio>
 
 /*
@@ -100,11 +100,11 @@ HWND FindTopMostChild(HWND parent , POINT abs_coords) {
       abs_coords.y -= clrect.top;
    }
    else {
-      log.Log("FindTopMostChild::Failed to get client rect for window %p\n" , parent);
+      ManyMouse::log.Log("FindTopMostChild::Failed to get client rect for window %p\n" , parent);
    }
 */
    if (!ScreenToClient(parent , &abs_coords)) {
-      log.Log("FindTopMostChild() - ScreenToClient failed.\n");
+      ManyMouse::log.Log("FindTopMostChild() - ScreenToClient failed.\n");
    }
 
 
@@ -202,14 +202,14 @@ void WindowHandler::EnumerateWindows() {
 
    desktop_window = GetDesktopWindow();
    shell_window = GetShellWindow();
-   taskbar_window = FindWindow("Shell_TrayWnd" , NULL);
+   taskbar_window = FindWindow(_T("Shell_TrayWnd") , NULL);
 
    EnumWindows(EnumerateWindowsProcess , (LPARAM)(this));
    EnumWindows(EnumerateVisibleWindowsProcess , (LPARAM)&hwnds_zorder);
 
-   log.Log("Desktop window handle = %p\n" , desktop_window);
-   log.Log("Shell   window handle = %p\n" , shell_window);
-   log.Log("Taskbar window handle = %p\n" , taskbar_window);
+   ManyMouse::log.Log("Desktop window handle = %p\n" , desktop_window);
+   ManyMouse::log.Log("Shell   window handle = %p\n" , shell_window);
+   ManyMouse::log.Log("Taskbar window handle = %p\n" , taskbar_window);
 
    deque<HWND>::iterator dit = hwnds_zorder.begin();
    while (dit != hwnds_zorder.end()) {
@@ -346,8 +346,8 @@ void WindowHandler::PrintWindowInfo() {
       map<HWND , WindowInfo*>::iterator itinfo = window_info_map.find(hwndA);
       if (itinfo != window_info_map.end()) {
          WindowInfo* pwi = itinfo->second;
-         log.Log(pwi->GetWindowInfoString());
-         log.Log("\n");
+         ManyMouse::log.Log(pwi->GetWindowInfoString());
+         ManyMouse::log.Log("\n");
       }
 
       ++itwin;
@@ -441,7 +441,7 @@ HWND WindowHandler::GetWindowAtPos(int xpos , int ypos) {
 
       RECT r;
       if (!GetWindowRect(hwndA , &r)) {
-         log.Log("Failed to get window rect for hwnd %p\n" , hwndA);
+         ManyMouse::log.Log("Failed to get window rect for hwnd %p\n" , hwndA);
       }
       else if (RectContains(r , xpos , ypos)) {
          return hwndA;
@@ -582,13 +582,13 @@ void WindowHandler::PrintWindows() {
 
 
       if (IsProgramWindow(hwnd)) {
-         log.Log("Program Window : %p : (%i,%i,%i,%i)\n" , (void*)hwnd , wrect.left , wrect.top , wrect.right , wrect.bottom);
+         ManyMouse::log.Log("Program Window : %p : (%i,%i,%i,%i)\n" , (void*)hwnd , wrect.left , wrect.top , wrect.right , wrect.bottom);
       }
       else if (IsMouseWindow(hwnd)) {
-         log.Log("Mouse Window : %p : (%i,%i,%i,%i)\n" , (void*)hwnd , wrect.left , wrect.top , wrect.right , wrect.bottom);
+         ManyMouse::log.Log("Mouse Window : %p : (%i,%i,%i,%i)\n" , (void*)hwnd , wrect.left , wrect.top , wrect.right , wrect.bottom);
       }
       else {
-         log.Log("Desktop Window : %p : (%i,%i,%i,%i)\n" , (void*)hwnd , wrect.left , wrect.top , wrect.right , wrect.bottom);
+         ManyMouse::log.Log("Desktop Window : %p : (%i,%i,%i,%i)\n" , (void*)hwnd , wrect.left , wrect.top , wrect.right , wrect.bottom);
       }
    }
 }

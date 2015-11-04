@@ -4,34 +4,34 @@
 #include <windowsx.h>
 #include "VisualLogger.hpp"
 
-using ManyMouse::log;
+//using ManyMouse::log;
 
 bool passback(ALLEGRO_DISPLAY *display, UINT message, WPARAM wparam,
    LPARAM lparam, LRESULT *result, void *userdata){
    if(message==WM_LBUTTONDOWN){
         //printf("Left button down \n");
-        log.Log("Left button down \n");
+        ManyMouse::log.Log("Left button down \n");
 
    }
    else if(message==WM_LBUTTONUP) {
         //printf("Left button up \n");
-        log.Log("Left button up \n");
+        ManyMouse::log.Log("Left button up \n");
    }
    else if (message==WM_RBUTTONDOWN){
         //printf("Right button down \n");
-        log.Log("Right button down \n");
+        ManyMouse::log.Log("Right button down \n");
    }
    else if (message==WM_RBUTTONUP){
 //        printf("Right button up \n");
-        log.Log("Right button up \n");
+        ManyMouse::log.Log("Right button up \n");
    }
    else if (message==WM_MBUTTONDOWN){
   //      printf("Middle button down \n");
-        log.Log("Middle button down \n");
+        ManyMouse::log.Log("Middle button down \n");
    }
    else if (message==WM_MBUTTONUP){
 //        printf("Middle button up \n");
-        log.Log("Middle button up \n");
+        ManyMouse::log.Log("Middle button up \n");
    }
    else if (message==WM_MOUSEMOVE){
         //printf("Mouse is moving;   %u \n");
@@ -39,60 +39,60 @@ bool passback(ALLEGRO_DISPLAY *display, UINT message, WPARAM wparam,
    }
    else if (message==WM_MOUSEHOVER){
 //        printf("Mouse is hovering over \n");
-        log.Log("Mouse is hovering \n");
+        ManyMouse::log.Log("Mouse is hovering \n");
    }
    else if (message==WM_MOUSEACTIVATE) {
  //       printf("Mouse is active \n");
-        log.Log("Mouse is active \n");
+        ManyMouse::log.Log("Mouse is active \n");
    }
     else if (message==WM_NCLBUTTONDOWN){
         //printf("Mouse Left button down on taskbar; %u \n", message);
-        log.Log("Mouse left button is down on taskbar \n");
+        ManyMouse::log.Log("Mouse left button is down on taskbar \n");
     }
     else if (message==WM_NCMOUSEMOVE) {
         //printf("Mouse Movement over taskbar; %u \n", message);
-        log.Log("Mouse movement over taskbar \n");
+        ManyMouse::log.Log("Mouse movement over taskbar \n");
     }
     else if (message==WM_NCMOUSELEAVE){
         //printf("I dont know what this is; %u \n", message);
-        log.Log("NC Mouse leave \n");
+        ManyMouse::log.Log("NC Mouse leave \n");
     }
     else if (message==WM_NCMOUSEHOVER){
 //        printf("I think this is hovering \n");
-        log.Log("NC Mouse is hovering \n");
+        ManyMouse::log.Log("NC Mouse is hovering \n");
     }
     else if (message==WM_NCHITTEST){
-        log.Log("NC Hit Test \n");
+        ManyMouse::log.Log("NC Hit Test \n");
     }
     else if (message==WM_SYSCOMMAND){
-         log.Log("System command \n");
+         ManyMouse::log.Log("System command \n");
     }
     else if (message==WM_CAPTURECHANGED){
-        log.Log("Capture Changed \n");
+        ManyMouse::log.Log("Capture Changed \n");
     }
     else if (message==WM_GETMINMAXINFO){
-         log.Log("Min and Max info \n");
+         ManyMouse::log.Log("Min and Max info \n");
     }
     else if (message==WM_ENTERSIZEMOVE){
-         log.Log("Enter size move \n");
+         ManyMouse::log.Log("Enter size move \n");
     }
     else if(message==WM_SETCURSOR){
-         log.Log("Set Cursor \n");
+         ManyMouse::log.Log("Set Cursor \n");
     }
     else if(message==WM_CONTEXTMENU){
-         log.Log("Context Menu \n");
+         ManyMouse::log.Log("Context Menu \n");
     }
     else if(message==WM_MOUSEWHEEL){
-         log.Log("Mouse wheel has scrolled \n");
+         ManyMouse::log.Log("Mouse wheel has scrolled \n");
     }
     else if(message==WM_GETICON){
-         log.Log("Get Icon \n");
+         ManyMouse::log.Log("Get Icon \n");
     }
     else if (message==WM_MOUSELEAVE){
-         log.Log("WM Mouse leave \n");
+         ManyMouse::log.Log("WM Mouse leave \n");
     }
     else if(message==WM_KEYUP){
-         log.Log("Key up \n");
+         ManyMouse::log.Log("Key up \n");
     }
    //else printf("Unknown; %u \n", message);
 
@@ -162,7 +162,7 @@ if(!al_win_add_window_callback(display,passback, NULL)){
       if(redraw){
          al_set_target_backbuffer(display);
          al_clear_to_color(al_map_rgb(0,0,0));
-         log.DrawLog(font,al_map_rgb(255,255,255),10,470);
+         ManyMouse::log.DrawLog(font,al_map_rgb(255,255,255),10,470);
          al_flip_display();
       }
       if(get_event) {

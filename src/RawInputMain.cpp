@@ -50,7 +50,7 @@ int main(int argc , char** argv) {
    int status = SetupAllegro(atexit);
    
    if (status != 0) {
-      log.Log("Failed to setup allegro. status = %d.\n" , status);
+      ManyMouse::log.Log("Failed to setup allegro. status = %d.\n" , status);
       return 1;
    }
 
@@ -59,21 +59,21 @@ int main(int argc , char** argv) {
    int windows_setup = rawhandler.SetupWindows();
    
    if (windows_setup != 0) {
-      log.Log("Failed to setup windows.\n");
+      ManyMouse::log.Log("Failed to setup windows.\n");
       return 2;
    }
    
    bool raw_init = rawhandler.InitRawInfo();
    
-   log.Log("InitRawInfo was %s\n" , raw_init?"successful":"not successful");
+   ManyMouse::log.Log("InitRawInfo was %s\n" , raw_init?"successful":"not successful");
    
    bool registered_devices = rawhandler.RegisterDevices(false);
    
-   log.Log("RegisterDevices was %s\n" , registered_devices?"successful":"not successful");
+   ManyMouse::log.Log("RegisterDevices was %s\n" , registered_devices?"successful":"not successful");
    
    
 
-   log.Activate(true);
+   ManyMouse::log.Activate(true);
    
    rawhandler.InputLoop();
    

@@ -38,7 +38,7 @@ bool MouseController::CreateMouse(HANDLE hDevice) {
       newmouse->SetBounds(r);
    }
    else {
-      log.Log("Failed to SetBounds for new mouse. GetLastError says %d\n" , GetLastError());
+      ManyMouse::log.Log("Failed to SetBounds for new mouse. GetLastError says %d\n" , GetLastError());
    }
 
    newmouse->SetPos(p.x , p.y);
@@ -91,7 +91,7 @@ MouseController::MouseController(WindowHandler* wh) :
       mouse_device_count(0)
 {
    if (!LoadMiceImages()) {
-      log.Log("Failed to load mice images.\n");
+      ManyMouse::log.Log("Failed to load mice images.\n");
       ALLEGRO_ASSERT(0);// failed to load mice images
    }
    normal_strategy.Reset();
@@ -142,9 +142,9 @@ void MouseController::HandleRawInput(RAWINPUT rawinput) {
 
    Mouse* mouse = mouse_tracker.GetMouseFromHandle(hdr.hDevice);
    if (!mouse) {
-      log.Log("Creating new mouse. hDevice = %p\n" , hdr.hDevice);
+      ManyMouse::log.Log("Creating new mouse. hDevice = %p\n" , hdr.hDevice);
       if (!CreateMouse(hdr.hDevice)) {
-         log.Log("MouseController::HandleRawInput - Could not create mouse.\n");
+         ManyMouse::log.Log("MouseController::HandleRawInput - Could not create mouse.\n");
       }
       mouse = mouse_tracker.GetMouseFromHandle(hdr.hDevice);
    }
@@ -210,7 +210,7 @@ void MouseController::ToggleMouseImage() {
    for (unsigned int i = 0 ; i < micevec.size() ; ++i) {
       Mouse* m = micevec[i];
       if (!m->SetImage(ms_image)) {
-         log.Log("Failed to set mouse image for mouse %p and image %p\n" , micevec[i] , ms_image);
+         ManyMouse::log.Log("Failed to set mouse image for mouse %p and image %p\n" , micevec[i] , ms_image);
       }
    }
 

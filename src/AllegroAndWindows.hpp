@@ -21,6 +21,8 @@
 //#define WINVER 0x0600
 //#define _WIN32_WINNT 0x0600
 
+//#define ALLEGRO_NO_MAGIC_MAIN
+
 // Include Allegro library headers
 #include "allegro5/allegro.h"
 #include "allegro5/allegro_windows.h"

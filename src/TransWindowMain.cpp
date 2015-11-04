@@ -87,14 +87,14 @@ int main(int argc, char** argv) {
    handle = al_get_win_window_handle(display);
 
    if (0 == SetWindowLong(handle , GWL_EXSTYLE , WS_EX_LAYERED)) {
-      log.Log("Couldn't set WS_EX_LAYERED style attribute\n");
+      ManyMouse::log.Log("Couldn't set WS_EX_LAYERED style attribute\n");
    }
    
    COLORREF trans_key = RGB(0,0,0);
    COLORREF white = RGB(255,255,255);
    
    if (!SetLayeredWindowAttributes(handle , trans_key , 255 , LWA_COLORKEY)) {
-      log.Log("Couldn't set color key!\n");
+      ManyMouse::log.Log("Couldn't set color key!\n");
    }
    
    HDC hdc = GetDC(handle);
@@ -132,7 +132,7 @@ int main(int argc, char** argv) {
 /*
    HBRUSH hbrush_trans = CreateSolidBrush(trans_key);
    if (!hbrush_trans) {
-      log.Log("Failed to create HBRUSH.\n");
+      ManyMouse::log.Log("Failed to create HBRUSH.\n");
       ReleaseDC(handle , hdc);
       return 12;
    }
@@ -155,17 +155,17 @@ BOOL WINAPI SetLayeredWindowAttributes(
 
 ///   al_win_add_window_callback(display , WindowProcCallback , this);
    
-   log.Log("Testing visual logger for feedback1\n");
-   log.Log("Testing visual logger for feedback2\n");
-   log.Log("Testing visual logger for feedback3\n");
+   ManyMouse::log.Log("Testing visual logger for feedback1\n");
+   ManyMouse::log.Log("Testing visual logger for feedback2\n");
+   ManyMouse::log.Log("Testing visual logger for feedback3\n");
    
    DIBbuffer dibbuf;
    
    if (!dibbuf.Create(handle)) {
-      log.Log("Failed to create DIB buffer.\n");
+      ManyMouse::log.Log("Failed to create DIB buffer.\n");
    }
    else {
-      log.Log("Created DIB buffer.\n");
+      ManyMouse::log.Log("Created DIB buffer.\n");
    }
    
    dibbuf.ClearToColor(RGB(255,255,255));
@@ -239,14 +239,14 @@ typedef struct _RECT {
 */         
 
          if (!SetLayeredWindowAttributes(handle , trans_key , alpha , LWA_COLORKEY | LWA_ALPHA)) {
-            log.Log("Couldn't set color key!\n");
+            ManyMouse::log.Log("Couldn't set color key!\n");
          }
 //         al_clear_to_color(al_map_rgba(0,0,0,0));
 //         log.DrawLog(verdana12 , al_map_rgb(255,255,255) , 10 , sh);
 //         al_flip_display();
 /*
          if (!SetLayeredWindowAttributes(handle , black_key , 255 , LWA_COLORKEY)) {
-            log.Log("Couldn't set color key!\n");
+            ManyMouse::log.Log("Couldn't set color key!\n");
          }
 */
       }
@@ -301,10 +301,10 @@ void PrintPixel(HDC hdc , int x , int y) {
    printf("WTF\n");
    COLORREF cref = GetPixel(hdc , 0 , 0);
    if (cref == CLR_INVALID) {
-      log.Log("GetPixel(hdc,%i,%i) returned CLR_INVALID\n" , x , y);
+      ManyMouse::log.Log("GetPixel(hdc,%i,%i) returned CLR_INVALID\n" , x , y);
       return;
    }
-   log.Log("Pixel at %i,%i has an RGB of (%i,%i,%i)\n" , x , y ,
+   ManyMouse::log.Log("Pixel at %i,%i has an RGB of (%i,%i,%i)\n" , x , y ,
            (int)GetRValue(cref) , (int)GetGValue(cref) , (int)GetBValue(cref));
 }
 

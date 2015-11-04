@@ -94,7 +94,7 @@ bool LoadMiceImages() {
       ALLEGRO_BITMAP* image = al_load_bitmap(normal_mouse_paths[i]);
       if (!image) {
          success = false;
-         log.Log("Failed to load mouse image \"%s\"\n" , normal_mouse_paths[i]);
+         ManyMouse::log.Log("Failed to load mouse image \"%s\"\n" , normal_mouse_paths[i]);
       }
       normal_mouse_images[i] = image;
    }
@@ -102,7 +102,7 @@ bool LoadMiceImages() {
       ALLEGRO_BITMAP* image = al_load_bitmap(fcfs_mouse_paths[i]);
       if (!image) {
          success = false;
-         log.Log("Failed to load mouse image \"%s\"\n" , fcfs_mouse_paths[i]);
+         ManyMouse::log.Log("Failed to load mouse image \"%s\"\n" , fcfs_mouse_paths[i]);
       }
       fcfs_mouse_images[i] = image;
    }
@@ -110,13 +110,13 @@ bool LoadMiceImages() {
       ALLEGRO_BITMAP* image = al_load_bitmap(heavy_mouse_paths[i]);
       if (!image) {
          success = false;
-         log.Log("Failed to load mouse image \"%s\"\n" , heavy_mouse_paths[i]);
+         ManyMouse::log.Log("Failed to load mouse image \"%s\"\n" , heavy_mouse_paths[i]);
       }
       heavy_mouse_images[i] = image;
    }
    mouse_font = al_load_ttf_font(mouse_font_path , 20 , 0);
    if (!mouse_font) {
-      log.Log("Failed to load mouse font at '%s'\n" , mouse_font_path);
+      ManyMouse::log.Log("Failed to load mouse font at '%s'\n" , mouse_font_path);
       success = false;
    }
    
@@ -148,7 +148,7 @@ ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active) {
    }
 
    if (!cursor_bmp) {
-      log.Log("Failed to load cursor bitmap.\n");
+      ManyMouse::log.Log("Failed to load cursor bitmap.\n");
       return 0;
    }
 
@@ -200,7 +200,7 @@ ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active) {
     ALLEGRO_BITMAP* circle = 0;
     cursor1 = al_load_bitmap("Images/NormalCursor1.png");
     if (!cursor1) {
-          log.Log("Failed to load cursor bitmap.\n");
+          ManyMouse::log.Log("Failed to load cursor bitmap.\n");
           return 0;
        }
     circle = al_create_bitmap(32,32);
@@ -234,7 +234,7 @@ ALLEGRO_BITMAP* DrawMouseImage(bool active){
    ALLEGRO_BITMAP* circle = 0;
    cursor1 = al_load_bitmap("Images/NormalCursor1.png");
    if (!cursor1) {
-      log.Log("Failed to load cursor bitmap.\n");
+      ManyMouse::log.Log("Failed to load cursor bitmap.\n");
       return 0;
    }
    circle = al_create_bitmap(32,32);
@@ -364,7 +364,7 @@ void Mouse::MoveBy(int dx , int dy) {
 
 void Mouse::Draw() {
    if (!transparent_window.GetAllegroDisplay()) {
-      log.Log("Mouse::Draw - transparent window's display is NULL.\n");
+      ManyMouse::log.Log("Mouse::Draw - transparent window's display is NULL.\n");
       return;
    }
    al_set_target_backbuffer(transparent_window.GetAllegroDisplay());
@@ -378,13 +378,13 @@ void Mouse::HandleRawInput(RAWINPUT rawinput) {
    RAWMOUSE rms = rawinput.data.mouse;
 
    if (hdr.hDevice != device_handle) {
-      log.Log("Mouse::HandleRawInput - Device handle doesn't match.\n");
+      ManyMouse::log.Log("Mouse::HandleRawInput - Device handle doesn't match.\n");
       return;
    }
 
    if (hdr.dwType != RIM_TYPEMOUSE) {
       // we only handle mouse messages
-      log.Log("Mouse::HandleRawInput - dwType doesn't match.\n");
+      ManyMouse::log.Log("Mouse::HandleRawInput - dwType doesn't match.\n");
       return;
    }
 
@@ -392,11 +392,11 @@ void Mouse::HandleRawInput(RAWINPUT rawinput) {
    /// Their flags could use a better configuration
 
    if (rms.usFlags == MOUSE_MOVE_RELATIVE) {
-//      log.Log("Mouse::HandleRawInput : MOUSE_MOVE_RELATIVE\n");
+//      ManyMouse::log.Log("Mouse::HandleRawInput : MOUSE_MOVE_RELATIVE\n");
       MoveBy(rms.lLastX , rms.lLastY);
    }
    else if (rms.usFlags & MOUSE_MOVE_ABSOLUTE) {
-//      log.Log("Mouse::HandleRawInput : MOUSE_MOVE_ABSOLUTE\n");
+//      ManyMouse::log.Log("Mouse::HandleRawInput : MOUSE_MOVE_ABSOLUTE\n");
       SetPos(rms.lLastX , rms.lLastY);
    }
    else {
@@ -417,22 +417,22 @@ void Mouse::HandleRawInput(RAWINPUT rawinput) {
    }
 
    if (flags & RI_MOUSE_LEFT_BUTTON_DOWN) {
-      log.Log("Mouse %p : LMB down\n" , hdr.hDevice);
+      ManyMouse::log.Log("Mouse %p : LMB down\n" , hdr.hDevice);
    }
    if (flags & RI_MOUSE_LEFT_BUTTON_UP) {
-      log.Log("Mouse %p : LMB up\n" , hdr.hDevice);
+      ManyMouse::log.Log("Mouse %p : LMB up\n" , hdr.hDevice);
    }
    if (flags & RI_MOUSE_MIDDLE_BUTTON_DOWN) {
-      log.Log("Mouse %p : MMB down\n" , hdr.hDevice);
+      ManyMouse::log.Log("Mouse %p : MMB down\n" , hdr.hDevice);
    }
    if (flags & RI_MOUSE_MIDDLE_BUTTON_UP) {
-      log.Log("Mouse %p : MMB up\n" , hdr.hDevice);
+      ManyMouse::log.Log("Mouse %p : MMB up\n" , hdr.hDevice);
    }
    if (flags & RI_MOUSE_RIGHT_BUTTON_DOWN) {
-      log.Log("Mouse %p : RMB down\n" , hdr.hDevice);
+      ManyMouse::log.Log("Mouse %p : RMB down\n" , hdr.hDevice);
    }
    if (flags & RI_MOUSE_RIGHT_BUTTON_UP) {
-      log.Log("Mouse %p : RMB up\n" , hdr.hDevice);
+      ManyMouse::log.Log("Mouse %p : RMB up\n" , hdr.hDevice);
    }
 }
 

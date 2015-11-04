@@ -17,7 +17,7 @@ class DIBbuffer {
    
    HBITMAP hbm_DIBbuffer;
    BITMAPINFO bm_info;
-   void* hbm_DIBdata;/// This has proven to be useless so far - don't know what its good for
+   void* hbm_DIBdata;
    
    HGDIOBJ oldGDIobj;
    

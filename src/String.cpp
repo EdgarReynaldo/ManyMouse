@@ -58,7 +58,7 @@ wstring utf8_decode(const std::string &str)
    }
 #endif // #ifdef UNICODE
 
-int STRINGPRINTF_BUFFER_SIZE = 4096;
+//const int STRINGPRINTF_BUFFER_SIZE = 4096;
 
 
 std::string StringPrintF(const char* format_str , ...) {

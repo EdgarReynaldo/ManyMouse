@@ -1,10 +1,11 @@
 
 
+#include <tchar.h>
 
 #include "WindowTree.hpp"
 
 #include "VisualLogger.hpp"
-using ManyMouse::log;
+//using ManyMouse::log;
 
 #include "String.hpp"
 
@@ -98,7 +99,7 @@ void WindowTree::EnumerateTree() {
 
    desktop_window = GetDesktopWindow();
    shell_window = GetShellWindow();
-   taskbar_window = FindWindow("Shell_TrayWnd" , NULL);
+   taskbar_window = FindWindow(_T("Shell_TrayWnd") , NULL);
 
    GetMiceWindows();
 
@@ -160,13 +161,13 @@ bool WindowTree::GetBaseWindowNode(POINT pscreen , WindowNode& store_node) {
       POINT pc = pscreen;
 /*
       if (!ScreenToClient(window , &pc)) {
-         log.Log("WindowTree::GetBaseWindowNode() - ScreenToClient failed. GetLastError reports %d\n" , GetLastError());
+         ManyMouse::log.Log("WindowTree::GetBaseWindowNode() - ScreenToClient failed. GetLastError reports %d\n" , GetLastError());
          continue;
       }
 */
       RECT rc;
       if (!GetWindowRect(window , &rc)) {
-         log.Log("WindowTree::GetBaseWindowNode() - GetWindowRect failed. GetLastError reports %d\n" , GetLastError());
+         ManyMouse::log.Log("WindowTree::GetBaseWindowNode() - GetWindowRect failed. GetLastError reports %d\n" , GetLastError());
          continue;
       }
       if (pc.x >= rc.left &&
@@ -265,7 +266,7 @@ bool GetTopChild(WindowNode& root_node , POINT pscreen , WindowNode& store_node)
       POINT pc = pscreen;
       RECT rc;
       if (!GetWindowRect(window , &rc)) {
-         log.Log("GetTopChild() - GetWindowRect failed. GetLastError reports %d" , GetLastError());
+         ManyMouse::log.Log("GetTopChild() - GetWindowRect failed. GetLastError reports %d" , GetLastError());
          continue;
       }
       if (pc.x >= rc.left &&
