@@ -29,7 +29,10 @@ class VisualLogger {
    deque<string> log;
 
    bool active;
-
+   bool console_output_active;
+   bool file_output_active;
+   bool window_output_active;
+   
 public :
    VisualLogger();
    VisualLogger(const char* logpath);
@@ -45,10 +48,13 @@ public :
    void Log(const char* format_str , ...);
 
    void Activate(bool activate);
+   void ActivateConsoleOutput(bool activate);
+   void ActivateFileOutput(bool activate);
+   void ActivateWindowOutput(bool activate);
    
    void Clear();
    
-   FILE* GetLogFile() {return logfile;}
+///   FILE* GetLogFile() {return logfile;}
 };
 
 

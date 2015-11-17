@@ -100,7 +100,7 @@ public :
    void FreeBuffer();
 
    void HandleInput(RAWINPUT input);
-   void HandleInput(RAWINPUT input , bool process_input);
+   virtual void HandleInput(RAWINPUT input , bool process_input);
 
    void Reset();
    void ResetImages();
@@ -108,10 +108,17 @@ public :
    
    void ToggleEnabled();
 
-   void SetFCFSStrategyState(FCFS_STRATEGY_STATE new_state);
+   virtual void SetFCFSStrategyState(FCFS_STRATEGY_STATE new_state);
 
-   MOUSE_STRATEGY GetStrategy();
+   virtual MOUSE_STRATEGY GetStrategy();
 };
+
+
+
+class TurnBasedFCFSMouseStrategy : public FCFSMouseStrategy {
+   map<Mouse* , int> mouse_turn_count;
+   
+}
 
 
 

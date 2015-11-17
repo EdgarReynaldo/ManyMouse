@@ -32,7 +32,10 @@ VisualLogger::VisualLogger() :
       numlines(30),
       linepadding(4),
       log(),
-      active(true)
+      active(true),
+      console_output_active(true),
+      file_output_active(true),
+      window_output_active(true)
 {
    logfile = fopen("RawLog2.txt" , "w");
 }
@@ -102,20 +105,26 @@ void VisualLogger::Log(string s) {
    
    if (active) {
       
-      printf("%s" , s.c_str());
-      
-      fprintf(logfile , "%s" , s.c_str());
-
-      fflush(logfile);
-      
       vector<string> lines = SplitByNewLines(s);
       
       /// CRITICAL SECTION
       mutex.Lock();
-      
+
       // Add new lines to log
       for (unsigned int i = 0 ; i < lines.size() ; ++i) {
-         log.push_front(lines[i]);
+         const char* str = lines[i].c_str();
+         if (console_output_active) {
+            printf("%s\n" , str);
+         }
+         if (file_output_active) {
+            fprintf(logfile , "%s\n" , str);
+         }
+         if (window_output_active) {
+            log.push_front(lines[i]);
+         }
+      }
+      if (file_output_active) {
+         fflush(logfile);
       }
       
       // Remove excess lines from log
@@ -149,6 +158,24 @@ void VisualLogger::Log(const char* format_str , ...) {
 
 void VisualLogger::Activate(bool activate) {
    active = activate;
+}
+
+
+
+void VisualLogger::ActivateConsoleOutput(bool activate) {
+   console_output_active = activate;
+}
+
+
+
+void VisualLogger::ActivateFileOutput(bool activate) {
+   file_output_active = activate;
+}
+
+
+
+void VisualLogger::ActivateWindowOutput(bool activate) {
+   window_output_active = activate;
 }
 
 

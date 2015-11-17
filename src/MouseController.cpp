@@ -50,6 +50,8 @@ bool MouseController::CreateMouse(HANDLE hDevice) {
    
    newmouse->SetDeviceNumber(mouse_device_count);
    
+   newmouse->SetTransColor(0,0,0);
+   
    if (!newmouse->SetImage(ms_image)) {
       printf("MouseController::CreateMouse : Failed to set image %p.\n" , ms_image);
       return false;

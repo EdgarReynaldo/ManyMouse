@@ -28,10 +28,10 @@ ALLEGRO_BITMAP* normal_mouse_images[NUM_NORMAL_MOUSE_STATES] = {
 
 
 const char* fcfs_mouse_paths[NUM_FCFS_MOUSE_STATES] = {
-   "NewImages/MouseInactive.png",
-   "NewImages/MouseActive.png",
-   "NewImages/MouseGrabbing.png",
-   "NewImages/MouseDragging.png"
+   "NewImages/MouseInactive2.png",
+   "NewImages/MouseActive2.png",
+   "NewImages/MouseGrabbing2.png",
+   "NewImages/MouseDragging2.png"
 };
 
 ALLEGRO_BITMAP* fcfs_mouse_images[NUM_FCFS_MOUSE_STATES] = {
@@ -41,12 +41,12 @@ ALLEGRO_BITMAP* fcfs_mouse_images[NUM_FCFS_MOUSE_STATES] = {
 
 
 const char* heavy_mouse_paths[NUM_HEAVY_MOUSE_STATES] = {
-   "NewImages/MouseInactive.png",
-   "NewImages/MouseActive.png",
-   "NewImages/MouseGrabbing.png",
-   "NewImages/MouseNeedsHelper.png",
-   "NewImages/MouseHelperReady.png",
-   "NewImages/MouseDragging.png"
+   "NewImages/MouseInactive2.png",
+   "NewImages/MouseActive2.png",
+   "NewImages/MouseGrabbing2.png",
+   "NewImages/MouseNeedsHelper2.png",
+   "NewImages/MouseHelperReady2.png",
+   "NewImages/MouseDragging2.png"
 };
 
 
@@ -61,21 +61,21 @@ void FreeMiceImages() {
    for (int i = 0 ; i < NUM_NORMAL_MOUSE_STATES ; ++i) {
       ALLEGRO_BITMAP*& image = normal_mouse_images[i];
       if (image) {
-         al_destroy_bitmap(image);
+         DestroyAllegroBitmap(image);
          image = 0;
       }
    }
    for (int i = 0 ; i < NUM_FCFS_MOUSE_STATES ; ++i) {
       ALLEGRO_BITMAP*& image = fcfs_mouse_images[i];
       if (image) {
-         al_destroy_bitmap(image);
+         DestroyAllegroBitmap(image);
          image = 0;
       }
    }
    for (int i = 0 ; i < NUM_HEAVY_MOUSE_STATES ; ++i) {
       ALLEGRO_BITMAP*& image = heavy_mouse_images[i];
       if (image) {
-         al_destroy_bitmap(image);
+         DestroyAllegroBitmap(image);
          image = 0;
       }
    }
@@ -114,7 +114,7 @@ bool LoadMiceImages() {
       }
       heavy_mouse_images[i] = image;
    }
-   mouse_font = al_load_ttf_font(mouse_font_path , 20 , 0);
+   mouse_font = al_load_ttf_font(mouse_font_path , 20 , ALLEGRO_TTF_MONOCHROME);
    if (!mouse_font) {
       ManyMouse::log.Log("Failed to load mouse font at '%s'\n" , mouse_font_path);
       success = false;
@@ -160,14 +160,14 @@ ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active) {
    /// Scale image to specified width and height
    ALLEGRO_BITMAP* user_bmp = 0;
 
-   user_bmp = al_create_bitmap(w , h);
+   user_bmp = CreateAllegroBitmap(w , h);
    if (!user_bmp) {
       al_destroy_bitmap(cursor_bmp);
       return 0;
    }
 
    al_set_blender(ALLEGRO_ADD , ALLEGRO_ONE , ALLEGRO_ZERO);
-   al_set_target_bitmap(user_bmp);
+   AllegroSetTargetBitmap(user_bmp);
 
 //void al_draw_scaled_bitmap(ALLEGRO_BITMAP *bitmap,
 //   float sx, float sy, float sw, float sh,
@@ -179,53 +179,7 @@ ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active) {
    al_destroy_bitmap(cursor_bmp);
 
    return user_bmp;
-/*
-   userbmp = al_create_bitmap(w,h);
 
-   al_set_target_bitmap(userbmp);
-   al_clear_to_color(al_map_rgb(0,0,0));
-
-   ALLEGRO_COLOR bg_color = al_map_rgb(255,255,255);
-   ALLEGRO_COLOR outline_color;
-   if (active) {
-      outline_color = al_map_rgb(0,255,0);
-   }
-   else {
-      outline_color = al_map_rgb(255,0,0);
-   }
-   al_draw_filled_rectangle(0,0,w,h , outline_color);
-   al_draw_filled_rectangle(5,5,w-5,h-5 , bg_color);
-///   al_draw_rectangle(0.5 , 0.5 , w -0.5 , h - 0.ALLEGRO_BITMAP* DrawMouseImage(bool activee){
-    ALLEGRO_BITMAP* cursor1 = 0;
-    ALLEGRO_BITMAP* circle = 0;
-    cursor1 = al_load_bitmap("Images/NormalCursor1.png");
-    if (!cursor1) {
-          ManyMouse::log.Log("Failed to load cursor bitmap.\n");
-          return 0;
-       }
-    circle = al_create_bitmap(32,32);
-    if(!circle){
-        al_destroy_bitmap(cursor1);
-        return 0;
-    }
-    al_clear_to_color(al_map_rgba(0,0,0,0));
-    al_set_blender(ALLEGRO_ADD,ALLEGRO_ONE,ALLEGRO_ZERO);
-    al_set_target_bitmap(circle);
-    ALLEGRO_COLOR color = al_map_rgba(127,0,0,127);
-
-    if(activee){
-        color = al_map_rgba(0,0,127,127);
-    }
-    al_draw_filled_circle(16,16,8,color);
-    al_set_blender(ALLEGRO_ADD,ALLEGRO_ALPHA,ALLEGRO_INVERSE_ALPHA);
-    al_draw_bitmap(cursor1,0,0,0);
-    al_destroy_bitmap(cursor1);
-    return circle;
-}
-5 , outline_color , 1.0);
-*/
-
-///   return userbmp;
 }
 
 ALLEGRO_BITMAP* DrawMouseImage(bool active){
@@ -237,12 +191,12 @@ ALLEGRO_BITMAP* DrawMouseImage(bool active){
       ManyMouse::log.Log("Failed to load cursor bitmap.\n");
       return 0;
    }
-   circle = al_create_bitmap(32,32);
+   circle = CreateAllegroBitmap(32,32);
    if(!circle){
-      al_destroy_bitmap(cursor1);
+      DestroyAllegroBitmap(cursor1);
       return 0;
    }
-   al_set_target_bitmap(circle);
+   AllegroSetTargetBitmap(circle);
    al_clear_to_color(al_map_rgba(0 , 1.0*0.5 , 0 , 0.5));
    //al_set_blender(ALLEGRO_ADD , ALLEGRO_ONE , ALLEGRO_ZERO);
    al_set_blender(ALLEGRO_ADD , ALLEGRO_ONE , ALLEGRO_INVERSE_ALPHA);
@@ -258,7 +212,7 @@ ALLEGRO_BITMAP* DrawMouseImage(bool active){
    //al_set_blender(ALLEGRO_ADD , ALLEGRO_ONE , ALLEGRO_INVERSE_ALPHA);
          al_draw_bitmap(cursor1,0,0,0);
 
-   al_destroy_bitmap(cursor1);
+   DestroyAllegroBitmap(cursor1);
    return circle;
 }
 

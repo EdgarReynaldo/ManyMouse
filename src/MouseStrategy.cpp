@@ -61,6 +61,7 @@ void NormalMouseStrategy::ResetImages() {
    vector<Mouse*> mice_vec = mouse_tracker->MiceVector();
    for (int i = 0 ; i < (int)mice_vec.size() ; ++i) {
       Mouse* m = mice_vec[i];
+      m->SetTransColor(0,0,0);
       ALLEGRO_ASSERT(m->SetImage(normal_mouse_images[mouse_state]));
    }
 }
@@ -122,6 +123,9 @@ void FCFSMouseStrategy::FreeBuffer() {
 void FCFSMouseStrategy::HandleInput(RAWINPUT input) {
    HandleInput(input , true);
 }
+
+
+
 void FCFSMouseStrategy::HandleInput(RAWINPUT input , bool process_input) {
    
    RAWINPUTHEADER hdr = input.header;
@@ -203,7 +207,7 @@ void FCFSMouseStrategy::ResetImages() {
    
    int w = al_get_bitmap_width(fcfs_mouse_images[0]);
    int h = al_get_bitmap_height(fcfs_mouse_images[0]);
-   fcfs_mouse_buffer = al_create_bitmap(w,h);
+   fcfs_mouse_buffer = CreateAllegroBitmap(w,h);
 
    ALLEGRO_ASSERT(fcfs_mouse_buffer);
 
@@ -225,7 +229,10 @@ void FCFSMouseStrategy::DrawPointers(FCFS_STRATEGY_STATE strategy_state) {
    for (unsigned i = 0 ; i < mouse_vec.size() ; ++i) {
       Mouse* m = mouse_vec[i];
       al_set_blender(ALLEGRO_ADD , ALLEGRO_ONE , ALLEGRO_ZERO);
-      al_hold_bitmap_drawing(false);
+      
+      al_set_target_backbuffer(NULL);
+      
+//      al_hold_bitmap_drawing(false);
       al_set_target_bitmap(fcfs_mouse_buffer);
       al_clear_to_color(al_map_rgb(0,0,0));
       switch(strategy_state) {
@@ -265,6 +272,8 @@ void FCFSMouseStrategy::DrawPointers(FCFS_STRATEGY_STATE strategy_state) {
             "%d",m->MouseDeviceNumber());
       
       printf("FCFS DrawPointers : Setting image for mouse device #%d\n" , m->MouseDeviceNumber());
+      
+      m->SetTransColor(255,0,255);
       
       ALLEGRO_ASSERT(m->SetImage(fcfs_mouse_buffer));
    }
@@ -515,6 +524,7 @@ void HeavyMouseStrategy::SetHeavyMouseStrategyState(HEAVY_MOUSE_STRATEGY_STATE n
    case HEAVY_MOUSE_STATE_FREE :
       for (int i = 0 ; i < (int)all_mice.size() ; ++i) {
          Mouse* m = all_mice[i];
+         m->SetTransColor(255,0,255);
          ALLEGRO_ASSERT(m->SetImage(heavy_mouse_images[HEAVY_MOUSE_ACTIVE]));
       }
       grabbing_mouse_starting_time = 0.0;
@@ -523,9 +533,11 @@ void HeavyMouseStrategy::SetHeavyMouseStrategyState(HEAVY_MOUSE_STRATEGY_STATE n
       break;
    case HEAVY_MOUSE_STATE_GRABBING :
       ALLEGRO_ASSERT(grabbing_mouse);
+      grabbing_mouse->SetTransColor(255,0,255);
       grabbing_mouse->SetImage(heavy_mouse_images[HEAVY_MOUSE_GRABBING]);
       for (int i = 0 ; i < (int)other_mice.size() ; ++i) {
          Mouse* m = other_mice[i];
+         m->SetTransColor(255,0,255);
          if (MouseNear(m)) {
             ALLEGRO_ASSERT(m->SetImage(heavy_mouse_images[HEAVY_MOUSE_HELPER_READY]));
          }
@@ -537,9 +549,11 @@ void HeavyMouseStrategy::SetHeavyMouseStrategyState(HEAVY_MOUSE_STRATEGY_STATE n
    case HEAVY_MOUSE_STATE_DRAGGING :
       ALLEGRO_ASSERT(grabbing_mouse);
       
+      grabbing_mouse->SetTransColor(255,0,255);
       grabbing_mouse->SetImage(heavy_mouse_images[HEAVY_MOUSE_DRAGGING]);
       for (int i = 0 ; i < (int)other_mice.size() ; ++i) {
          Mouse* m = other_mice[i];
+         m->SetTransColor(255,0,255);
          ALLEGRO_ASSERT(m->SetImage(heavy_mouse_images[HEAVY_MOUSE_INACTIVE]));
       }
       

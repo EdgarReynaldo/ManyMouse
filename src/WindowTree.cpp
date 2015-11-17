@@ -52,8 +52,8 @@ BOOL CALLBACK EnumerateWindowTreeChildren(HWND hwindow , LPARAM lp) {
 
 /// Private global function declarations
 void SetParent(vector<WindowNode>* children , WindowNode* node_parent);
-void PrintTree(FILE* outfile , vector<WindowNode>* nodevec , int depth = 0);
-void PrintNodeToFile(FILE* outfile , WindowNode* node);
+void PrintTree(vector<WindowNode>* nodevec , int depth = 0);
+void PrintNodeToFile(WindowNode* node);
 string PrintNode(WindowNode* node , int depth = 0);
 
 
@@ -295,15 +295,9 @@ void SetParent(vector<WindowNode>* children , WindowNode* node_parent) {
 
 
 
-void PrintNodeToFile(FILE* outfile , WindowNode* node) {
+void PrintNodeToFile(WindowNode* node) {
    string s = PrintNode(node , 0);
-   fprintf(outfile , s.c_str());
-/*
-   vector<string> lines = SplitByNewLines(s);
-   for (unsigned int i = 0 ; i < lines.size() ; ++i) {
-
-   }
-*/
+   ManyMouse::log.Log("%s\n" , s.c_str());
 }
 
 
@@ -341,9 +335,8 @@ string PrintNode(WindowNode* node, int depth) {
 
 
 
-void PrintTree(FILE* outfile , vector<WindowNode>* nodevec , int depth) {
+void PrintTree(vector<WindowNode>* nodevec , int depth) {
    if (!nodevec) {return;}
-   if (!outfile) {return;}
 
    int size = depth*3;
    char* buf = new char[size + 1];
@@ -354,12 +347,17 @@ void PrintTree(FILE* outfile , vector<WindowNode>* nodevec , int depth) {
       WindowNode& node = (*nodevec)[i];
       vector<WindowNode>* vec = &(node.child_windows);
       WindowInfo info(node.hwindow);
+      string infostr = info.GetWindowInfoString();
+      const char* str = infostr.c_str();
+      ManyMouse::log.Log("%s%s\n" , buf , str);
+/*      
       vector<string> strs = SplitByNewLines(info.GetWindowInfoString());
       fprintf(outfile , "\n");
       for (unsigned int j = 0 ; j < strs.size() ; ++j) {
          fprintf(outfile , "%s%s\n" , buf , strs[j].c_str());
       }
-      PrintTree(outfile , vec , depth + 1);
+*/
+      PrintTree(vec , depth + 1);
    }
 
    delete buf;
@@ -380,9 +378,9 @@ int MaxDepth(vector<WindowNode>* nodevec) {
 
 
 
-void PrintWindowTree(FILE* outfile , vector<WindowNode>& nodevec , int depth) {
+void PrintWindowTree(vector<WindowNode>& nodevec , int depth) {
    tree_mutex.Lock();
-   PrintTree(outfile , &nodevec , depth);
+   PrintTree(&nodevec , depth);
    tree_mutex.Unlock();
 }
 

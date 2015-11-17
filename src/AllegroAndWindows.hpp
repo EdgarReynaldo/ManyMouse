@@ -51,8 +51,13 @@ void DrawBitmapToHDC(HDC hdc , ALLEGRO_BITMAP* bmp);
 
 void DrawBitmapToDIB(const DIBbuffer& dib_buf , ALLEGRO_BITMAP* bmp);
 
+ALLEGRO_BITMAP* CreateAllegroBitmap(int w , int h);
+ALLEGRO_DISPLAY* CreateAllegroDisplay(int w , int h);
 
+void DestroyAllegroBitmap(ALLEGRO_BITMAP*& bmp);
+void DestroyAllegroDisplay(ALLEGRO_DISPLAY*& display);
 
+void AllegroSetTargetBitmap(ALLEGRO_BITMAP* bmp);
 
 
 #endif // #ifdef AllegroAndWindows_HPP

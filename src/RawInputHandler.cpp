@@ -370,14 +370,14 @@ int RawInputHandler::SetupWindows() {
 ///   al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
    al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
 
-   display = al_create_display(tww,twh);
+   display = CreateAllegroDisplay(tww,twh);
 
    if (!display) {return 3;}
 
    int ww = al_get_display_width(display);
    int wh = al_get_display_height(display);
 
-   allegro_buffer = al_create_bitmap(ww , wh);
+   allegro_buffer = CreateAllegroBitmap(ww , wh);
 
    if (!allegro_buffer) {return 4;}
 
@@ -400,7 +400,7 @@ int RawInputHandler::SetupWindows() {
    al_set_new_display_flags(ALLEGRO_WINDOWED);
 ///   al_set_new_display_flags(ALLEGRO_WINDOWED | ALLEGRO_OPENGL);
 
-   log_display = al_create_display(lww , lwh);
+   log_display = CreateAllegroDisplay(lww , lwh);
 
    if (!log_display) {return 5;}
 
@@ -465,7 +465,7 @@ BOOL WINAPI SetWindowPos(
 );
 */
    /// Using HWND_TOPMOST has no effect on the focus, except in the initial call
-   SetWindowPos(winhandle , HWND_TOPMOST , 0 , 0 , -1 , -1 , SWP_NOMOVE | SWP_NOSIZE);
+///   SetWindowPos(winhandle , HWND_TOPMOST , 0 , 0 , -1 , -1 , SWP_NOMOVE | SWP_NOSIZE);
 
    BringWindowToTop(winhandle);
 
@@ -533,17 +533,17 @@ void RawInputHandler::CloseWindows() {
    }
 
    if (log_display) {
-      al_destroy_display(log_display);
+      DestroyAllegroDisplay(log_display);
       log_display = 0;
    }
 
    if (allegro_buffer) {
-      al_destroy_bitmap(allegro_buffer);
+      DestroyAllegroBitmap(allegro_buffer);
       allegro_buffer = 0;
    }
 
    if (display) {
-      al_destroy_display(display);
+      DestroyAllegroDisplay(display);
       display = 0;
    }
 
@@ -560,6 +560,8 @@ void RawInputHandler::InputLoop() {
 
    QueuePaintMessage();
 
+   ManyMouse::log.ActivateConsoleOutput(false);
+   
    al_start_timer(timer);
    while (!quit) {
 
@@ -718,7 +720,7 @@ void RawInputHandler::InputLoop() {
 
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_O) {
-            PrintWindowTree(ManyMouse::log.GetLogFile() , root_node.child_windows);
+            PrintWindowTree(root_node.child_windows);
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_K) {
             /*

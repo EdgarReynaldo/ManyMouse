@@ -81,7 +81,8 @@ void TransparentWindow::CloseTheWindow() {
    }
    
    if (display) {
-      al_destroy_display(display);
+      ManyMouse::log.Log("TransparentWindow::CloseTheWindow - Destroying display %p\n" , display);
+      DestroyAllegroDisplay(display);
       display = 0;
    }
    
@@ -96,11 +97,9 @@ void TransparentWindow::CloseTheWindow() {
 
 
 
-bool TransparentWindow::CreateTheWindow(ALLEGRO_BITMAP* img , COLORREF transparent_color , int width , int height) {
+bool TransparentWindow::CreateTheWindow(ALLEGRO_BITMAP* img , int width , int height) {
    
    CloseTheWindow();
-   
-   trans_color = transparent_color;
    
    if ((width == -1) || (height == -1)) {
       if (img) {
@@ -118,19 +117,20 @@ bool TransparentWindow::CreateTheWindow(ALLEGRO_BITMAP* img , COLORREF transpare
       return false;
    }
    
-   al_hold_bitmap_drawing(false);
+//   al_hold_bitmap_drawing(false);
    
    al_set_target_bitmap(NULL);
    al_set_new_display_flags(ALLEGRO_FRAMELESS | ALLEGRO_WINDOWED);
 ///   al_set_new_display_flags(ALLEGRO_FRAMELESS | ALLEGRO_WINDOWED | ALLEGRO_OPENGL);
 
-   if (!(display = al_create_display(width , height))) {
+   if (!(display = CreateAllegroDisplay(width , height))) {
       ManyMouse::log.Log("TransparentWindow::CreateTheWindow - Could not create the display.\n");
       CloseTheWindow();
       return false;
    }
+   ManyMouse::log.Log("TransparentWindow::CreateTheWindow - Created display %p\n" , display);
    
-   image = al_create_bitmap(al_get_bitmap_width(img) , al_get_bitmap_height(img));
+   image = CreateAllegroBitmap(al_get_bitmap_width(img) , al_get_bitmap_height(img));
    
    if (!image) {
       CloseTheWindow();
@@ -250,13 +250,6 @@ bool TransparentWindow::SetWindowImage(ALLEGRO_BITMAP* img) {
          al_set_target_bitmap(image);
          al_draw_bitmap(img , 0 , 0 , 0);
       }
-/*
-      al_set_target_backbuffer(display);
-      image = al_create_display(nw,nh);
-      al_set_blender(ALLEGRO_ADD , ALLEGRO_ONE , ALLEGRO_ZERO);
-      al_set_target_bitmap(image);
-      al_draw_bitmap(img , 0 , 0);
-*/
       DrawImageToDIB();
    }
    else {

@@ -79,7 +79,7 @@ public :
    
    void CloseTheWindow();
    
-   bool CreateTheWindow(ALLEGRO_BITMAP* img , COLORREF transparent_color = RGB(0,0,0) , int width = -1 , int height = -1);
+   bool CreateTheWindow(ALLEGRO_BITMAP* img , int width = -1 , int height = -1);
 
    void PaintTheWindow();
 
@@ -99,6 +99,10 @@ public :
    
    bool Ready();
    
+//   void SetTransColor(int r , int g , int b);
+   void SetTransColor(int r , int g , int b) {
+       trans_color = RGB(r,g,b);
+   }
    
 };
 

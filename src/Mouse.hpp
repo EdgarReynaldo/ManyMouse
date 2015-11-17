@@ -176,6 +176,11 @@ Mouse() :
    int MouseDeviceNumber() {return mouse_device_number;}
 
    bool GetButtonState(int button);
+   
+//   void SetTransColor(int r , int g , int b);
+   void SetTransColor(int r , int g , int b) {
+       transparent_window.SetTransColor(r,g,b);
+   }
 };
 
 

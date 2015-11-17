@@ -179,4 +179,51 @@ void DrawBitmapToDIB(const DIBbuffer& dib_buf , ALLEGRO_BITMAP* bmp) {
 
 
 
+ALLEGRO_BITMAP* CreateAllegroBitmap(int w , int h) {
+   ALLEGRO_BITMAP* bmp = al_create_bitmap(w,h);
+   ManyMouse::log.Log("CreateAllegroBitmap : Created %d X %d bitmap at %p\n" , w , h , bmp);
+   ALLEGRO_ASSERT(bmp);
+   return bmp;
+}
+
+
+
+ALLEGRO_DISPLAY* CreateAllegroDisplay(int w , int h) {
+   ALLEGRO_DISPLAY* display = al_create_display(w,h);
+   ManyMouse::log.Log("CreateAllegroDisplay : Created %d X %d allegro display at %p\n" , w , h , display);
+   ALLEGRO_ASSERT(display);
+   return display;
+}
+
+
+
+void DestroyAllegroBitmap(ALLEGRO_BITMAP*& bmp) {
+   ManyMouse::log.Log("DestroyAllegroBitmap - Destroying allegro bitmap %p\n" , bmp);
+   ALLEGRO_ASSERT(bmp);
+   al_destroy_bitmap(bmp);
+   bmp = 0;
+}
+
+
+
+void DestroyAllegroDisplay(ALLEGRO_DISPLAY*& display) {
+   ManyMouse::log.Log("DestroyAllegroDisplay - Destroying allegro display %p\n" , display);
+   ALLEGRO_ASSERT(display);
+   al_destroy_display(display);
+   display = 0;
+}
+
+
+
+void AllegroSetTargetBitmap(ALLEGRO_BITMAP* bmp) {
+   ManyMouse::log.Log("AllegroSetTargetBitmap - setting target bitmap %p\n" , bmp);
+   al_set_target_bitmap(bmp);
+}
+
+
+
+
+
+
+
 

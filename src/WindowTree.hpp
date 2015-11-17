@@ -64,7 +64,7 @@ public :
 bool GetTopChild(WindowNode& root_node , POINT pscreen , WindowNode& store_node);
 
 
-void PrintWindowTree(FILE* outfile , vector<WindowNode>& nodevec , int depth = 0);
+void PrintWindowTree(vector<WindowNode>& nodevec , int depth = 0);
 
 
 
@@ -112,7 +112,7 @@ public :
 
 //   void Print();
    void Print() {
-      PrintWindowTree(ManyMouse::log.GetLogFile() ,  root_windows);
+      PrintWindowTree(root_windows);
    }
 
    bool GetBaseWindowNode(POINT pscreen , WindowNode& store_node);
