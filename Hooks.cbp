@@ -68,8 +68,17 @@
 		<Unit filename="src/Mouse.hpp" />
 		<Unit filename="src/MouseController.cpp" />
 		<Unit filename="src/MouseController.hpp" />
+		<Unit filename="src/MouseData.cpp" />
+		<Unit filename="src/MouseData.hpp" />
+		<Unit filename="src/MouseStates.hpp" />
 		<Unit filename="src/MouseStrategy.cpp" />
 		<Unit filename="src/MouseStrategy.hpp" />
+		<Unit filename="src/MouseStrategyFCFS.cpp" />
+		<Unit filename="src/MouseStrategyFCFS.hpp" />
+		<Unit filename="src/MouseStrategyHeavy.cpp" />
+		<Unit filename="src/MouseStrategyHeavy.hpp" />
+		<Unit filename="src/MouseStrategyNormal.cpp" />
+		<Unit filename="src/MouseStrategyNormal.hpp" />
 		<Unit filename="src/MouseTracker.cpp" />
 		<Unit filename="src/MouseTracker.hpp" />
 		<Unit filename="src/Mutex.cpp" />

@@ -7,6 +7,9 @@
 
 #include "Mouse.hpp"
 #include "MouseStrategy.hpp"
+#include "MouseStrategyFCFS.hpp"
+#include "MouseStrategyHeavy.hpp"
+#include "MouseStrategyNormal.hpp"
 #include "MouseTracker.hpp"
 
 #include <vector>

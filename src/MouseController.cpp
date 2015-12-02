@@ -5,6 +5,7 @@
 #include "WindowHandler.hpp"
 #include "VisualLogger.hpp"
 #include "MouseTracker.hpp"
+#include "MouseData.hpp"
 
 
 
