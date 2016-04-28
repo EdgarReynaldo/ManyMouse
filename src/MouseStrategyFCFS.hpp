@@ -32,7 +32,7 @@ class FCFSMouseStrategy : public MouseStrategy {
    
 public :
    FCFSMouseStrategy(MouseTracker* mt , WindowHandler* wh);
-   ~FCFSMouseStrategy();
+   virtual ~FCFSMouseStrategy();
 
    void FreeBuffer();
 

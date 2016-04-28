@@ -49,7 +49,7 @@ int FlagsToButtonIndex(USHORT flags , bool* down) {
 
 
 
-Mouse() :
+Mouse::Mouse() :
       transparent_window(),
       device_handle(0),
       mouse_device_number(-1),

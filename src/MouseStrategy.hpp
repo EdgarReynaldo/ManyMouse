@@ -38,6 +38,8 @@ public :
 //   MouseStrategy();
    MouseStrategy(MouseTracker* mt , WindowHandler* wh);
 
+   virtual ~MouseStrategy() {}
+   
    virtual void HandleInput(RAWINPUT input)=0;
 
    virtual void Reset()=0;

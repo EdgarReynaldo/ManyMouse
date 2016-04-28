@@ -35,6 +35,6 @@ cbbuild/bin/libHooks.def
 cbbuild/bin/RawLog2.txt
 MonitorTestWindow_build_log.html
 cbbuild/bin/WorkingImages
-/A5112distro
+/A5113distro/**
 MSVC2015build
 A5112distroMSVC2015

@@ -136,7 +136,7 @@ public :
    void HandleShellHookInfo(int code , WPARAM wp , LPARAM lp) {
 
 //   int codes[4] = {HSHELL_WINDOWACTIVATED , HSHELL_WINDOWCREATED
-
+      /// TODO : This function *should* be tracking window changes but for some reason it's not doing it fully/right
       if ((code == HSHELL_WINDOWACTIVATED) ||
          (code == HSHELL_WINDOWCREATED) ||
          (code == HSHELL_WINDOWDESTROYED) ||
