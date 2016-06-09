@@ -37,7 +37,7 @@ VisualLogger::VisualLogger() :
       file_output_active(true),
       window_output_active(true)
 {
-   logfile = fopen("RawLog2.txt" , "w");
+   logfile = fopen("RawLog.txt" , "w");
 }
 
 

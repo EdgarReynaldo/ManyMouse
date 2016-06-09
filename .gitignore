@@ -4,8 +4,8 @@ RawInputTest_build_log.html
 cbbuild/bin/obj
 cbbuild/bin/Raw.exe
 cbbuild/bin/RawDebug.exe
-cbbuild/bin/allegro_monolith-5.1.dll
-cbbuild/bin/allegro_monolith-debug-5.1.dll
+cbbuild/bin/allegro_monolith-5.2.dll
+cbbuild/bin/allegro_monolith-debug-5.2.dll
 cbbuild/bin/libfreetype-6.dll
 cbbuild/bin/libgcc_s_dw2-1.dll
 cbbuild/bin/libogg-0.dll
@@ -22,7 +22,6 @@ cbbuild/bin/libzlib.dll
 cbbuild/bin/OpenAl32.dll
 cbbuild/bin/allegro.log
 cbbuild/bin/RawLog.txt
-cbbuild/bin/RawLog2.txt
 MonitorTestWindow.depend
 cbbuild/bin/MonitorTestWindow.exe
 cbbuild/bin/Hooks.dll
@@ -31,10 +30,11 @@ Hooks.layout
 Hooks_build_log.html
 allegro.log
 libHooks.dll.a
+libHooksDebug.dll.a
 cbbuild/bin/libHooks.def
-cbbuild/bin/RawLog2.txt
+cbbuild/bin/libHooksDebug.def
 MonitorTestWindow_build_log.html
 cbbuild/bin/WorkingImages
-/A5113distro/**
+/A5GITdistro/**
 MSVC2015build
 A5112distroMSVC2015
