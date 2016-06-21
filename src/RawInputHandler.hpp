@@ -45,7 +45,7 @@ RawInputDevice() :
 }
 
    void SetDeviceHandle(HANDLE hdev);
-   void GetDeviceInfo();// SetDeviceHandle calls this automatically, call Error() to see if it fails
+   void GetDeviceInfo();/// SetDeviceHandle calls this automatically, call Error() to see if it fails
 
    bool Error() {return error;}
 

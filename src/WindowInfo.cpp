@@ -6,13 +6,13 @@
 
 
 
-bool RectContains(RECT r , int xpos , int ypos) {
+MMDECLSPEC bool RectContains(RECT r , int xpos , int ypos) {
    return ((xpos >= r.left) && (ypos >= r.top) && (xpos < r.right) && (ypos < r.bottom));
 }
 
 
 
-string RectString(RECT rect) {
+MMDECLSPEC string RectString(RECT rect) {
    int l = rect.left;
    int r = rect.right;
    int t = rect.top;
@@ -24,7 +24,7 @@ string RectString(RECT rect) {
 
 
 
-WindowInfo::WindowInfo() :
+MMDECLSPEC WindowInfo::WindowInfo() :
       hwnd((HWND)0),
       parent((HWND)0),
       pid(-1),
@@ -39,7 +39,7 @@ WindowInfo::WindowInfo() :
 }
 
 
-WindowInfo::WindowInfo(HWND window) :
+MMDECLSPEC WindowInfo::WindowInfo(HWND window) :
       hwnd((HWND)0),
       parent((HWND)0),
       pid(-1),
@@ -56,7 +56,7 @@ WindowInfo::WindowInfo(HWND window) :
 
 
 
-WindowInfo::WindowInfo(const WindowInfo& rhs) :
+MMDECLSPEC WindowInfo::WindowInfo(const WindowInfo& rhs) :
       hwnd(rhs.hwnd),
       parent(rhs.parent),
       pid(rhs.pid),
@@ -73,7 +73,7 @@ WindowInfo::WindowInfo(const WindowInfo& rhs) :
 
 
 
-void WindowInfo::InitRects() {
+MMDECLSPEC void WindowInfo::InitRects() {
    window_rect.left = -1;
    window_rect.right = -1;
    window_rect.top = -1;
@@ -86,14 +86,14 @@ void WindowInfo::InitRects() {
 
 
 
-void WindowInfo::RefreshRects() {
+MMDECLSPEC void WindowInfo::RefreshRects() {
    GetWindowRect(hwnd , &window_rect);
    GetClientRect(hwnd , &client_rect);
 }
 
 
 
-void WindowInfo::RefreshWindowTitle() {
+MMDECLSPEC void WindowInfo::RefreshWindowTitle() {
    /// TODO : remove next line
    return;
    window_title = "";
@@ -110,7 +110,7 @@ void WindowInfo::RefreshWindowTitle() {
 
 
 
-void WindowInfo::RefreshWindowClassName() {
+MMDECLSPEC void WindowInfo::RefreshWindowClassName() {
    window_class = "";
    if (hwnd) {
       const int BUFSIZE = 512;
@@ -125,7 +125,7 @@ void WindowInfo::RefreshWindowClassName() {
 
 
 
-void WindowInfo::RefreshInfo() {
+MMDECLSPEC void WindowInfo::RefreshInfo() {
    if (hwnd) {
       (void)GetWindowThreadProcessId(hwnd , &pid);
       window_process = (WNDPROC)GetWindowLong(hwnd , GWL_WNDPROC);
@@ -137,7 +137,7 @@ void WindowInfo::RefreshInfo() {
 
 
 
-void WindowInfo::SetWindowHandle(HWND window) {
+MMDECLSPEC void WindowInfo::SetWindowHandle(HWND window) {
    hwnd = window;
    parent = GetParent(hwnd);
    RefreshInfo();
@@ -145,13 +145,13 @@ void WindowInfo::SetWindowHandle(HWND window) {
 
 
 
-void WindowInfo::SetWindowTypeString(string type) {
+MMDECLSPEC void WindowInfo::SetWindowTypeString(string type) {
    window_type = type;
 }
 
 
 
-string WindowInfo::GetWindowInfoString() {
+MMDECLSPEC string WindowInfo::GetWindowInfoString() {
    int l = window_rect.left;
    int t = window_rect.top;
    int r = window_rect.right;
@@ -164,19 +164,19 @@ string WindowInfo::GetWindowInfoString() {
 
 
 
-void WindowInfo::RefreshAreas() {
+MMDECLSPEC void WindowInfo::RefreshAreas() {
    RefreshRects();
 }
 
 
 
-bool WindowInfo::WindowContains(int xpos , int ypos) {
+MMDECLSPEC bool WindowInfo::WindowContains(int xpos , int ypos) {
    return RectContains(window_rect , xpos , ypos);
 }
 
 
 
-bool WindowInfo::ClientContains(int xpos , int ypos) {
+MMDECLSPEC bool WindowInfo::ClientContains(int xpos , int ypos) {
    return RectContains(client_rect , xpos , ypos);
 }
 

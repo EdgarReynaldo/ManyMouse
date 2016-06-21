@@ -9,7 +9,11 @@
 
 
 
-class NormalMouseStrategy : public MouseStrategy {
+#include "DllBuild.hpp"
+
+
+
+class MMDECLSPEC NormalMouseStrategy : public MouseStrategy {
 
    NORMAL_MOUSE_STATE mouse_state;
 

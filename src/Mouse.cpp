@@ -16,7 +16,7 @@
 
 
 
-int FlagsToButtonIndex(USHORT flags , bool* down) {
+MMDECLSPEC int FlagsToButtonIndex(USHORT flags , bool* down) {
    assert(down);
    int btn = 0;
    if (flags & RI_MOUSE_LEFT_BUTTON_DOWN) {
@@ -49,7 +49,7 @@ int FlagsToButtonIndex(USHORT flags , bool* down) {
 
 
 
-Mouse::Mouse() :
+MMDECLSPEC Mouse::Mouse() :
       transparent_window(),
       device_handle(0),
       mouse_device_number(-1),
@@ -79,7 +79,7 @@ Mouse::Mouse() :
 
 
 
-Mouse::~Mouse() {
+MMDECLSPEC Mouse::~Mouse() {
    CloseOurWindow();
    al_destroy_font(mouse_font);
    mouse_font = 0;
@@ -87,14 +87,14 @@ Mouse::~Mouse() {
 
 
 
-void Mouse::CloseOurWindow() {
+MMDECLSPEC void Mouse::CloseOurWindow() {
    transparent_window.CloseTheWindow();
    ready = false;
 }
 
 
 
-bool Mouse::CreateOurWindow(ALLEGRO_BITMAP* mouse_image) {
+MMDECLSPEC bool Mouse::CreateOurWindow(ALLEGRO_BITMAP* mouse_image) {
    CloseOurWindow();
    transparent_window.UseAlphaDrawing(true);
    ready = transparent_window.CreateTheWindow(mouse_image);
@@ -103,20 +103,20 @@ bool Mouse::CreateOurWindow(ALLEGRO_BITMAP* mouse_image) {
 
 
 
-void Mouse::SetHandle(HANDLE hDevice) {
+MMDECLSPEC void Mouse::SetHandle(HANDLE hDevice) {
    device_handle = hDevice;
 }
 
 
 
-bool Mouse::SetImage(ALLEGRO_BITMAP* mouse_image) {
+MMDECLSPEC bool Mouse::SetImage(ALLEGRO_BITMAP* mouse_image) {
    transparent_window.UseAlphaDrawing(true);
    return transparent_window.SetWindowImage(mouse_image);
 }
 
 
 
-void Mouse::SetPos(int newx , int newy) {
+MMDECLSPEC void Mouse::SetPos(int newx , int newy) {
    if(newx < bounds.left){
       newx = bounds.left;
    }
@@ -138,7 +138,7 @@ void Mouse::SetPos(int newx , int newy) {
 
 
 
-void Mouse::MoveBy(int dx , int dy) {
+MMDECLSPEC void Mouse::MoveBy(int dx , int dy) {
    ldx = dx;
    ldy = dy;
    SetPos(x + dx , y + dy);
@@ -146,7 +146,7 @@ void Mouse::MoveBy(int dx , int dy) {
 
 
 
-void Mouse::Draw() {
+MMDECLSPEC void Mouse::Draw() {
    if (!transparent_window.GetAllegroDisplay()) {
       ManyMouse::log.Log("Mouse::Draw - transparent window's display is NULL.\n");
       return;
@@ -157,7 +157,7 @@ void Mouse::Draw() {
 
 
 
-void Mouse::HandleRawInput(RAWINPUT rawinput) {
+MMDECLSPEC void Mouse::HandleRawInput(RAWINPUT rawinput) {
    RAWINPUTHEADER hdr = rawinput.header;
    RAWMOUSE rms = rawinput.data.mouse;
 
@@ -222,19 +222,19 @@ void Mouse::HandleRawInput(RAWINPUT rawinput) {
 
 
 
-HWND Mouse::GetMouseWindowHandle() {
+MMDECLSPEC HWND Mouse::GetMouseWindowHandle() {
    return transparent_window.GetWindowHandle();
 }
 
 
 
-void Mouse::BringMouseToFront() {
+MMDECLSPEC void Mouse::BringMouseToFront() {
    BringWindowToTop(GetMouseWindowHandle());
 }
 
 
 
-void Mouse::ShowMouse(bool show_mouse) {
+MMDECLSPEC void Mouse::ShowMouse(bool show_mouse) {
    shown = show_mouse;
    HWND window = transparent_window.GetWindowHandle();
    if (shown) {
@@ -247,7 +247,7 @@ void Mouse::ShowMouse(bool show_mouse) {
 
 
 
-void Mouse::SetDeviceNumber(int dev_num) {
+MMDECLSPEC void Mouse::SetDeviceNumber(int dev_num) {
    if (dev_num < -1) {
          dev_num = -1;
    }
@@ -256,7 +256,7 @@ void Mouse::SetDeviceNumber(int dev_num) {
 
 
 
-bool Mouse::GetButtonState(int button) {
+MMDECLSPEC bool Mouse::GetButtonState(int button) {
    ALLEGRO_ASSERT(button > 0 && button < NUM_MOUSE_BUTTONS + 1);
    return buttons_down[button - 1];
 }

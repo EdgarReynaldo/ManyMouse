@@ -15,7 +15,7 @@
 
 
 
-void MouseController::DestroyMouse(HANDLE hDevice) {
+MMDECLSPEC void MouseController::DestroyMouse(HANDLE hDevice) {
 
    mouse_tracker.StopTrackingMouse(hDevice);
 
@@ -23,7 +23,7 @@ void MouseController::DestroyMouse(HANDLE hDevice) {
 
 
 
-bool MouseController::CreateMouse(HANDLE hDevice) {
+MMDECLSPEC bool MouseController::CreateMouse(HANDLE hDevice) {
 
    if (mouse_tracker.GetMouseFromHandle(hDevice)) {
       mouse_tracker.StopTrackingMouse(hDevice);
@@ -67,7 +67,7 @@ bool MouseController::CreateMouse(HANDLE hDevice) {
 
 
 
-void MouseController::DestroyMice() {
+MMDECLSPEC void MouseController::DestroyMice() {
 
    mouse_tracker.CleanUp();
 
@@ -77,7 +77,7 @@ void MouseController::DestroyMice() {
 
 
 
-MouseController::MouseController(WindowHandler* wh) :
+MMDECLSPEC MouseController::MouseController(WindowHandler* wh) :
       mouse_tracker(),
       normal_strategy(&mouse_tracker , wh),
       fcfs_strategy(&mouse_tracker , wh),
@@ -104,7 +104,7 @@ MouseController::MouseController(WindowHandler* wh) :
 
 
 
-MouseController::~MouseController() {
+MMDECLSPEC MouseController::~MouseController() {
    DestroyMice();
    FreeMiceImages();
    MouseController::FreeMouseImages();
@@ -112,7 +112,7 @@ MouseController::~MouseController() {
 
 
 
-void MouseController::FreeMouseImages() {
+MMDECLSPEC void MouseController::FreeMouseImages() {
    if (ms_enabled_image) {
       al_destroy_bitmap(ms_enabled_image);
       ms_enabled_image = 0;
@@ -125,7 +125,7 @@ void MouseController::FreeMouseImages() {
 
 
 
-bool MouseController::CreateMouseImages() {
+MMDECLSPEC bool MouseController::CreateMouseImages() {
    FreeMouseImages();
    ms_enabled_image = CreateMouseImage(-1,-1,true);
    ms_disabled_image = CreateMouseImage(-1,-1,false);
@@ -135,7 +135,7 @@ bool MouseController::CreateMouseImages() {
 }
 
 
-void MouseController::HandleRawInput(RAWINPUT rawinput) {
+MMDECLSPEC void MouseController::HandleRawInput(RAWINPUT rawinput) {
 
    RAWINPUTHEADER hdr = rawinput.header;
 
@@ -183,7 +183,7 @@ void MouseController::HandleRawInput(RAWINPUT rawinput) {
 
 
 
-void MouseController::Draw() {
+MMDECLSPEC void MouseController::Draw() {
 
    vector<Mouse*> micevec = mouse_tracker.MiceVector();
 
@@ -195,7 +195,7 @@ void MouseController::Draw() {
 
 
 
-void MouseController::ToggleMouseImage() {
+MMDECLSPEC void MouseController::ToggleMouseImage() {
    
    if (active_strategy->GetStrategy() != MOUSE_STRATEGY_NORMAL) {
       return;
@@ -221,14 +221,14 @@ void MouseController::ToggleMouseImage() {
 
 
 
-void MouseController::ActivateMice(bool activate_mice) {
+MMDECLSPEC void MouseController::ActivateMice(bool activate_mice) {
    mice_active = activate_mice;
    ShowMice(mice_active);
 }
 
 
 
-void MouseController::ShowMice(bool show_mice) {
+MMDECLSPEC void MouseController::ShowMice(bool show_mice) {
    mice_shown = show_mice;
 
    vector<Mouse*> mice = mouse_tracker.MiceVector();
@@ -240,7 +240,7 @@ void MouseController::ShowMice(bool show_mice) {
 
 
 
-void MouseController::GetMiceWindows(vector<HWND>* winvec) {
+MMDECLSPEC void MouseController::GetMiceWindows(vector<HWND>* winvec) {
 
    vector<Mouse*> micevec = mouse_tracker.MiceVector();
 
@@ -253,19 +253,19 @@ void MouseController::GetMiceWindows(vector<HWND>* winvec) {
 
 
 
-vector<Mouse*> MouseController::GetMice() {
+MMDECLSPEC vector<Mouse*> MouseController::GetMice() {
    return mouse_tracker.MiceVector();
 }
 
 
 
-void MouseController::SetWindowHandler(WindowHandler* handler) {
+MMDECLSPEC void MouseController::SetWindowHandler(WindowHandler* handler) {
    window_handler = handler;
 }
 
 
 
-void MouseController::BringMiceToFront() {
+MMDECLSPEC void MouseController::BringMiceToFront() {
    vector<Mouse*> micevec = mouse_tracker.MiceVector();
    for (unsigned int i = 0 ; i < micevec.size() ; ++i) {
       Mouse* m = micevec[i];
@@ -275,7 +275,7 @@ void MouseController::BringMiceToFront() {
 
 
 
-bool MouseController::IsMouseWindow(HWND hwnd) {
+MMDECLSPEC bool MouseController::IsMouseWindow(HWND hwnd) {
    vector<Mouse*> micevec = mouse_tracker.MiceVector();
    for (unsigned int i = 0 ; i < micevec.size() ; ++i) {
       Mouse* m = micevec[i];
@@ -286,7 +286,7 @@ bool MouseController::IsMouseWindow(HWND hwnd) {
 
 
 
-void MouseController::SetMouseStrategy(MOUSE_STRATEGY strategy) {
+MMDECLSPEC void MouseController::SetMouseStrategy(MOUSE_STRATEGY strategy) {
    MouseStrategy* strategies[NUM_MOUSE_STRATEGIES] = {
       &normal_strategy,
       &fcfs_strategy,

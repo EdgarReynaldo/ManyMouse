@@ -38,7 +38,7 @@ typedef struct tagBITMAPINFO {
 
 
 
-BYTE* DIBbuffer::GetDataByte(int x , int y) {
+MMDECLSPEC BYTE* DIBbuffer::GetDataByte(int x , int y) {
    if (!ready || !hbm_DIBdata) {
       return 0;
    }
@@ -57,7 +57,7 @@ BYTE* DIBbuffer::GetDataByte(int x , int y) {
 
 
 
-DIBbuffer::DIBbuffer() :
+MMDECLSPEC DIBbuffer::DIBbuffer() :
    win_handle(0),
    winDC(0),
    memDC(0),
@@ -71,12 +71,12 @@ DIBbuffer::DIBbuffer() :
 
 
 
-DIBbuffer::~DIBbuffer() {
+MMDECLSPEC DIBbuffer::~DIBbuffer() {
    Free();
 }
 
 
-void DIBbuffer::Free() {
+MMDECLSPEC void DIBbuffer::Free() {
    
    if (oldGDIobj) {
       // put back the old object if there was one
@@ -108,7 +108,7 @@ void DIBbuffer::Free() {
 }
 
 
-bool DIBbuffer::Create(HWND window_handle) {
+MMDECLSPEC bool DIBbuffer::Create(HWND window_handle) {
    if (!window_handle) {
       return false;
    }
@@ -167,7 +167,7 @@ bool DIBbuffer::Create(HWND window_handle) {
 
 
 
-bool DIBbuffer::GetBitmapInfo(BITMAPINFO* pbi , HWND handle) {
+MMDECLSPEC bool DIBbuffer::GetBitmapInfo(BITMAPINFO* pbi , HWND handle) {
    // Gets bitmap info suitable for creating a DIB the same size as the window specified by 'handle'.
    if (!pbi || !handle) {
       if (!pbi) {
@@ -209,7 +209,7 @@ bool DIBbuffer::GetBitmapInfo(BITMAPINFO* pbi , HWND handle) {
 
 
 
-void DIBbuffer::BlitBufferToWindowDC() {
+MMDECLSPEC void DIBbuffer::BlitBufferToWindowDC() {
    if (!ready) {
       ManyMouse::log.Log("DIBbuffer::BlitBufferToWindowDC - not ready.\n");
       return;
@@ -304,7 +304,7 @@ BOOL AlphaBlend(
 
 //*
 
-void DIBbuffer::BlendBufferToWindowDC() {
+MMDECLSPEC void DIBbuffer::BlendBufferToWindowDC() {
 
 //   HDC winhdc = GetDC(window);
    
@@ -391,7 +391,7 @@ BOOL WINAPI UpdateLayeredWindow(
 
 
 
-void DIBbuffer::ClearToColor(COLORREF c) {
+MMDECLSPEC void DIBbuffer::ClearToColor(COLORREF c) {
    
    if (!ready) {return;}
    
@@ -411,7 +411,7 @@ void DIBbuffer::ClearToColor(COLORREF c) {
 
 
 
-void DIBbuffer::ClearToColor(int red , int green , int blue , int alpha) {
+MMDECLSPEC void DIBbuffer::ClearToColor(int red , int green , int blue , int alpha) {
    
    if (!ready) {
       ManyMouse::log.Log("DIBbuffer::ClearToColor(r,g,b,a) - not ready.\n");
@@ -452,7 +452,7 @@ void DIBbuffer::ClearToColor(int red , int green , int blue , int alpha) {
 
 
 
-void DIBbuffer::FillAreaRect(float fx , float fy , float fw , float fh , COLORREF c) {
+MMDECLSPEC void DIBbuffer::FillAreaRect(float fx , float fy , float fw , float fh , COLORREF c) {
    if (!ready) {return;}
    
    HBRUSH hbr = CreateSolidBrush(c);
@@ -484,7 +484,7 @@ void DIBbuffer::FillAreaRect(float fx , float fy , float fw , float fh , COLORRE
 
 
 
-void DIBbuffer::Test() {
+MMDECLSPEC void DIBbuffer::Test() {
    if (!ready) {return;}
    
    int w = bm_info.bmiHeader.biWidth;
@@ -506,7 +506,7 @@ void DIBbuffer::Test() {
 
 
 
-void DIBbuffer::SetXYRGBA(int x , int y , char r , char g , char b , char a) {
+MMDECLSPEC void DIBbuffer::SetXYRGBA(int x , int y , char r , char g , char b , char a) {
    if (!ready) {return;}
    int* pb = (int*)GetDataByte(x,y);
    if (!pb) {return;}
@@ -519,7 +519,7 @@ void DIBbuffer::SetXYRGBA(int x , int y , char r , char g , char b , char a) {
 
 
 
-void DIBbuffer::Flush() {
+MMDECLSPEC void DIBbuffer::Flush() {
    GdiFlush();
 }
 

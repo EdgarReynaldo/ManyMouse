@@ -216,6 +216,8 @@ void RawInputHandler::DrawHandlerToDIB() {
 
 ///   dib_buffer.ClearToColor(RGB(255,255,255));
 
+   /// TODO : GetBufferDC should only be called once, and then ReleaseDC should probably be called.
+
    for (int y = 0 ; y < maxh ; ++y) {
       for (int x = 0 ; x < maxw ; ++x) {
          unsigned int* pdata = (unsigned int*)&((const char*)alr->data)[y*alr->pitch + 4*x];

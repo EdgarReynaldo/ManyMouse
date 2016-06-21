@@ -14,9 +14,12 @@
 #include <vector>
 using std::vector;
 
+#include "DllBuild.hpp"
 
 
-class MouseTrackingInfo {
+
+
+class MMDECLSPEC MouseTrackingInfo {
 public :
    bool used;
    unsigned int id;
@@ -38,7 +41,7 @@ public :
 
 /// MouseTracker is responsible for tracking and destroying mice, but does not create them
 
-class MouseTracker {
+class MMDECLSPEC MouseTracker {
 
 private :
    vector<MouseTrackingInfo> mtinfo;

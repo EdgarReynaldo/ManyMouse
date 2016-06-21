@@ -9,6 +9,9 @@
 #include "DIBbuffer.hpp"
 
 
+#include "DllBuild.hpp"
+
+
 // Private
 
 //bool WindowPainterCallback
@@ -16,7 +19,7 @@
 
 
 
-class TransparentWindow {
+class MMDECLSPEC TransparentWindow {
    
 private :
    int x;
@@ -41,7 +44,7 @@ private :
    bool draw_with_alpha;
    
    /// Give the callback access to our data
-   friend bool WindowPainterCallback
+   friend MMDECLSPEC bool WindowPainterCallback
    (ALLEGRO_DISPLAY* display , UINT message , WPARAM wparam , LPARAM lparam , LRESULT* lresult , void* data);
 
    /// Make copy constructor and assignment operator private to disallow copying

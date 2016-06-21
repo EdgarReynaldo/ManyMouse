@@ -37,27 +37,32 @@
 #include <winuser.h>
 ///#include <winable.h>
 
+
+#include "DllBuild.hpp"
+
+
+
 class DIBbuffer;
 
 typedef bool (*WINDOW_CALLBACK)(ALLEGRO_DISPLAY* , UINT , WPARAM , LPARAM , LRESULT* , void*);
 
 
 
-int SetupAllegro(int (*atexit_ptr)(void (*)(void)));// returns 0 for success, and non-zero for failure
+MMDECLSPEC int SetupAllegro(int (*atexit_ptr)(void (*)(void)));// returns 0 for success, and non-zero for failure
 
-bool AllegroReady();
+MMDECLSPEC bool AllegroReady();
 
-void DrawBitmapToHDC(HDC hdc , ALLEGRO_BITMAP* bmp);
+MMDECLSPEC void DrawBitmapToHDC(HDC hdc , ALLEGRO_BITMAP* bmp);
 
-void DrawBitmapToDIB(const DIBbuffer& dib_buf , ALLEGRO_BITMAP* bmp);
+MMDECLSPEC void DrawBitmapToDIB(const DIBbuffer& dib_buf , ALLEGRO_BITMAP* bmp);
 
-ALLEGRO_BITMAP* CreateAllegroBitmap(int w , int h);
-ALLEGRO_DISPLAY* CreateAllegroDisplay(int w , int h);
+MMDECLSPEC ALLEGRO_BITMAP* CreateAllegroBitmap(int w , int h);
+MMDECLSPEC ALLEGRO_DISPLAY* CreateAllegroDisplay(int w , int h);
 
-void DestroyAllegroBitmap(ALLEGRO_BITMAP*& bmp);
-void DestroyAllegroDisplay(ALLEGRO_DISPLAY*& display);
+MMDECLSPEC void DestroyAllegroBitmap(ALLEGRO_BITMAP*& bmp);
+MMDECLSPEC void DestroyAllegroDisplay(ALLEGRO_DISPLAY*& display);
 
-void AllegroSetTargetBitmap(ALLEGRO_BITMAP* bmp);
+MMDECLSPEC void AllegroSetTargetBitmap(ALLEGRO_BITMAP* bmp);
 
 
 #endif // #ifdef AllegroAndWindows_HPP

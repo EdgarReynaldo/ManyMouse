@@ -6,16 +6,16 @@
 class WindowHandler;
 class MouseController;
 
-void SetWindowHandler(WindowHandler* wh);
-void SetMouseController(MouseController* mc);
+MMDECLSPEC void SetWindowHandler(WindowHandler* wh);
+MMDECLSPEC void SetMouseController(MouseController* mc);
 
 
 LRESULT CALLBACK LowLevelMouseHook(int nCode, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK MouseHook(int nCode, WPARAM wParam, LPARAM lParam);
 
-void StopMouse();
+MMDECLSPEC void StopMouse();
 
-void StartMouse();
+MMDECLSPEC void StartMouse();
 
 LRESULT CALLBACK ShellHook(int nCode , WPARAM wParam , LPARAM lParam);
 

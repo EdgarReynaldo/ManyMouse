@@ -12,7 +12,7 @@
 
 
 
-MouseTracker::MouseTracker() :
+MMDECLSPEC MouseTracker::MouseTracker() :
       mtinfo()
 {
 
@@ -20,7 +20,7 @@ MouseTracker::MouseTracker() :
 
 
 
-unsigned int MouseTracker::TrackNewMouse(Mouse* mouse , HANDLE hdev) {
+MMDECLSPEC unsigned int MouseTracker::TrackNewMouse(Mouse* mouse , HANDLE hdev) {
    unsigned int new_id = 0;
    bool found_spot = false;
    for (new_id = 0 ; new_id < mtinfo.size() ; ++new_id) {
@@ -42,7 +42,7 @@ unsigned int MouseTracker::TrackNewMouse(Mouse* mouse , HANDLE hdev) {
 
 
 
-void MouseTracker::StopTrackingMouse(HANDLE hdev) {
+MMDECLSPEC void MouseTracker::StopTrackingMouse(HANDLE hdev) {
    for (unsigned int new_id = 0 ; new_id < mtinfo.size() ; ++new_id) {
       HANDLE hdev2 = mtinfo[new_id].hdev;
       if (hdev == hdev2) {
@@ -57,13 +57,13 @@ void MouseTracker::StopTrackingMouse(HANDLE hdev) {
 
 
 
-MouseTracker::~MouseTracker() {
+MMDECLSPEC MouseTracker::~MouseTracker() {
    CleanUp();
 }
 
 
 
-void MouseTracker::CleanUp() {
+MMDECLSPEC void MouseTracker::CleanUp() {
    for (unsigned int i = 0 ; i < mtinfo.size() ; ++i) {
       Mouse* m = mtinfo[i].mouse;
       if (m) {
@@ -76,7 +76,7 @@ void MouseTracker::CleanUp() {
 
 
 
-vector<unsigned int> MouseTracker::GetIdsInUse() {
+MMDECLSPEC vector<unsigned int> MouseTracker::GetIdsInUse() {
    vector<unsigned int> ids_in_use;
    for (unsigned int i = 0 ; i < mtinfo.size() ; ++i) {
       bool in_use = mtinfo[i].used;
@@ -89,7 +89,7 @@ vector<unsigned int> MouseTracker::GetIdsInUse() {
 
 
 
-Mouse* MouseTracker::GetMouseFromHandle(HANDLE hdev) {
+MMDECLSPEC Mouse* MouseTracker::GetMouseFromHandle(HANDLE hdev) {
    // linear search, so what there will probably never be more than 10 devices attached anyway
    for (unsigned int i = 0 ; i < mtinfo.size() ; ++i) {
       if (mtinfo[i].hdev == hdev) {
@@ -101,7 +101,7 @@ Mouse* MouseTracker::GetMouseFromHandle(HANDLE hdev) {
 
 
 
-unsigned int MouseTracker::NMice() {
+MMDECLSPEC unsigned int MouseTracker::NMice() {
    unsigned int nmice = 0;
    for (unsigned int i = 0 ; i < mtinfo.size() ; ++i) {
       Mouse* m = mtinfo[i].mouse;
@@ -114,7 +114,7 @@ unsigned int MouseTracker::NMice() {
 
 
 
-Mouse* MouseTracker::GetMouseByIndex(unsigned int index) {
+MMDECLSPEC Mouse* MouseTracker::GetMouseByIndex(unsigned int index) {
    unsigned int idx = 0;
    for (unsigned int i = 0 ; i < mtinfo.size() ; ++i) {
       Mouse* m = mtinfo[i].mouse;
@@ -130,7 +130,7 @@ Mouse* MouseTracker::GetMouseByIndex(unsigned int index) {
 
 
 
-vector<Mouse*> MouseTracker::MiceVector() {
+MMDECLSPEC vector<Mouse*> MouseTracker::MiceVector() {
    vector<Mouse*> micevec;
    for (unsigned int i = 0 ; i < mtinfo.size() ; ++i) {
       Mouse* m = mtinfo[i].mouse;
@@ -143,7 +143,7 @@ vector<Mouse*> MouseTracker::MiceVector() {
 
 
 
-vector<Mouse*> MouseTracker::OtherMiceVector(Mouse* exclude) {
+MMDECLSPEC vector<Mouse*> MouseTracker::OtherMiceVector(Mouse* exclude) {
    vector<Mouse*> micevec;
    for (unsigned int i = 0 ; i < mtinfo.size() ; ++i) {
       Mouse* m = mtinfo[i].mouse;

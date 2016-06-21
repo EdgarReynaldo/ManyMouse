@@ -7,7 +7,7 @@
 using namespace ManyMouse;
 
 
-bool WindowPainterCallback
+MMDECLSPEC bool WindowPainterCallback
    (ALLEGRO_DISPLAY* display , UINT message , WPARAM wparam , LPARAM lparam , LRESULT* lresult , void* data)
 {
    
@@ -38,7 +38,7 @@ bool WindowPainterCallback
 
 
 
-void TransparentWindow::DrawImageToDIB() {
+MMDECLSPEC void TransparentWindow::DrawImageToDIB() {
    
    if (!image) {
       ManyMouse::log.Log("TransparentWindow::DrawImageToDIB() : image is NULL\n");
@@ -54,7 +54,7 @@ void TransparentWindow::DrawImageToDIB() {
 
 
 
-void TransparentWindow::QueuePaintMessage() {
+MMDECLSPEC void TransparentWindow::QueuePaintMessage() {
    if (window) {
       RECT clrect;
       GetClientRect(window , &clrect);
@@ -65,13 +65,13 @@ void TransparentWindow::QueuePaintMessage() {
 
 
 
-TransparentWindow::~TransparentWindow() {
+MMDECLSPEC TransparentWindow::~TransparentWindow() {
    CloseTheWindow();
 }
 
 
 
-void TransparentWindow::CloseTheWindow() {
+MMDECLSPEC void TransparentWindow::CloseTheWindow() {
    
    dib_buffer.Free();
    
@@ -97,7 +97,7 @@ void TransparentWindow::CloseTheWindow() {
 
 
 
-bool TransparentWindow::CreateTheWindow(ALLEGRO_BITMAP* img , int width , int height) {
+MMDECLSPEC bool TransparentWindow::CreateTheWindow(ALLEGRO_BITMAP* img , int width , int height) {
    
    CloseTheWindow();
    
@@ -215,7 +215,7 @@ bool TransparentWindow::CreateTheWindow(ALLEGRO_BITMAP* img , int width , int he
 
 
 
-void TransparentWindow::PaintTheWindow() {
+MMDECLSPEC void TransparentWindow::PaintTheWindow() {
    if (!ready) {
       ManyMouse::log.Log("TransparentWindow::PaintTheWindow - paint called when ready is false.\n");
    }
@@ -228,7 +228,7 @@ void TransparentWindow::PaintTheWindow() {
 
 
 
-bool TransparentWindow::SetWindowImage(ALLEGRO_BITMAP* img) {
+MMDECLSPEC bool TransparentWindow::SetWindowImage(ALLEGRO_BITMAP* img) {
    
 /*
    if (image) {
@@ -271,7 +271,7 @@ bool TransparentWindow::SetWindowImage(ALLEGRO_BITMAP* img) {
 
 
 
-void TransparentWindow::SetWindowPosition(int xpos , int ypos) {
+MMDECLSPEC void TransparentWindow::SetWindowPosition(int xpos , int ypos) {
    if (display) {
       al_set_window_position(display , xpos,ypos);
       al_get_window_position(display , &x , &y);
@@ -280,7 +280,7 @@ void TransparentWindow::SetWindowPosition(int xpos , int ypos) {
 
 
 
-void TransparentWindow::SetWindowTitle(const char* title) {
+MMDECLSPEC void TransparentWindow::SetWindowTitle(const char* title) {
    if (display) {
       al_set_window_title(display , title);
    }
@@ -288,32 +288,32 @@ void TransparentWindow::SetWindowTitle(const char* title) {
 
 
 
-bool TransparentWindow::AddWindowCallback(WINDOW_CALLBACK cb , void* cb_data) {
+MMDECLSPEC bool TransparentWindow::AddWindowCallback(WINDOW_CALLBACK cb , void* cb_data) {
    if (!display) {return false;}
    return al_win_add_window_callback(display , cb , cb_data);
 }
 
 
 
-void TransparentWindow::UseAlphaDrawing(bool use_alpha) {
+MMDECLSPEC void TransparentWindow::UseAlphaDrawing(bool use_alpha) {
    dib_buffer.UseAlphaDrawing(use_alpha);
 }
 
 
 
-ALLEGRO_DISPLAY* TransparentWindow::GetAllegroDisplay() {
+MMDECLSPEC ALLEGRO_DISPLAY* TransparentWindow::GetAllegroDisplay() {
    return display;
 }
 
 
 
-HWND TransparentWindow::GetWindowHandle() {
+MMDECLSPEC HWND TransparentWindow::GetWindowHandle() {
    return window;
 }
 
 
 
-bool TransparentWindow::Ready() {return ready;}
+MMDECLSPEC bool TransparentWindow::Ready() {return ready;}
 
 
 

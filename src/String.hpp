@@ -10,6 +10,11 @@
 #include <string>
 #include <vector>
 
+
+#include "DllBuild.hpp"
+
+
+
 /*
 
    // Convert a wide Unicode string to an UTF8 string
@@ -42,10 +47,10 @@
 */
 
 // Convert a wide Unicode string to an UTF8 string
-std::string utf8_encode(const std::wstring &wstr);
+MMDECLSPEC std::string utf8_encode(const std::wstring &wstr);
 
 // Convert an UTF8 string to a wide Unicode String
-std::wstring utf8_decode(const std::string &str);
+MMDECLSPEC std::wstring utf8_decode(const std::string &str);
 
 
 // this depends on whether or not UNICODE is defined. If so, TCHAR is WCHAR else CHAR
@@ -60,13 +65,13 @@ std::wstring utf8_decode(const std::string &str);
 
 #endif // #ifdef UNICODE
 
-std::string GetStlString(const String& s);
+MMDECLSPEC std::string GetStlString(const String& s);
 
 #define STRINGPRINTF_BUFFER_SIZE 4096
 
-std::string StringPrintF(const char* format_str , ...);
+MMDECLSPEC std::string StringPrintF(const char* format_str , ...);
 
-std::vector<std::string> SplitByNewLines(std::string s);
+MMDECLSPEC std::vector<std::string> SplitByNewLines(std::string s);
 
 
 

@@ -12,13 +12,13 @@ map<DWORD , string> thread_id_to_name;
 
 
 
-void RegisterThread(string thread_name , DWORD thread_id) {
+MMDECLSPEC void RegisterThread(string thread_name , DWORD thread_id) {
    thread_id_to_name[thread_id] = thread_name;
 }
 
 
 
-Mutex::Mutex() :
+MMDECLSPEC Mutex::Mutex() :
       al_mutex(0),
       tid_lock_count()
 {
@@ -27,13 +27,13 @@ Mutex::Mutex() :
 
 
 
-Mutex::~Mutex() {
+MMDECLSPEC Mutex::~Mutex() {
    Free();
 }
 
 
 
-void Mutex::Free() {
+MMDECLSPEC void Mutex::Free() {
    if (al_mutex) {
       al_destroy_mutex(al_mutex);
       al_mutex = 0;
@@ -43,7 +43,7 @@ void Mutex::Free() {
 
 
 
-bool Mutex::Init() {
+MMDECLSPEC bool Mutex::Init() {
    Free();
    al_mutex = al_create_mutex_recursive();
    return al_mutex;
@@ -51,7 +51,7 @@ bool Mutex::Init() {
 
 
 
-void Mutex::Lock() {
+MMDECLSPEC void Mutex::Lock() {
    
    const DWORD tid = GetCurrentThreadId();
    int count = tid_lock_count[tid];
@@ -71,7 +71,7 @@ void Mutex::Lock() {
 
 
 
-void Mutex::Unlock() {
+MMDECLSPEC void Mutex::Unlock() {
    
    const DWORD tid = GetCurrentThreadId();
    int count = tid_lock_count[tid];

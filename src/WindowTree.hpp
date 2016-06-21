@@ -14,7 +14,13 @@
 #include <vector>
 using std::vector;
 
-class FakeMutex {
+
+#include "DllBuild.hpp"
+
+
+
+
+class MMDECLSPEC FakeMutex {
    
 public :   
    FakeMutex() {}
@@ -28,17 +34,17 @@ public :
 };
 
 
-extern Mutex tree_mutex;
+extern MMDECLSPEC Mutex tree_mutex;
 
-bool InitTree();
-
-
-BOOL CALLBACK EnumerateWindowTree(HWND hwindow , LPARAM lp);
-BOOL CALLBACK EnumerateWindowTreeChildren(HWND hwindow , LPARAM lp);
+MMDECLSPEC bool InitTree();
 
 
+MMDECLSPEC BOOL CALLBACK EnumerateWindowTree(HWND hwindow , LPARAM lp);
+MMDECLSPEC BOOL CALLBACK EnumerateWindowTreeChildren(HWND hwindow , LPARAM lp);
 
-class WindowNode {
+
+
+class MMDECLSPEC WindowNode {
 public :
    HWND hwindow;
 
@@ -48,8 +54,8 @@ public :
 
    WindowInfo info;
 
-   friend BOOL CALLBACK EnumerateWindowTree(HWND hwindow , LPARAM lp);
-   friend BOOL CALLBACK EnumerateWindowTreeChildren(HWND hwindow , LPARAM lp);
+   friend MMDECLSPEC BOOL CALLBACK EnumerateWindowTree(HWND hwindow , LPARAM lp);
+   friend MMDECLSPEC BOOL CALLBACK EnumerateWindowTreeChildren(HWND hwindow , LPARAM lp);
 
 public :
 
@@ -61,19 +67,19 @@ public :
 };
 
 
-bool GetTopChild(WindowNode& root_node , POINT pscreen , WindowNode& store_node);
+MMDECLSPEC bool GetTopChild(WindowNode& root_node , POINT pscreen , WindowNode& store_node);
 
 
-void PrintWindowTree(vector<WindowNode>& nodevec , int depth = 0);
-
-
-
-
-int MaxDepth(vector<WindowNode>* nodevec);
+MMDECLSPEC void PrintWindowTree(vector<WindowNode>& nodevec , int depth = 0);
 
 
 
-class WindowTree {
+
+MMDECLSPEC int MaxDepth(vector<WindowNode>* nodevec);
+
+
+
+class MMDECLSPEC WindowTree {
 
    vector<WindowNode> root_windows;
 

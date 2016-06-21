@@ -10,23 +10,23 @@
 using std::vector;
 
 namespace ManyMouse {
-   VisualLogger log;
+   MMDECLSPEC VisualLogger log;
 };
 
 
-void VisualLogger::FreeMutex() {
+MMDECLSPEC void VisualLogger::FreeMutex() {
    mutex.Free();
 }
 
 
 
-bool VisualLogger::InitMutex() {
+MMDECLSPEC bool VisualLogger::InitMutex() {
    return mutex.Init();
 }
 
 
 
-VisualLogger::VisualLogger() :
+MMDECLSPEC VisualLogger::VisualLogger() :
       mutex(),
       logfile(0),
       numlines(30),
@@ -42,7 +42,7 @@ VisualLogger::VisualLogger() :
 
 
 
-VisualLogger::VisualLogger(const char* logpath) :
+MMDECLSPEC VisualLogger::VisualLogger(const char* logpath) :
       mutex(),
       logfile(0),
       numlines(30),
@@ -54,7 +54,7 @@ VisualLogger::VisualLogger(const char* logpath) :
 
 
 
-VisualLogger::~VisualLogger() {
+MMDECLSPEC VisualLogger::~VisualLogger() {
    if (logfile) {
       fclose(logfile);
    }
@@ -63,7 +63,7 @@ VisualLogger::~VisualLogger() {
 
 
 
-void VisualLogger::DrawLog(ALLEGRO_FONT* font , ALLEGRO_COLOR textcol , int lx , int by) {
+MMDECLSPEC void VisualLogger::DrawLog(ALLEGRO_FONT* font , ALLEGRO_COLOR textcol , int lx , int by) {
    if (!font) {return;}
    
 //   printf("DrawLog : Before mutex lock\n");
@@ -101,7 +101,7 @@ void VisualLogger::DrawLog(ALLEGRO_FONT* font , ALLEGRO_COLOR textcol , int lx ,
    
 
 
-void VisualLogger::Log(string s) {
+MMDECLSPEC void VisualLogger::Log(string s) {
    
    if (active) {
       
@@ -143,7 +143,7 @@ void VisualLogger::Log(string s) {
    
 
 
-void VisualLogger::Log(const char* format_str , ...) {
+MMDECLSPEC void VisualLogger::Log(const char* format_str , ...) {
    char buffer[STRINGPRINTF_BUFFER_SIZE];
    va_list args;
    va_start(args , format_str);
@@ -156,31 +156,31 @@ void VisualLogger::Log(const char* format_str , ...) {
 
 
 
-void VisualLogger::Activate(bool activate) {
+MMDECLSPEC void VisualLogger::Activate(bool activate) {
    active = activate;
 }
 
 
 
-void VisualLogger::ActivateConsoleOutput(bool activate) {
+MMDECLSPEC void VisualLogger::ActivateConsoleOutput(bool activate) {
    console_output_active = activate;
 }
 
 
 
-void VisualLogger::ActivateFileOutput(bool activate) {
+MMDECLSPEC void VisualLogger::ActivateFileOutput(bool activate) {
    file_output_active = activate;
 }
 
 
 
-void VisualLogger::ActivateWindowOutput(bool activate) {
+MMDECLSPEC void VisualLogger::ActivateWindowOutput(bool activate) {
    window_output_active = activate;
 }
 
 
 
-void VisualLogger::Clear() {
+MMDECLSPEC void VisualLogger::Clear() {
    mutex.Lock();
    log.clear();
    mutex.Unlock();

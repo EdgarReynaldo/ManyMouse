@@ -9,9 +9,13 @@
 #include "VisualLogger.hpp"
 //using ManyMouse::log;
 
-int GetAllegroKeyFromVKey(unsigned char vkey);
+#include "DllBuild.hpp"
 
-class KeyboardHandler {
+
+
+MMDECLSPEC int GetAllegroKeyFromVKey(unsigned char vkey);
+
+class MMDECLSPEC KeyboardHandler {
 
 
       bool vkeys[256];

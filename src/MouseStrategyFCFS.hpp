@@ -19,7 +19,7 @@ enum FCFS_STRATEGY_STATE {
 
 
 
-class FCFSMouseStrategy : public MouseStrategy {
+class MMDECLSPEC FCFSMouseStrategy : public MouseStrategy {
 
    FCFS_STRATEGY_STATE fcfs_state;
 
@@ -52,7 +52,7 @@ public :
 
 
 
-class TurnBasedFCFSMouseStrategy : public FCFSMouseStrategy {
+class MMDECLSPEC TurnBasedFCFSMouseStrategy : public FCFSMouseStrategy {
    map<Mouse* , int> mouse_turn_count;
    
 public :

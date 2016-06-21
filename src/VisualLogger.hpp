@@ -16,10 +16,12 @@ using std::deque;
 using std::string;
 
 
+#include "DllBuild.hpp"
 
 
 
-class VisualLogger {
+
+class MMDECLSPEC VisualLogger {
    
    Mutex mutex;/// A log may be shared between threads, so it needs to be synchronized if you don't want crazy output
    
@@ -59,7 +61,7 @@ public :
 
 
 namespace ManyMouse {
-   extern VisualLogger log;
+   extern MMDECLSPEC VisualLogger log;
 };
 
 #endif // VisualLogger_HPP

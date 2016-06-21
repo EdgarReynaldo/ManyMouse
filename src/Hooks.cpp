@@ -7,33 +7,33 @@
 
 
 
-WindowHandler* whandler = 0;
-MouseController* mouse_controller = 0;
+MMDECLSPEC WindowHandler* whandler = 0;
+MMDECLSPEC MouseController* mouse_controller = 0;
 
 
 
-bool swallowmouse = false;
+MMDECLSPEC bool swallowmouse = false;
 
 
 
-void SetWindowHandler(WindowHandler* wh) {
+MMDECLSPEC void SetWindowHandler(WindowHandler* wh) {
    whandler = wh;
 }
 
 
-void SetMouseController(MouseController* mc) {
+MMDECLSPEC void SetMouseController(MouseController* mc) {
    mouse_controller = mc;
 }
 
 
 
-void StopMouse(){
+MMDECLSPEC void StopMouse(){
    swallowmouse = true;
 }
 
 
 
-void StartMouse(){
+MMDECLSPEC void StartMouse(){
    swallowmouse = false;
 }
 

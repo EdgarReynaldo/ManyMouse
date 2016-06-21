@@ -76,7 +76,7 @@ public :
 
 
 
-class MouseController {
+class MMDECLSPEC MouseController {
 public:
 
    MouseTracker mouse_tracker;

@@ -75,6 +75,6 @@ static const unsigned char vk_to_al_keycode[256] =
 
 
 
-int GetAllegroKeyFromVKey(unsigned char vkey) {
+MMDECLSPEC int GetAllegroKeyFromVKey(unsigned char vkey) {
    return vk_to_al_keycode[vkey];
 }

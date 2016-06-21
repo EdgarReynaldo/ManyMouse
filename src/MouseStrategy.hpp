@@ -25,9 +25,11 @@ enum MOUSE_STRATEGY {
 class MouseTracker;
 class WindowHandler;
 
+#include "DllBuild.hpp"
 
 
-class MouseStrategy {
+
+class MMDECLSPEC MouseStrategy {
 
 protected :
    MouseTracker* mouse_tracker;

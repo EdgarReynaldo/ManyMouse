@@ -13,14 +13,18 @@ using std::string;
 using std::map;
 
 
-void RegisterThread(string thread_name , DWORD thread_id);
+#include "DllBuild.hpp"
+
+
+
+MMDECLSPEC void RegisterThread(string thread_name , DWORD thread_id);
 
 
 
 
 
 
-class Mutex {
+class MMDECLSPEC Mutex {
 
    ALLEGRO_MUTEX* al_mutex;
    

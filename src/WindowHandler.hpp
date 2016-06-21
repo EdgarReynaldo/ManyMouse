@@ -29,6 +29,9 @@ using std::vector;
 using std::deque;
 
 
+#include "DllBuild.hpp"
+
+
 
 /*
    The window handler class is responsible for keeping track of all the desktop windows through their
@@ -38,18 +41,18 @@ using std::deque;
 
 
 
-const char* HTCODE_to_str(int htcode);
+MMDECLSPEC const char* HTCODE_to_str(int htcode);
 
-bool GetDesktopBounds(RECT* b);
-
-
-BOOL CALLBACK EnumerationProcess(HWND hwindow , LPARAM lp);
-
-HWND FindTopMostChild(HWND parent , POINT abs_coords);
+MMDECLSPEC bool GetDesktopBounds(RECT* b);
 
 
+MMDECLSPEC BOOL CALLBACK EnumerationProcess(HWND hwindow , LPARAM lp);
 
-class WindowHandler {
+MMDECLSPEC HWND FindTopMostChild(HWND parent , POINT abs_coords);
+
+
+
+class MMDECLSPEC WindowHandler {
 
    map<HWND , WindowInfo*> window_info_map;
    deque<HWND> hwnds_zorder;// front is front - ie on top of everything else
@@ -89,7 +92,7 @@ class WindowHandler {
    WindowNode child_node;
 
 
-   friend BOOL CALLBACK EnumerateWindowsProcess(HWND hwindow , LPARAM lp);
+   friend MMDECLSPEC BOOL CALLBACK EnumerateWindowsProcess(HWND hwindow , LPARAM lp);
 
 
 
@@ -135,6 +138,11 @@ public :
 ///   void HandleShellHookInfo(int code , WPARAM wp , LPARAM lp);
    void HandleShellHookInfo(int code , WPARAM wp , LPARAM lp) {
 
+      /// TODO : Use WPARAM wp and LPARAM lp for something?
+      (void)wp;
+      (void)lp;
+      
+   
 //   int codes[4] = {HSHELL_WINDOWACTIVATED , HSHELL_WINDOWCREATED
       /// TODO : This function *should* be tracking window changes but for some reason it's not doing it fully/right
       if ((code == HSHELL_WINDOWACTIVATED) ||

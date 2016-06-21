@@ -13,7 +13,7 @@
 
 
 
-NormalMouseStrategy::NormalMouseStrategy(MouseTracker* mt , WindowHandler* wh) :
+MMDECLSPEC NormalMouseStrategy::NormalMouseStrategy(MouseTracker* mt , WindowHandler* wh) :
    MouseStrategy(mt,wh),
    mouse_state(NORMAL_MOUSE_ACTIVE)
 {
@@ -22,7 +22,7 @@ NormalMouseStrategy::NormalMouseStrategy(MouseTracker* mt , WindowHandler* wh) :
 
 
 
-void NormalMouseStrategy::HandleInput(RAWINPUT input) {
+MMDECLSPEC void NormalMouseStrategy::HandleInput(RAWINPUT input) {
 
    RAWINPUTHEADER hdr = input.header;
 
@@ -53,14 +53,14 @@ void NormalMouseStrategy::HandleInput(RAWINPUT input) {
 
 
 
-void NormalMouseStrategy::Reset() {
+MMDECLSPEC void NormalMouseStrategy::Reset() {
    mouse_state = NORMAL_MOUSE_ACTIVE;
    ResetImages();
 }
 
 
 
-void NormalMouseStrategy::ResetImages() {
+MMDECLSPEC void NormalMouseStrategy::ResetImages() {
    vector<Mouse*> mice_vec = mouse_tracker->MiceVector();
    for (int i = 0 ; i < (int)mice_vec.size() ; ++i) {
       Mouse* m = mice_vec[i];
@@ -71,7 +71,7 @@ void NormalMouseStrategy::ResetImages() {
 
 
 
-void NormalMouseStrategy::ToggleEnabled() {
+MMDECLSPEC void NormalMouseStrategy::ToggleEnabled() {
    if (mouse_state == NORMAL_MOUSE_ACTIVE) {
       mouse_state = NORMAL_MOUSE_INACTIVE;
    }
@@ -84,11 +84,11 @@ void NormalMouseStrategy::ToggleEnabled() {
 
 
 
-MOUSE_STRATEGY NormalMouseStrategy::GetStrategy() {return MOUSE_STRATEGY_NORMAL;}
+MMDECLSPEC MOUSE_STRATEGY NormalMouseStrategy::GetStrategy() {return MOUSE_STRATEGY_NORMAL;}
 
 
 
-NORMAL_MOUSE_STATE NormalMouseStrategy::GetState() {return mouse_state;}
+MMDECLSPEC NORMAL_MOUSE_STATE NormalMouseStrategy::GetState() {return mouse_state;}
 
 
 

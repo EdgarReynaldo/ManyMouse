@@ -25,8 +25,11 @@ enum HEAVY_MOUSE_STRATEGY_STATE {
 class Mouse;
 
 
+#include "DllBuild.hpp"
 
-class HeavyMouseStrategy : public MouseStrategy {
+
+
+class MMDECLSPEC HeavyMouseStrategy : public MouseStrategy {
 
    HEAVY_MOUSE_STRATEGY_STATE heavy_mouse_strategy_state;
 

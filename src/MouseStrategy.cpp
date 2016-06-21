@@ -8,7 +8,7 @@
 
 
 
-MouseStrategy::MouseStrategy(MouseTracker* mt , WindowHandler* wh)  :
+MMDECLSPEC MouseStrategy::MouseStrategy(MouseTracker* mt , WindowHandler* wh)  :
       mouse_tracker(mt),
       window_handler(wh)
 {

@@ -50,6 +50,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-DDLLBUILD" />
 			<Add directory="A5GITdistro/include" />
 		</Compiler>
 		<Linker>
@@ -59,6 +60,8 @@
 		<Unit filename="src/AllegroAndWindows.hpp" />
 		<Unit filename="src/DIBbuffer.cpp" />
 		<Unit filename="src/DIBbuffer.hpp" />
+		<Unit filename="src/DllBuild.cpp" />
+		<Unit filename="src/DllBuild.hpp" />
 		<Unit filename="src/Hooks.cpp" />
 		<Unit filename="src/Hooks.hpp" />
 		<Unit filename="src/KeyboardHandler.cpp" />

@@ -27,7 +27,7 @@ using std::vector;
 */
 
 // Convert a wide Unicode string to an UTF8 string
-string utf8_encode(const std::wstring &wstr)
+MMDECLSPEC string utf8_encode(const std::wstring &wstr)
 {
     if( wstr.empty() ) return string();
     int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
@@ -37,7 +37,7 @@ string utf8_encode(const std::wstring &wstr)
 }
 
 // Convert an UTF8 string to a wide Unicode String
-wstring utf8_decode(const std::string &str)
+MMDECLSPEC wstring utf8_decode(const std::string &str)
 {
     if( str.empty() ) return wstring();
     int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
@@ -61,7 +61,7 @@ wstring utf8_decode(const std::string &str)
 //const int STRINGPRINTF_BUFFER_SIZE = 4096;
 
 
-std::string StringPrintF(const char* format_str , ...) {
+MMDECLSPEC std::string StringPrintF(const char* format_str , ...) {
    char buffer[STRINGPRINTF_BUFFER_SIZE];
    va_list args;
    va_start(args , format_str);
@@ -73,7 +73,7 @@ std::string StringPrintF(const char* format_str , ...) {
 
 
 
-vector<string> SplitByNewLines(std::string s) {
+MMDECLSPEC vector<string> SplitByNewLines(std::string s) {
    vector<string> lines;
    
    if (s.length() == 0) {

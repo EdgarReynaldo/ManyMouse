@@ -13,7 +13,7 @@ bool allegro_ready = false;
 
 
 
-int SetupAllegro(int (*atexit_ptr)(void (*)(void))) {
+MMDECLSPEC int SetupAllegro(int (*atexit_ptr)(void (*)(void))) {
    // returns 0 for success, and non-zero for failure
    
    // setup allegro system
@@ -39,13 +39,13 @@ int SetupAllegro(int (*atexit_ptr)(void (*)(void))) {
 
 
 
-bool AllegroReady() {
+MMDECLSPEC bool AllegroReady() {
    return allegro_ready;
 }
 
 
 
-void DrawBitmapToHDC(HDC hdc , ALLEGRO_BITMAP* bmp) {
+MMDECLSPEC void DrawBitmapToHDC(HDC hdc , ALLEGRO_BITMAP* bmp) {
    assert(0);
    if (!hdc) {
       ManyMouse::log.Log("DrawBitmapToHDC() : hdc is NULL\n");
@@ -95,10 +95,10 @@ void DrawBitmapToHDC(HDC hdc , ALLEGRO_BITMAP* bmp) {
 }
 
 
-int lock_fail_count = 0;
-int lock_success_count = 0;
+MMDECLSPEC int lock_fail_count = 0;
+MMDECLSPEC int lock_success_count = 0;
 
-void DrawBitmapToDIB(const DIBbuffer& dib_buf , ALLEGRO_BITMAP* bmp) {
+MMDECLSPEC void DrawBitmapToDIB(const DIBbuffer& dib_buf , ALLEGRO_BITMAP* bmp) {
    
    assert(dib_buf.ready);
    
@@ -188,7 +188,7 @@ ALLEGRO_BITMAP* CreateAllegroBitmap(int w , int h) {
 
 
 
-ALLEGRO_DISPLAY* CreateAllegroDisplay(int w , int h) {
+MMDECLSPEC ALLEGRO_DISPLAY* CreateAllegroDisplay(int w , int h) {
    ALLEGRO_DISPLAY* display = al_create_display(w,h);
    ManyMouse::log.Log("CreateAllegroDisplay : Created %d X %d allegro display at %p\n" , w , h , display);
    ALLEGRO_ASSERT(display);
@@ -197,8 +197,9 @@ ALLEGRO_DISPLAY* CreateAllegroDisplay(int w , int h) {
 
 
 
-void DestroyAllegroBitmap(ALLEGRO_BITMAP*& bmp) {
-   ManyMouse::log.Log("DestroyAllegroBitmap - Destroying allegro bitmap %p\n" , bmp);
+MMDECLSPEC void DestroyAllegroBitmap(ALLEGRO_BITMAP*& bmp) {
+   ManyMouse::log.Log("DestroyAllegroBitmap - Destroying %d x %d allegro bitmap %p\n" ,
+                      al_get_bitmap_width(bmp) , al_get_bitmap_height(bmp) , bmp);
    ALLEGRO_ASSERT(bmp);
    al_destroy_bitmap(bmp);
    bmp = 0;
@@ -206,8 +207,9 @@ void DestroyAllegroBitmap(ALLEGRO_BITMAP*& bmp) {
 
 
 
-void DestroyAllegroDisplay(ALLEGRO_DISPLAY*& display) {
-   ManyMouse::log.Log("DestroyAllegroDisplay - Destroying allegro display %p\n" , display);
+MMDECLSPEC void DestroyAllegroDisplay(ALLEGRO_DISPLAY*& display) {
+   ManyMouse::log.Log("DestroyAllegroDisplay - Destroying %d x %d allegro display %p\n" , 
+                      al_get_display_width(display) , al_get_display_height(display) , display);
    ALLEGRO_ASSERT(display);
    al_destroy_display(display);
    display = 0;
@@ -215,7 +217,7 @@ void DestroyAllegroDisplay(ALLEGRO_DISPLAY*& display) {
 
 
 
-void AllegroSetTargetBitmap(ALLEGRO_BITMAP* bmp) {
+MMDECLSPEC void AllegroSetTargetBitmap(ALLEGRO_BITMAP* bmp) {
    ManyMouse::log.Log("AllegroSetTargetBitmap - setting target bitmap %p\n" , bmp);
    al_set_target_bitmap(bmp);
 }

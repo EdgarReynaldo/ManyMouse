@@ -18,7 +18,7 @@
 /// ----------------------------------------------------------   FCFSMouseStrategy    -----------------------------------------------------
 
 
-FCFSMouseStrategy::FCFSMouseStrategy(MouseTracker* mt , WindowHandler* wh) :
+MMDECLSPEC FCFSMouseStrategy::FCFSMouseStrategy(MouseTracker* mt , WindowHandler* wh) :
       MouseStrategy(mt,wh),
       fcfs_mouse_buffer(0),
       grabbing_mouse(0),
@@ -30,13 +30,13 @@ FCFSMouseStrategy::FCFSMouseStrategy(MouseTracker* mt , WindowHandler* wh) :
 
 
 
-FCFSMouseStrategy::~FCFSMouseStrategy() {
+MMDECLSPEC FCFSMouseStrategy::~FCFSMouseStrategy() {
    FreeBuffer();
 }
 
 
 
-void FCFSMouseStrategy::FreeBuffer() {
+MMDECLSPEC void FCFSMouseStrategy::FreeBuffer() {
    if (fcfs_mouse_buffer) {
       al_destroy_bitmap(fcfs_mouse_buffer);
       fcfs_mouse_buffer = 0;
@@ -45,13 +45,13 @@ void FCFSMouseStrategy::FreeBuffer() {
 
 
 
-void FCFSMouseStrategy::HandleInput(RAWINPUT input) {
+MMDECLSPEC void FCFSMouseStrategy::HandleInput(RAWINPUT input) {
    HandleInput(input , true);
 }
 
 
 
-void FCFSMouseStrategy::HandleInput(RAWINPUT input , bool process_input) {
+MMDECLSPEC void FCFSMouseStrategy::HandleInput(RAWINPUT input , bool process_input) {
    
    RAWINPUTHEADER hdr = input.header;
    if (hdr.dwType != RIM_TYPEMOUSE) {
@@ -121,12 +121,14 @@ void FCFSMouseStrategy::HandleInput(RAWINPUT input , bool process_input) {
 
 
 
-void FCFSMouseStrategy::Reset() {
+MMDECLSPEC void FCFSMouseStrategy::Reset() {
    ResetImages();
    
 }
 
-void FCFSMouseStrategy::ResetImages() {
+
+
+MMDECLSPEC void FCFSMouseStrategy::ResetImages() {
    FreeBuffer();
    ALLEGRO_ASSERT(fcfs_mouse_images[0]);
    
@@ -143,7 +145,9 @@ void FCFSMouseStrategy::ResetImages() {
    SetFCFSStrategyState(FCFS_STATE_FREE);
 }
 
-void FCFSMouseStrategy::DrawPointers(FCFS_STRATEGY_STATE strategy_state) {
+
+
+MMDECLSPEC void FCFSMouseStrategy::DrawPointers(FCFS_STRATEGY_STATE strategy_state) {
    
    ALLEGRO_ASSERT(fcfs_mouse_buffer);
    
@@ -154,8 +158,6 @@ void FCFSMouseStrategy::DrawPointers(FCFS_STRATEGY_STATE strategy_state) {
    for (unsigned i = 0 ; i < mouse_vec.size() ; ++i) {
       Mouse* m = mouse_vec[i];
       al_set_blender(ALLEGRO_ADD , ALLEGRO_ONE , ALLEGRO_ZERO);
-      
-      al_set_target_backbuffer(NULL);
       
 //      al_hold_bitmap_drawing(false);
       al_set_target_bitmap(fcfs_mouse_buffer);
@@ -206,13 +208,13 @@ void FCFSMouseStrategy::DrawPointers(FCFS_STRATEGY_STATE strategy_state) {
 
 
 
-void FCFSMouseStrategy::ToggleEnabled() {
+MMDECLSPEC void FCFSMouseStrategy::ToggleEnabled() {
    
 }
 
 
 
-void FCFSMouseStrategy::SetFCFSStrategyState(FCFS_STRATEGY_STATE new_state) {
+MMDECLSPEC void FCFSMouseStrategy::SetFCFSStrategyState(FCFS_STRATEGY_STATE new_state) {
    fcfs_state = new_state; 
    DrawPointers(fcfs_state);
 
@@ -234,7 +236,7 @@ void FCFSMouseStrategy::SetFCFSStrategyState(FCFS_STRATEGY_STATE new_state) {
 
 
 
-MOUSE_STRATEGY FCFSMouseStrategy::GetStrategy() {
+MMDECLSPEC MOUSE_STRATEGY FCFSMouseStrategy::GetStrategy() {
    return MOUSE_STRATEGY_FCFS;
 }
 

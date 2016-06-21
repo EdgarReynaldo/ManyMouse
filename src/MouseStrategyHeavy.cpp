@@ -22,13 +22,13 @@
 
 
 
-void HeavyMouseStrategy::HandleInput(RAWINPUT input) {
+MMDECLSPEC void HeavyMouseStrategy::HandleInput(RAWINPUT input) {
    HandleInput(input , true);
 }
 
 
 
-void HeavyMouseStrategy::HandleInput(RAWINPUT input , bool process_input) {
+MMDECLSPEC void HeavyMouseStrategy::HandleInput(RAWINPUT input , bool process_input) {
    
    RAWINPUTHEADER hdr = input.header;
    if (hdr.dwType != RIM_TYPEMOUSE) {
@@ -163,13 +163,13 @@ void HeavyMouseStrategy::HandleInput(RAWINPUT input , bool process_input) {
 
 
 
-void HeavyMouseStrategy::Reset() {
+MMDECLSPEC void HeavyMouseStrategy::Reset() {
    SetHeavyMouseStrategyState(HEAVY_MOUSE_STATE_FREE);
 }
 
 
 
-bool HeavyMouseStrategy::OtherMiceNear() {
+MMDECLSPEC bool HeavyMouseStrategy::OtherMiceNear() {
    if (!grabbing_mouse) {return false;}
    vector<Mouse*> other_mice = mouse_tracker->OtherMiceVector(grabbing_mouse);
    int near_count = 0;
@@ -184,7 +184,7 @@ bool HeavyMouseStrategy::OtherMiceNear() {
 
 
 
-bool HeavyMouseStrategy::MouseNear(Mouse* m) {
+MMDECLSPEC bool HeavyMouseStrategy::MouseNear(Mouse* m) {
    if (!grabbing_mouse) {
       return false;
    }
@@ -199,7 +199,7 @@ bool HeavyMouseStrategy::MouseNear(Mouse* m) {
 
 
 
-bool HeavyMouseStrategy::GroupAgrees() {
+MMDECLSPEC bool HeavyMouseStrategy::GroupAgrees() {
    std::vector<Mouse*> other_mice = mouse_tracker->OtherMiceVector(grabbing_mouse);
    int consent_count = 1;
    for (int i = 0 ; i < (int)other_mice.size() ; ++i) {
@@ -214,7 +214,7 @@ bool HeavyMouseStrategy::GroupAgrees() {
 
 
 
-void HeavyMouseStrategy::SetHeavyMouseStrategyState(HEAVY_MOUSE_STRATEGY_STATE new_state) {
+MMDECLSPEC void HeavyMouseStrategy::SetHeavyMouseStrategyState(HEAVY_MOUSE_STRATEGY_STATE new_state) {
 //   HEAVY_MOUSE_STRATEGY_STATE old_state = heavy_mouse_strategy_state;
    heavy_mouse_strategy_state = new_state;
    
@@ -278,3 +278,7 @@ void HeavyMouseStrategy::SetHeavyMouseStrategyState(HEAVY_MOUSE_STRATEGY_STATE n
       break;
    };
 }
+
+
+
+

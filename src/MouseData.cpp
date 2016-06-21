@@ -11,40 +11,40 @@
 
 //ALLEGRO_FONT* mouse_font = 0;
 
-const char* mouse_font_path = "verdana.ttf";
-int mouse_font_size = -20;
-int mouse_font_flags = ALLEGRO_TTF_MONOCHROME;
+MMDECLSPEC const char* mouse_font_path = "verdana.ttf";
+MMDECLSPEC int mouse_font_size = -20;
+MMDECLSPEC int mouse_font_flags = ALLEGRO_TTF_MONOCHROME;
 
 
 
 
-const char* normal_mouse_paths[NUM_NORMAL_MOUSE_STATES] = {
+MMDECLSPEC const char* normal_mouse_paths[NUM_NORMAL_MOUSE_STATES] = {
    "Images/DaltonRedCursor2.png",
    "Images/DaltonGreenCursor2.png"
 };
 
 
 
-ALLEGRO_BITMAP* normal_mouse_images[NUM_NORMAL_MOUSE_STATES] = {
+MMDECLSPEC ALLEGRO_BITMAP* normal_mouse_images[NUM_NORMAL_MOUSE_STATES] = {
    0,0
 };
 
 
 
-const char* fcfs_mouse_paths[NUM_FCFS_MOUSE_STATES] = {
+MMDECLSPEC const char* fcfs_mouse_paths[NUM_FCFS_MOUSE_STATES] = {
    "NewImages/MouseInactive2.png",
    "NewImages/MouseActive2.png",
    "NewImages/MouseGrabbing2.png",
    "NewImages/MouseDragging2.png"
 };
 
-ALLEGRO_BITMAP* fcfs_mouse_images[NUM_FCFS_MOUSE_STATES] = {
+MMDECLSPEC ALLEGRO_BITMAP* fcfs_mouse_images[NUM_FCFS_MOUSE_STATES] = {
    0,0,0,0
 };
 
 
 
-const char* heavy_mouse_paths[NUM_HEAVY_MOUSE_STATES] = {
+MMDECLSPEC const char* heavy_mouse_paths[NUM_HEAVY_MOUSE_STATES] = {
    "NewImages/MouseInactive2.png",
    "NewImages/MouseActive2.png",
    "NewImages/MouseGrabbing2.png",
@@ -55,13 +55,13 @@ const char* heavy_mouse_paths[NUM_HEAVY_MOUSE_STATES] = {
 
 
 
-ALLEGRO_BITMAP* heavy_mouse_images[NUM_HEAVY_MOUSE_STATES] = {
+MMDECLSPEC ALLEGRO_BITMAP* heavy_mouse_images[NUM_HEAVY_MOUSE_STATES] = {
    0,0,0,0,0,0
 };
 
 
 
-void FreeMiceImages() {
+MMDECLSPEC void FreeMiceImages() {
    for (int i = 0 ; i < NUM_NORMAL_MOUSE_STATES ; ++i) {
       ALLEGRO_BITMAP*& image = normal_mouse_images[i];
       if (image) {
@@ -91,7 +91,7 @@ void FreeMiceImages() {
 
 
 
-bool LoadMiceImages() {
+MMDECLSPEC bool LoadMiceImages() {
    FreeMiceImages();
    bool success = true;
    for (int i = 0 ; i < NUM_NORMAL_MOUSE_STATES ; ++i) {
@@ -133,7 +133,7 @@ bool LoadMiceImages() {
 
 
 
-ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active) {
+MMDECLSPEC ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active) {
 
    // Pass -1 for w or h to use default size
 
@@ -186,7 +186,9 @@ ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active) {
 
 }
 
-ALLEGRO_BITMAP* DrawMouseImage(bool active){
+
+
+MMDECLSPEC ALLEGRO_BITMAP* DrawMouseImage(bool active){
 
    ALLEGRO_BITMAP* cursor1 = 0;
    ALLEGRO_BITMAP* circle = 0;

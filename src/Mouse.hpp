@@ -12,16 +12,19 @@
 #define NUM_MOUSE_BUTTONS 5
 
 
-
-int FlagsToButtonIndex(USHORT flags , bool* down);
-
+#include "DllBuild.hpp"
 
 
-class ALLEGRO_BITMAP;
-class ALLEGRO_FONT;
+
+MMDECLSPEC int FlagsToButtonIndex(USHORT flags , bool* down);
 
 
-class Mouse {
+
+struct ALLEGRO_BITMAP;
+struct ALLEGRO_FONT;
+
+
+class MMDECLSPEC Mouse {
 
 public :
 

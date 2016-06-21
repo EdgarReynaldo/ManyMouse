@@ -21,7 +21,7 @@ BOOL WINAPI EnumChildWindows(
 */
 
 
-bool GetDesktopBounds(RECT* b) {
+MMDECLSPEC bool GetDesktopBounds(RECT* b) {
    b->left = 0;
    b->right = 0;
    b->top = 0;
@@ -32,7 +32,7 @@ bool GetDesktopBounds(RECT* b) {
 
 
 ///BOOL CALLBACK EnumerateChildWindowsProcess(HWND hwindow , LPARAM lp);
-BOOL CALLBACK EnumerateChildWindowsProcess(HWND hwindow , LPARAM lp) {
+MMDECLSPEC BOOL CALLBACK EnumerateChildWindowsProcess(HWND hwindow , LPARAM lp) {
    deque<HWND>* pdeq = (deque<HWND>*)lp;
    ALLEGRO_ASSERT(pdeq);
    pdeq->push_back(hwindow);
@@ -42,7 +42,7 @@ BOOL CALLBACK EnumerateChildWindowsProcess(HWND hwindow , LPARAM lp) {
 
 
 //friend BOOL CALLBACK EnumerateWindowsProcess(HWND hwindow , LPARAM lp);
-BOOL CALLBACK EnumerateWindowsProcess(HWND hwindow , LPARAM lp) {
+MMDECLSPEC BOOL CALLBACK EnumerateWindowsProcess(HWND hwindow , LPARAM lp) {
    WindowHandler* wh = (WindowHandler*)lp;
    ALLEGRO_ASSERT(wh);
 //   deque<HWND> all_windows;
@@ -63,7 +63,7 @@ BOOL CALLBACK EnumerateWindowsProcess(HWND hwindow , LPARAM lp) {
 
 
 
-BOOL CALLBACK EnumerateVisibleWindowsProcess(HWND hwindow , LPARAM lp) {
+MMDECLSPEC BOOL CALLBACK EnumerateVisibleWindowsProcess(HWND hwindow , LPARAM lp) {
    deque<HWND>* pwin = (deque<HWND>*)lp;
    ALLEGRO_ASSERT(pwin);
    if (IsWindowVisible(hwindow)) {
@@ -72,7 +72,9 @@ BOOL CALLBACK EnumerateVisibleWindowsProcess(HWND hwindow , LPARAM lp) {
    return true;
 }
 
-BOOL CALLBACK EnumerateAllWindowsProcess(HWND hwindow , LPARAM lp) {
+
+
+MMDECLSPEC BOOL CALLBACK EnumerateAllWindowsProcess(HWND hwindow , LPARAM lp) {
    deque<HWND>* pwin = (deque<HWND>*)lp;
    ALLEGRO_ASSERT(pwin);
    pwin->push_back(hwindow);
@@ -89,7 +91,7 @@ BOOL CALLBACK EnumerationProcess(HWND hwindow , LPARAM lp) {
    return true;
 }
 */
-HWND FindTopMostChild(HWND parent , POINT abs_coords) {
+MMDECLSPEC HWND FindTopMostChild(HWND parent , POINT abs_coords) {
 
    if (!parent) {return NULL;}
 
@@ -136,7 +138,7 @@ HWND WINAPI RealChildWindowFromPoint(
 
 
 
-void WindowHandler::PrintAllWindows() {
+MMDECLSPEC void WindowHandler::PrintAllWindows() {
 
    window_tree.Print();
 
@@ -180,7 +182,7 @@ void WindowHandler::PrintAllWindows() {
 
 
 
-void WindowHandler::GetMiceWindows() {
+MMDECLSPEC void WindowHandler::GetMiceWindows() {
    if (mc) {
       mice_windows.clear();
       mc->GetMiceWindows(&mice_windows);
@@ -189,7 +191,7 @@ void WindowHandler::GetMiceWindows() {
 
 
 
-void WindowHandler::EnumerateWindows() {
+MMDECLSPEC void WindowHandler::EnumerateWindows() {
 
 
    window_tree.EnumerateTree();
@@ -258,25 +260,25 @@ void WindowHandler::EnumerateWindows() {
 
 
 
-WindowHandler::~WindowHandler() {
+MMDECLSPEC WindowHandler::~WindowHandler() {
    ClearWindowInfo();
 }
 
 
 
-bool WindowHandler::GetBaseNode(POINT p , WindowNode& store_node) {
+MMDECLSPEC bool WindowHandler::GetBaseNode(POINT p , WindowNode& store_node) {
    return window_tree.GetBaseWindowNode(p , store_node);
 }
 
 
 
-bool WindowHandler::GetChildNode(POINT p , WindowNode& store_node) {
+MMDECLSPEC bool WindowHandler::GetChildNode(POINT p , WindowNode& store_node) {
    return window_tree.GetTopChildWindowNode(p , store_node);
 }
 
 
 
-void WindowHandler::ClearWindowInfo() {
+MMDECLSPEC void WindowHandler::ClearWindowInfo() {
    map<HWND , WindowInfo*>::iterator it = window_info_map.begin();
    while (it != window_info_map.end()) {
       WindowInfo* pwi = it->second;
@@ -294,7 +296,7 @@ void WindowHandler::ClearWindowInfo() {
 
 
 
-void WindowHandler::RefreshWindowInfo() {
+MMDECLSPEC void WindowHandler::RefreshWindowInfo() {
    ClearWindowInfo();
    EnumerateWindows();
    SetOurWindows(program_window , log_window , test_window);
@@ -302,7 +304,7 @@ void WindowHandler::RefreshWindowInfo() {
 
 
 
-void WindowHandler::SetOurWindows(HWND program_window_handle , HWND log_window_handle , HWND test_window_handle) {
+MMDECLSPEC void WindowHandler::SetOurWindows(HWND program_window_handle , HWND log_window_handle , HWND test_window_handle) {
    program_window = program_window_handle;
    log_window = log_window_handle;
    test_window = test_window_handle;
@@ -336,7 +338,7 @@ void WindowHandler::SetOurWindows(HWND program_window_handle , HWND log_window_h
 
 
 
-void WindowHandler::PrintWindowInfo() {
+MMDECLSPEC void WindowHandler::PrintWindowInfo() {
 
    deque<HWND>::iterator itwin = hwnds_zorder.begin();
    while (itwin != hwnds_zorder.end()) {
@@ -356,7 +358,7 @@ void WindowHandler::PrintWindowInfo() {
 
 
 
-bool WindowHandler::NotOurWindow(HWND hwindow) {
+MMDECLSPEC bool WindowHandler::NotOurWindow(HWND hwindow) {
 
    if ((hwindow != program_window) &&
        !IsMouseWindow(hwindow)) {
@@ -408,7 +410,7 @@ bool WindowHandler::NotOurWindow(HWND hwindow) {
 
 
 
-bool WindowHandler::IsMouseWindow(HWND hwndA) {
+MMDECLSPEC bool WindowHandler::IsMouseWindow(HWND hwndA) {
    for (unsigned int i = 0 ; i < mice_windows.size() ; ++i) {
       HWND hwndmouse = mice_windows[i];
       if (hwndA == hwndmouse) {
@@ -420,7 +422,7 @@ bool WindowHandler::IsMouseWindow(HWND hwndA) {
 
 
 
-HWND WindowHandler::GetWindowAtPos(int xpos , int ypos) {
+MMDECLSPEC HWND WindowHandler::GetWindowAtPos(int xpos , int ypos) {
 
    deque<HWND>::iterator it = hwnds_zorder.begin();
    while (it != hwnds_zorder.end()) {
@@ -457,7 +459,7 @@ HWND WindowHandler::GetWindowAtPos(int xpos , int ypos) {
 
 
 
-WindowInfo WindowHandler::GetWindowInfoFromHandle(HWND hwndA) {
+MMDECLSPEC WindowInfo WindowHandler::GetWindowInfoFromHandle(HWND hwndA) {
 
    WindowInfo winfo;
    winfo.SetWindowHandle(hwndA);
@@ -471,7 +473,7 @@ WindowInfo WindowHandler::GetWindowInfoFromHandle(HWND hwndA) {
 
 
 
-void WindowHandler::ToggleSystemMouseOnOff(bool on) {
+MMDECLSPEC void WindowHandler::ToggleSystemMouseOnOff(bool on) {
    system_mouse_on = on;
 }
 
@@ -594,7 +596,7 @@ void WindowHandler::PrintWindows() {
 }
 */
 
-const char* HTCODE_to_str(int htcode) {
+MMDECLSPEC const char* HTCODE_to_str(int htcode) {
    if (htcode < -2) {htcode = 0;}
    if (htcode > 21) {htcode = 0;}
    

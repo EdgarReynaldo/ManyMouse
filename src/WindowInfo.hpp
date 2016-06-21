@@ -12,12 +12,16 @@ using std::string;
 
 
 
-bool RectContains(RECT r , int xpos , int ypos);
-string RectString(RECT r);
+#include "DllBuild.hpp"
 
 
 
-class WindowInfo {
+MMDECLSPEC bool RectContains(RECT r , int xpos , int ypos);
+MMDECLSPEC string RectString(RECT r);
+
+
+
+class MMDECLSPEC WindowInfo {
 
 public :
    HWND hwnd;

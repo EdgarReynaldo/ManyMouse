@@ -8,9 +8,11 @@
 
 #include "AllegroAndWindows.hpp"
 
+#include "DllBuild.hpp"
 
 
-class DIBbuffer {
+
+class MMDECLSPEC DIBbuffer {
    HWND win_handle;
    HDC winDC;
    HDC memDC;
@@ -33,7 +35,7 @@ class DIBbuffer {
 
    BYTE* GetDataByte(int x , int y);// access to hbm_DIBdata array
 
-   friend void DrawBitmapToDIB(const DIBbuffer& dib_buf , ALLEGRO_BITMAP* bmp);
+   friend MMDECLSPEC void DrawBitmapToDIB(const DIBbuffer& dib_buf , ALLEGRO_BITMAP* bmp);
 
 public :
    DIBbuffer();

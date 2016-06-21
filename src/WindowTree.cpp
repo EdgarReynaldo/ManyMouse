@@ -11,9 +11,9 @@
 
 #include <cstdio>
 
-Mutex tree_mutex;
+MMDECLSPEC Mutex tree_mutex;
 
-bool InitTree() {
+MMDECLSPEC bool InitTree() {
    return tree_mutex.Init();
 }
 
@@ -22,7 +22,7 @@ bool InitTree() {
 
 
 
-BOOL CALLBACK EnumerateWindowTree(HWND hwindow , LPARAM lp) {
+MMDECLSPEC BOOL CALLBACK EnumerateWindowTree(HWND hwindow , LPARAM lp) {
    vector<WindowNode>* children = (vector<WindowNode>*)lp;
    ALLEGRO_ASSERT(children);
    WindowNode node(hwindow);
@@ -37,7 +37,8 @@ BOOL CALLBACK EnumerateWindowTree(HWND hwindow , LPARAM lp) {
 }
 
 
-BOOL CALLBACK EnumerateWindowTreeChildren(HWND hwindow , LPARAM lp) {
+
+MMDECLSPEC BOOL CALLBACK EnumerateWindowTreeChildren(HWND hwindow , LPARAM lp) {
    vector<WindowNode>* children = (vector<WindowNode>*)lp;
    ALLEGRO_ASSERT(children);
    WindowNode node(hwindow);
@@ -51,10 +52,10 @@ BOOL CALLBACK EnumerateWindowTreeChildren(HWND hwindow , LPARAM lp) {
 
 
 /// Private global function declarations
-void SetParent(vector<WindowNode>* children , WindowNode* node_parent);
-void PrintTree(vector<WindowNode>* nodevec , int depth = 0);
-void PrintNodeToFile(WindowNode* node);
-string PrintNode(WindowNode* node , int depth = 0);
+void MMDECLSPEC SetParent(vector<WindowNode>* children , WindowNode* node_parent);
+void MMDECLSPEC PrintTree(vector<WindowNode>* nodevec , int depth = 0);
+void MMDECLSPEC PrintNodeToFile(WindowNode* node);
+string MMDECLSPEC PrintNode(WindowNode* node , int depth = 0);
 
 
 
@@ -62,7 +63,7 @@ string PrintNode(WindowNode* node , int depth = 0);
 /// -------------------------------------------   WindowNode class   -------------------------------------------------------
 
 
-WindowNode::WindowNode() :
+MMDECLSPEC WindowNode::WindowNode() :
       hwindow(0),
       parent(0),
       child_windows(),
@@ -73,7 +74,7 @@ WindowNode::WindowNode() :
 
 
 
-WindowNode::WindowNode(HWND hwnd) :
+MMDECLSPEC WindowNode::WindowNode(HWND hwnd) :
       hwindow(hwnd),
       parent(0),
       child_windows(),
@@ -89,7 +90,7 @@ WindowNode::WindowNode(HWND hwnd) :
 
 
 
-void WindowTree::EnumerateTree() {
+MMDECLSPEC void WindowTree::EnumerateTree() {
 
    tree_mutex.Lock();
 
@@ -147,7 +148,7 @@ void WindowTree::EnumerateTree() {
 }
 
 
-bool WindowTree::GetBaseWindowNode(POINT pscreen , WindowNode& store_node) {
+MMDECLSPEC bool WindowTree::GetBaseWindowNode(POINT pscreen , WindowNode& store_node) {
 
    tree_mutex.Lock();
 
@@ -194,7 +195,7 @@ bool WindowTree::GetBaseWindowNode(POINT pscreen , WindowNode& store_node) {
 
 
 
-HWND WindowTree::GetBaseWindow(POINT pscreen) {
+MMDECLSPEC HWND WindowTree::GetBaseWindow(POINT pscreen) {
    WindowNode store_node;
    if (GetBaseWindowNode(pscreen , store_node)) {
       return store_node.hwindow;
@@ -204,7 +205,7 @@ HWND WindowTree::GetBaseWindow(POINT pscreen) {
 
 
 
-bool WindowTree::GetTopChildWindowNode(POINT pscreen , WindowNode& store_node) {
+MMDECLSPEC bool WindowTree::GetTopChildWindowNode(POINT pscreen , WindowNode& store_node) {
 
    WindowNode base_node;
 
@@ -217,7 +218,7 @@ bool WindowTree::GetTopChildWindowNode(POINT pscreen , WindowNode& store_node) {
 
 
 
-bool WindowTree::NotOurWindow(HWND hwindow) {
+MMDECLSPEC bool WindowTree::NotOurWindow(HWND hwindow) {
 
    if ((hwindow != program_window) &&
        (hwindow != log_window) &&
@@ -230,7 +231,7 @@ bool WindowTree::NotOurWindow(HWND hwindow) {
 
 
 
-bool WindowTree::IsMouseWindow(HWND hwndA) {
+MMDECLSPEC bool WindowTree::IsMouseWindow(HWND hwndA) {
    for (unsigned int i = 0 ; i < mice_windows.size() ; ++i) {
       HWND hwndmouse = mice_windows[i];
       if (hwndA == hwndmouse) {
@@ -242,7 +243,7 @@ bool WindowTree::IsMouseWindow(HWND hwndA) {
 
 
 
-void WindowTree::GetMiceWindows() {
+MMDECLSPEC void WindowTree::GetMiceWindows() {
    if (mc) {
       mice_windows.clear();
       mc->GetMiceWindows(&mice_windows);
@@ -256,7 +257,7 @@ void WindowTree::GetMiceWindows() {
 
 
 
-bool GetTopChild(WindowNode& root_node , POINT pscreen , WindowNode& store_node) {
+MMDECLSPEC bool GetTopChild(WindowNode& root_node , POINT pscreen , WindowNode& store_node) {
 
    vector<WindowNode>& children = root_node.child_windows;
 
@@ -283,7 +284,7 @@ bool GetTopChild(WindowNode& root_node , POINT pscreen , WindowNode& store_node)
 
 
 
-void SetParent(vector<WindowNode>* children , WindowNode* node_parent) {
+MMDECLSPEC void SetParent(vector<WindowNode>* children , WindowNode* node_parent) {
    if (!children) {return;}
 
    for (unsigned int i = 0 ; i < children->size() ; ++i) {
@@ -295,14 +296,14 @@ void SetParent(vector<WindowNode>* children , WindowNode* node_parent) {
 
 
 
-void PrintNodeToFile(WindowNode* node) {
+MMDECLSPEC void PrintNodeToFile(WindowNode* node) {
    string s = PrintNode(node , 0);
    ManyMouse::log.Log("%s\n" , s.c_str());
 }
 
 
 
-string PrintNode(WindowNode* node, int depth) {
+MMDECLSPEC string PrintNode(WindowNode* node, int depth) {
    if (!node) {
       return "";
    }
@@ -335,7 +336,7 @@ string PrintNode(WindowNode* node, int depth) {
 
 
 
-void PrintTree(vector<WindowNode>* nodevec , int depth) {
+MMDECLSPEC void PrintTree(vector<WindowNode>* nodevec , int depth) {
    if (!nodevec) {return;}
 
    int size = depth*3;
@@ -365,7 +366,7 @@ void PrintTree(vector<WindowNode>* nodevec , int depth) {
 
 
 
-int MaxDepth(vector<WindowNode>* nodevec) {
+MMDECLSPEC int MaxDepth(vector<WindowNode>* nodevec) {
    int maxdepth = 1;
    for (unsigned int i = 0 ; i < nodevec->size() ; ++i) {
       WindowNode* node = &(*nodevec)[i];
@@ -378,7 +379,7 @@ int MaxDepth(vector<WindowNode>* nodevec) {
 
 
 
-void PrintWindowTree(vector<WindowNode>& nodevec , int depth) {
+MMDECLSPEC void PrintWindowTree(vector<WindowNode>& nodevec , int depth) {
    tree_mutex.Lock();
    PrintTree(&nodevec , depth);
    tree_mutex.Unlock();
