@@ -220,7 +220,10 @@ MMDECLSPEC void TransparentWindow::PaintTheWindow() {
       ManyMouse::log.Log("TransparentWindow::PaintTheWindow - paint called when ready is false.\n");
    }
    else {
-      DrawImageToDIB();
+
+/// We don't need to redraw the DIB
+///      DrawImageToDIB();
+
 //      dib_buffer.BlendBufferToWindowDC();
       QueuePaintMessage();
    }

@@ -49,11 +49,11 @@ MMDECLSPEC wstring utf8_decode(const std::string &str)
 
 
 #ifdef UNICODE
-   string GetStlString(const String& s) {
+   MMDECLSPEC string GetStlString(const String& s) {
       return utf8_encode(s);// s is really a std::wstring
    }
 #else // not UNICODE
-   string GetStlString(const String& s) {
+   MMDECLSPEC string GetStlString(const String& s) {
       return string(s);// make a copy, s is really a std::string
    }
 #endif // #ifdef UNICODE

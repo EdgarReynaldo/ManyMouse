@@ -22,6 +22,9 @@ using std::string;
 extern bool lograwinput;// value of lograwinput specifies whether or not the raw input is logged
 
 
+
+
+
 class RawInputDevice {
 
    HANDLE hdevice;
@@ -89,6 +92,9 @@ public:
 
    vector<RAWINPUTDEVICE> rids;
 //   RAWINPUTDEVICE rids[2];
+
+   MOUSE_STRATEGY new_mouse_strategy;
+   MOUSE_STRATEGY current_mouse_strategy;
 
    MouseController mouse_controller;
 
@@ -163,6 +169,8 @@ public :
          keyboards(),
          hids(),
          rids(),
+         new_mouse_strategy(MOUSE_STRATEGY_NORMAL),
+         current_mouse_strategy(MOUSE_STRATEGY_NORMAL),
          mouse_controller(&window_handler),
          window_handler(&mouse_controller),
          keyboard_handler(),
@@ -214,6 +222,7 @@ public :
    void PrintRawHid(RAWINPUTHEADER hdr , RAWHID* rhid);
 
    void HandleRawInput(RAWINPUT rinput);
+   
 };
 
 

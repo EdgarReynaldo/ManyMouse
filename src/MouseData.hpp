@@ -21,15 +21,15 @@ MMDECLSPEC void FreeMiceImages();
 MMDECLSPEC bool LoadMiceImages();
 
 /* Pass -1 for w or h to use default size */
-MMDECLSPEC ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active);
-MMDECLSPEC ALLEGRO_BITMAP* DrawMouseImage(bool active);
+///MMDECLSPEC ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active);
+///MMDECLSPEC ALLEGRO_BITMAP* DrawMouseImage(bool active);
 
 
 
 extern MMDECLSPEC const char*     mouse_font_path;
 extern MMDECLSPEC int             mouse_font_size;
 extern MMDECLSPEC int             mouse_font_flags;
-//extern ALLEGRO_FONT*   mouse_font;
+extern MMDECLSPEC ALLEGRO_FONT*   mouse_font;
 
 extern MMDECLSPEC const char*     normal_mouse_paths [NUM_NORMAL_MOUSE_STATES];
 extern MMDECLSPEC ALLEGRO_BITMAP* normal_mouse_images[NUM_NORMAL_MOUSE_STATES];

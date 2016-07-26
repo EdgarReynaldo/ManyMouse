@@ -21,7 +21,7 @@ MMDECLSPEC int SetupAllegro(int (*atexit_ptr)(void (*)(void))) {
    if (!al_install_system(ALLEGRO_VERSION_INT , atexit_ptr)) {
       return 1;
    }
-   if (!al_init()) {return 1;}
+///   if (!al_init()) {return 1;}
    
    // setup allegro addons
    if (!al_init_primitives_addon()) {return 2;}
@@ -179,7 +179,7 @@ MMDECLSPEC void DrawBitmapToDIB(const DIBbuffer& dib_buf , ALLEGRO_BITMAP* bmp) 
 
 
 
-ALLEGRO_BITMAP* CreateAllegroBitmap(int w , int h) {
+MMDECLSPEC ALLEGRO_BITMAP* CreateAllegroBitmap(int w , int h) {
    ALLEGRO_BITMAP* bmp = al_create_bitmap(w,h);
    ManyMouse::log.Log("CreateAllegroBitmap : Created %d X %d bitmap at %p\n" , w , h , bmp);
    ALLEGRO_ASSERT(bmp);

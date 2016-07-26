@@ -112,8 +112,25 @@ UINT WINAPI GetRawInputDeviceInfo(HANDLE hDevice , UINT uiCommand , LPVOID pData
          }
          else {
             s = buf;
-            dev_name = GetStlString(s);
-         }
+#ifdef UNICODE
+            dev_name = utf8_encode(s);
+#else
+			dev_name = s;
+#endif
+/*
+#ifdef UNICODE
+MMDECLSPEC string GetStlString(const String& s) {
+return utf8_encode(s);// s is really a std::wstring
+}
+#else // not UNICODE
+MMDECLSPEC string GetStlString(const String& s) {
+return string(s);// make a copy, s is really a std::string
+}
+#endif // #ifdef UNICODE
+
+*/		 
+		 
+		 }
          free(buf);
       }
 
@@ -245,7 +262,11 @@ void RawInputHandler::DrawHandlerToDIB() {
 
 
 void RawInputHandler::SetupHooks() {
-   hMod_hook_dll = LoadLibrary(_T("Hooks.dll"));
+#ifdef DEBUG
+	hMod_hook_dll = LoadLibrary(_T("ManyMouseHooksDLLDebug.dll"));
+#else
+   hMod_hook_dll = LoadLibrary(_T("ManyMouseHooksDLL.dll"));
+#endif
    ManyMouse::log.Log("Hook dll %s\n" , hMod_hook_dll?"loaded successfully":"failed to load");
    if (hMod_hook_dll) {
       ll_mouse_hook_func = (HOOKPROC)GetProcAddress(hMod_hook_dll , "_Z17LowLevelMouseHookijl@12");
@@ -437,9 +458,9 @@ int RawInputHandler::SetupWindows() {
    if (!font) {return 9;}
 
 
-   bool imgs_loaded = mouse_controller.CreateMouseImages();
+///   bool imgs_loaded = mouse_controller.CreateMouseImages();
 
-   ManyMouse::log.Log("Images %s\n" , imgs_loaded?"loaded successfully":"failed to load");
+///   ManyMouse::log.Log("Images %s\n" , imgs_loaded?"loaded successfully":"failed to load");
 
 //HWND al_get_win_window_handle(ALLEGRO_DISPLAY *display)
    winhandle = al_get_win_window_handle(display);
@@ -519,7 +540,7 @@ BOOL WINAPI SetWindowPos(
 
 void RawInputHandler::CloseWindows() {
    // mutex , queue , timer , display
-   mouse_controller.FreeMouseImages();
+///   mouse_controller.FreeMouseImages();
 
    if (mutex) {
       al_destroy_mutex(mutex);
@@ -563,6 +584,9 @@ void RawInputHandler::InputLoop() {
    QueuePaintMessage();
 
    ManyMouse::log.ActivateConsoleOutput(false);
+   
+   /// Initialize the mouse windows on the callback thread
+   SendMessage(winhandle , WM_MANYMOUSE_LOAD_MICE_IMAGES , 0 , 0);
    
    al_start_timer(timer);
    while (!quit) {
@@ -674,6 +698,7 @@ void RawInputHandler::InputLoop() {
 
          QueuePaintMessage();
 
+         /// This is okay to call here because it posts messages to the mouse windows, and doesn't draw to any allegro displays
          mouse_controller.Draw();
 //*/
       }
@@ -697,8 +722,8 @@ void RawInputHandler::InputLoop() {
          }
 //*
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_T) {
-            mouse_controller.ToggleMouseImage();
-            printf("Mice image toggled.\n");
+///            mouse_controller.ToggleMouseImage();
+///            printf("Mice image toggled.\n");
          }
 //*/
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_S) {
@@ -742,15 +767,20 @@ void RawInputHandler::InputLoop() {
             */
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_F) {
-            mouse_controller.SetMouseStrategy(MOUSE_STRATEGY_FCFS);
+            new_mouse_strategy = MOUSE_STRATEGY_FCFS;
+            SendMessage(winhandle , WM_MANYMOUSE_CHANGE_STRATEGY , 0 , 0);
+///            mouse_controller.SetMouseStrategy(MOUSE_STRATEGY_FCFS);
          }
 
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_G) {
-            mouse_controller.SetMouseStrategy(MOUSE_STRATEGY_NORMAL);
+            new_mouse_strategy = MOUSE_STRATEGY_NORMAL;
+            SendMessage(winhandle , WM_MANYMOUSE_CHANGE_STRATEGY , 0 , 0);
+///            mouse_controller.SetMouseStrategy(MOUSE_STRATEGY_NORMAL);
          }
          if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_H) {
-
-            mouse_controller.SetMouseStrategy(MOUSE_STRATEGY_HEAVYOBJECT);
+            new_mouse_strategy = MOUSE_STRATEGY_HEAVYOBJECT;
+            SendMessage(winhandle , WM_MANYMOUSE_CHANGE_STRATEGY , 0 , 0);
+///            mouse_controller.SetMouseStrategy(MOUSE_STRATEGY_HEAVYOBJECT);
 /*
             if (!SetCapture(al_get_win_window_handle(display))) {
                ManyMouse::log.Log("Failed to capture the mouse.\n");
@@ -798,6 +828,9 @@ void RawInputHandler::InputLoop() {
 
    }
 
+   /// Free the mouse windows on the callback thread
+   SendMessage(winhandle , WM_MANYMOUSE_FREE_MICE_IMAGES , 0 , 0);
+   
 ///   BlockInput(false);
 
 }
@@ -1128,6 +1161,28 @@ bool RawInputHandler::HandleWindowMessage(UINT message , WPARAM wparam , LPARAM 
 
 
    /// We never get WM_CREATE because the callback is registered after the window is created
+   
+/**
+#define WM_MANYMOUSE_LOAD_MICE_IMAGES   WM_APP + 1
+#define WM_MANYMOUSE_FREE_MICE_IMAGES   WM_APP + 2
+#define WM_MANYMOUSE_CHANGE_STRATEGY    WM_APP + 3
+///*/
+
+   if (message == WM_MANYMOUSE_LOAD_MICE_IMAGES) {
+      if (!mouse_controller.InitializeMice()) {
+         ManyMouse::log.Log("Failed to initialize mice with MouseController.\n");
+      }
+      return true;
+   }
+   if (message == WM_MANYMOUSE_FREE_MICE_IMAGES) {
+      mouse_controller.FreeMice();
+      return true;
+   }
+   if (message == WM_MANYMOUSE_CHANGE_STRATEGY) {
+      mouse_controller.SetMouseStrategy(new_mouse_strategy);
+      new_mouse_strategy = current_mouse_strategy = mouse_controller.CurrentStrategy();
+      return true;
+   }
 
    PAINTSTRUCT ps;
    if (message == WM_PAINT) {

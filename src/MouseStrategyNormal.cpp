@@ -60,12 +60,19 @@ MMDECLSPEC void NormalMouseStrategy::Reset() {
 
 
 
+/// This returns a shallow temporary reference, not a new image, so copy it
+MMDECLSPEC ALLEGRO_BITMAP* NormalMouseStrategy::GetMouseImage(Mouse* m) {
+   m->SetTransColor(0,0,0);
+   return normal_mouse_images[mouse_state];
+}
+
+
+
 MMDECLSPEC void NormalMouseStrategy::ResetImages() {
    vector<Mouse*> mice_vec = mouse_tracker->MiceVector();
    for (int i = 0 ; i < (int)mice_vec.size() ; ++i) {
       Mouse* m = mice_vec[i];
-      m->SetTransColor(0,0,0);
-      ALLEGRO_ASSERT(m->SetImage(normal_mouse_images[mouse_state]));
+      ALLEGRO_ASSERT(m->SetImage(GetMouseImage(m)));
    }
 }
 

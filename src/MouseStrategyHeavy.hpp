@@ -60,6 +60,8 @@ public :
 
    void Reset();
 
+   virtual ALLEGRO_BITMAP* GetMouseImage(Mouse* m);/// This returns a shallow temporary reference, not a new image, so copy it
+
    bool OtherMiceNear();
    bool MouseNear(Mouse* m);
    

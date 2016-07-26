@@ -23,6 +23,9 @@ public :
    void HandleInput(RAWINPUT input);
 
    void Reset();
+   
+   virtual ALLEGRO_BITMAP* GetMouseImage(Mouse* m);/// This returns a shallow temporary reference, not a new image, so copy it
+   
    void ResetImages();
    void ToggleEnabled();
 

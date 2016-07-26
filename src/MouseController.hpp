@@ -17,6 +17,13 @@ using std::vector;
 
 class MouseTracker;
 
+
+
+#define WM_MANYMOUSE_LOAD_MICE_IMAGES   WM_APP + 1
+#define WM_MANYMOUSE_FREE_MICE_IMAGES   WM_APP + 2
+#define WM_MANYMOUSE_CHANGE_STRATEGY    WM_APP + 3
+#define WM_MANYMOUSE_DRAW_MICE_IMAGES   WM_APP + 4
+
 /*
 class MouseTrackingInfo {
 public :
@@ -87,11 +94,12 @@ public:
 //   CollaborativeMouseStrategy collaborative_strategy;
 
    MouseStrategy* active_strategy;
+   
+   MOUSE_STRATEGY current_mouse_strategy;
 
 
-
-   ALLEGRO_BITMAP* ms_enabled_image;
-   ALLEGRO_BITMAP* ms_disabled_image;
+///   ALLEGRO_BITMAP* ms_enabled_image;
+///   ALLEGRO_BITMAP* ms_disabled_image;
 
    bool mouse_image_enabled;
 
@@ -104,6 +112,9 @@ public:
 
    int mouse_device_count;
 
+   bool mice_loaded;
+   bool mice_freed;
+   
 
    void DestroyMouse(HANDLE hDevice);
    bool CreateMouse(HANDLE hDevice);
@@ -116,15 +127,15 @@ public :
 
    ~MouseController();
 
-   void FreeMouseImages();
-   bool CreateMouseImages();
+///   void FreeMouseImages();
+///   bool CreateMouseImages();
 
 
    void HandleRawInput(RAWINPUT rawinput);
 
    void Draw();
 
-   void ToggleMouseImage();
+///   void ToggleMouseImage();
 
    void ActivateMice(bool activate_mice);
    void ShowMice(bool show_mice);
@@ -140,7 +151,13 @@ public :
    bool IsMouseWindow(HWND hwnd);
 
    void SetMouseStrategy(MOUSE_STRATEGY strategy);
+   MOUSE_STRATEGY CurrentStrategy() {return current_mouse_strategy;}
+   
+   bool InitializeMice();
+   void ResetStrategies();
+   void FreeMice();
 
+   
 };
 
 

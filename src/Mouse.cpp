@@ -151,7 +151,9 @@ MMDECLSPEC void Mouse::Draw() {
       ManyMouse::log.Log("Mouse::Draw - transparent window's display is NULL.\n");
       return;
    }
-   al_set_target_backbuffer(transparent_window.GetAllegroDisplay());
+
+   /// We don't paint the allegro display directly. We draw to the DIB and then use Windows to post WM_PAINT asynchronously
+///   al_set_target_backbuffer(transparent_window.GetAllegroDisplay());
    transparent_window.PaintTheWindow();
 }
 

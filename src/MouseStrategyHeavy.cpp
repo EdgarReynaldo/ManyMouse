@@ -169,6 +169,46 @@ MMDECLSPEC void HeavyMouseStrategy::Reset() {
 
 
 
+/// This returns a shallow temporary reference, not a new image, so copy it
+MMDECLSPEC ALLEGRO_BITMAP* HeavyMouseStrategy::GetMouseImage(Mouse* m) {
+
+   m->SetTransColor(255,0,255);
+   switch(heavy_mouse_strategy_state) {
+   case HEAVY_MOUSE_STATE_FREE :
+      return heavy_mouse_images[HEAVY_MOUSE_ACTIVE];
+      break;
+   case HEAVY_MOUSE_STATE_DETERMINING_CLICK :
+      return heavy_mouse_images[HEAVY_MOUSE_ACTIVE];
+      break;
+   case HEAVY_MOUSE_STATE_GRABBING :
+      if (m == grabbing_mouse) {
+         return heavy_mouse_images[HEAVY_MOUSE_GRABBING];
+      }
+      else {
+         if (MouseNear(m)) {
+            return heavy_mouse_images[HEAVY_MOUSE_HELPER_READY];
+         }
+         else {
+            return heavy_mouse_images[HEAVY_MOUSE_NEEDS_HELPER];
+         }
+      }
+      break;
+   case HEAVY_MOUSE_STATE_DRAGGING :
+      if (m == grabbing_mouse) {
+         return heavy_mouse_images[HEAVY_MOUSE_DRAGGING];
+      }
+      else {
+         return heavy_mouse_images[HEAVY_MOUSE_INACTIVE];
+      }
+      break;
+   default :
+      break;
+   }
+   return 0;
+}
+
+
+
 MMDECLSPEC bool HeavyMouseStrategy::OtherMiceNear() {
    if (!grabbing_mouse) {return false;}
    vector<Mouse*> other_mice = mouse_tracker->OtherMiceVector(grabbing_mouse);
@@ -220,48 +260,28 @@ MMDECLSPEC void HeavyMouseStrategy::SetHeavyMouseStrategyState(HEAVY_MOUSE_STRAT
    
    vector<Mouse*> all_mice = mouse_tracker->MiceVector();
    vector<Mouse*> other_mice = mouse_tracker->OtherMiceVector(grabbing_mouse);
+
+   for (int i = 0 ; i < (int)all_mice.size() ; ++i) {
+      Mouse* m = all_mice[i];
+      ALLEGRO_ASSERT(m->SetImage(GetMouseImage(m)));
+   }
    
    
    switch(new_state) {
    case HEAVY_MOUSE_STATE_FREE :
-      for (int i = 0 ; i < (int)all_mice.size() ; ++i) {
-         Mouse* m = all_mice[i];
-         m->SetTransColor(255,0,255);
-         ALLEGRO_ASSERT(m->SetImage(heavy_mouse_images[HEAVY_MOUSE_ACTIVE]));
-      }
       grabbing_mouse_starting_time = 0.0;
       break;
    case HEAVY_MOUSE_STATE_DETERMINING_CLICK :
       break;
    case HEAVY_MOUSE_STATE_GRABBING :
-      ALLEGRO_ASSERT(grabbing_mouse);
-      grabbing_mouse->SetTransColor(255,0,255);
-      grabbing_mouse->SetImage(heavy_mouse_images[HEAVY_MOUSE_GRABBING]);
-      for (int i = 0 ; i < (int)other_mice.size() ; ++i) {
-         Mouse* m = other_mice[i];
-         m->SetTransColor(255,0,255);
-         if (MouseNear(m)) {
-            ALLEGRO_ASSERT(m->SetImage(heavy_mouse_images[HEAVY_MOUSE_HELPER_READY]));
-         }
-         else {
-            ALLEGRO_ASSERT(m->SetImage(heavy_mouse_images[HEAVY_MOUSE_NEEDS_HELPER]));
-         }
-      }
       break;
    case HEAVY_MOUSE_STATE_DRAGGING :
       ALLEGRO_ASSERT(grabbing_mouse);
-      
-      grabbing_mouse->SetTransColor(255,0,255);
-      grabbing_mouse->SetImage(heavy_mouse_images[HEAVY_MOUSE_DRAGGING]);
-      for (int i = 0 ; i < (int)other_mice.size() ; ++i) {
-         Mouse* m = other_mice[i];
-         m->SetTransColor(255,0,255);
-         ALLEGRO_ASSERT(m->SetImage(heavy_mouse_images[HEAVY_MOUSE_INACTIVE]));
-      }
-      
+
       /// Send mouse down to window handler now - group agrees
       window_handler->HandleButton(grabbing_mouse , 1 , true , grabbing_mouse->X() , grabbing_mouse->Y());
       
+      /// Store offsets to other mice so we can sync their position
       other_mice_offsets.clear();
       for (int i = 0 ; i < (int)other_mice.size() ; ++i) {
          pair<int , int> pxy;
@@ -274,7 +294,8 @@ MMDECLSPEC void HeavyMouseStrategy::SetHeavyMouseStrategyState(HEAVY_MOUSE_STRAT
          
          other_mice_offsets.push_back(pmxy);
       }
-      
+      break;
+   default :
       break;
    };
 }

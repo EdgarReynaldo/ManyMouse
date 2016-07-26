@@ -27,6 +27,8 @@ class WindowHandler;
 
 #include "DllBuild.hpp"
 
+#include "Mouse.hpp"
+
 
 
 class MMDECLSPEC MouseStrategy {
@@ -46,8 +48,11 @@ public :
 
    virtual void Reset()=0;
 
+   virtual ALLEGRO_BITMAP* GetMouseImage(Mouse* m)=0;/// This returns a shallow temporary reference, not a new image, so copy it
+
    virtual MOUSE_STRATEGY GetStrategy()=0;
 
+   
 };
 
 

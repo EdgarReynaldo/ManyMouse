@@ -44,8 +44,6 @@ MMDECLSPEC bool MouseController::CreateMouse(HANDLE hDevice) {
 
    newmouse->SetPos(p.x , p.y);
 
-   ALLEGRO_BITMAP* ms_image = mouse_image_enabled?ms_enabled_image:ms_disabled_image;
-
    ++mouse_device_count;
    printf("Adding mouse device #%d\n" , mouse_device_count);
    
@@ -53,8 +51,8 @@ MMDECLSPEC bool MouseController::CreateMouse(HANDLE hDevice) {
    
    newmouse->SetTransColor(0,0,0);
    
-   if (!newmouse->SetImage(ms_image)) {
-      printf("MouseController::CreateMouse : Failed to set image %p.\n" , ms_image);
+   if (!newmouse->SetImage(active_strategy->GetMouseImage(newmouse))) {
+      printf("MouseController::CreateMouse : Failed to set image.\n");
       return false;
    }
    newmouse->SetHandle(hDevice);
@@ -84,34 +82,30 @@ MMDECLSPEC MouseController::MouseController(WindowHandler* wh) :
       heavy_strategy(&mouse_tracker , wh),
 //      collaborative_strategy(),
       active_strategy(&normal_strategy),
-      ms_enabled_image(0),
-      ms_disabled_image(0),
+      current_mouse_strategy(MOUSE_STRATEGY_NORMAL),  
+///      ms_enabled_image(0),
+///      ms_disabled_image(0),
       mouse_image_enabled(true),
       mice_active(true),
 //      mice_enabled(true),
       mice_shown(true),
       window_handler(0),
-      mouse_device_count(0)
+      mouse_device_count(0),
+      mice_loaded(false),
+      mice_freed(true)
 {
-   if (!LoadMiceImages()) {
-      ManyMouse::log.Log("Failed to load mice images.\n");
-      ALLEGRO_ASSERT(0);// failed to load mice images
-   }
-   normal_strategy.Reset();
-   fcfs_strategy.Reset();
-   heavy_strategy.Reset();
+   /// TODO : Initialize mice was here
 }
 
 
 
 MMDECLSPEC MouseController::~MouseController() {
-   DestroyMice();
-   FreeMiceImages();
-   MouseController::FreeMouseImages();
+   /// TODO : Mouse destruction was here
+
 }
 
 
-
+/**
 MMDECLSPEC void MouseController::FreeMouseImages() {
    if (ms_enabled_image) {
       al_destroy_bitmap(ms_enabled_image);
@@ -133,7 +127,7 @@ MMDECLSPEC bool MouseController::CreateMouseImages() {
 //   ms_disabled_image = DrawMouseImage(false);
    return ms_enabled_image && ms_disabled_image;
 }
-
+///*/
 
 MMDECLSPEC void MouseController::HandleRawInput(RAWINPUT rawinput) {
 
@@ -194,7 +188,7 @@ MMDECLSPEC void MouseController::Draw() {
 }
 
 
-
+/**
 MMDECLSPEC void MouseController::ToggleMouseImage() {
    
    if (active_strategy->GetStrategy() != MOUSE_STRATEGY_NORMAL) {
@@ -218,7 +212,7 @@ MMDECLSPEC void MouseController::ToggleMouseImage() {
    }
 
 }
-
+//*/
 
 
 MMDECLSPEC void MouseController::ActivateMice(bool activate_mice) {
@@ -293,10 +287,44 @@ MMDECLSPEC void MouseController::SetMouseStrategy(MOUSE_STRATEGY strategy) {
       &heavy_strategy,
       0
    };
+   current_mouse_strategy = strategy;
+   
    active_strategy = strategies[strategy];
    ALLEGRO_ASSERT(active_strategy);
+   
    active_strategy->Reset();
 }
 
 
+
+MMDECLSPEC bool MouseController::InitializeMice() {
+   mice_loaded = LoadMiceImages();
+   mice_freed = !mice_loaded;
+   if (!mice_loaded) {
+      ManyMouse::log.Log("Failed to load mice images.\n");
+      ALLEGRO_ASSERT(0);// failed to load mice images
+   }
+   ResetStrategies();
+   SetMouseStrategy(MOUSE_STRATEGY_NORMAL);
+   return mice_loaded;
+}
+
+
+
+MMDECLSPEC void MouseController::ResetStrategies() {
+   normal_strategy.Reset();
+   fcfs_strategy.Reset();
+   heavy_strategy.Reset();
+}
+
+
+
+MMDECLSPEC void MouseController::FreeMice() {
+   if (mice_freed) {return;}
+   
+   DestroyMice();
+   FreeMiceImages();
+///   MouseController::FreeMouseImages();
+   mice_freed = true;
+}
 

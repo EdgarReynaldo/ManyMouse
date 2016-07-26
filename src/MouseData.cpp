@@ -9,11 +9,11 @@
 #include "VisualLogger.hpp"
 
 
-//ALLEGRO_FONT* mouse_font = 0;
 
 MMDECLSPEC const char* mouse_font_path = "verdana.ttf";
 MMDECLSPEC int mouse_font_size = -20;
 MMDECLSPEC int mouse_font_flags = ALLEGRO_TTF_MONOCHROME;
+MMDECLSPEC ALLEGRO_FONT* mouse_font = 0;
 
 
 
@@ -83,10 +83,10 @@ MMDECLSPEC void FreeMiceImages() {
          image = 0;
       }
    }
-//   if (mouse_font) {
-//      al_destroy_font(mouse_font);
-//      mouse_font = 0;
-//   }
+   if (mouse_font) {
+      al_destroy_font(mouse_font);
+      mouse_font = 0;
+   }
 }
 
 
@@ -94,6 +94,8 @@ MMDECLSPEC void FreeMiceImages() {
 MMDECLSPEC bool LoadMiceImages() {
    FreeMiceImages();
    bool success = true;
+
+   /// Load normal mouse images
    for (int i = 0 ; i < NUM_NORMAL_MOUSE_STATES ; ++i) {
       ALLEGRO_BITMAP* image = al_load_bitmap(normal_mouse_paths[i]);
       if (!image) {
@@ -102,6 +104,8 @@ MMDECLSPEC bool LoadMiceImages() {
       }
       normal_mouse_images[i] = image;
    }
+
+   /// Load FCFS mouse images
    for (int i = 0 ; i < NUM_FCFS_MOUSE_STATES ; ++i) {
       ALLEGRO_BITMAP* image = al_load_bitmap(fcfs_mouse_paths[i]);
       if (!image) {
@@ -110,6 +114,8 @@ MMDECLSPEC bool LoadMiceImages() {
       }
       fcfs_mouse_images[i] = image;
    }
+
+   /// Load Heavy mouse images
    for (int i = 0 ; i < NUM_HEAVY_MOUSE_STATES ; ++i) {
       ALLEGRO_BITMAP* image = al_load_bitmap(heavy_mouse_paths[i]);
       if (!image) {
@@ -118,11 +124,13 @@ MMDECLSPEC bool LoadMiceImages() {
       }
       heavy_mouse_images[i] = image;
    }
-//   mouse_font = al_load_ttf_font(mouse_font_path , 20 , ALLEGRO_TTF_MONOCHROME);
-//   if (!mouse_font) {
-//      ManyMouse::log.Log("Failed to load mouse font at '%s'\n" , mouse_font_path);
-//      success = false;
-//   }
+
+   /// Load mouse font
+   mouse_font = al_load_ttf_font(mouse_font_path , 20 , ALLEGRO_TTF_MONOCHROME);
+   if (!mouse_font) {
+      ManyMouse::log.Log("Failed to load mouse font at '%s'\n" , mouse_font_path);
+      success = false;
+   }
    
    
    if (!success) {
@@ -132,6 +140,8 @@ MMDECLSPEC bool LoadMiceImages() {
 }
 
 
+
+/**
 
 MMDECLSPEC ALLEGRO_BITMAP* CreateMouseImage(int w , int h , bool active) {
 
@@ -222,6 +232,6 @@ MMDECLSPEC ALLEGRO_BITMAP* DrawMouseImage(bool active){
    return circle;
 }
 
-
+///*/
 
 

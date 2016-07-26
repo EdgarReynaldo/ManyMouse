@@ -128,6 +128,59 @@ MMDECLSPEC void FCFSMouseStrategy::Reset() {
 
 
 
+/// This returns a shallow temporary reference, not a new image, so copy it
+MMDECLSPEC ALLEGRO_BITMAP* FCFSMouseStrategy::GetMouseImage(Mouse* m) {
+
+   ALLEGRO_ASSERT(fcfs_mouse_buffer);
+   
+   ALLEGRO_BITMAP* image = 0;
+   
+   al_set_blender(ALLEGRO_ADD , ALLEGRO_ONE , ALLEGRO_ZERO);
+   
+   al_set_target_bitmap(fcfs_mouse_buffer);
+   al_clear_to_color(al_map_rgb(0,0,0));
+
+   switch(fcfs_state) {
+   case FCFS_STATE_FREE :
+      image = fcfs_mouse_images[FCFS_MOUSE_ACTIVE];
+      break;
+   case FCFS_STATE_PROCESSING_CLICK :
+      if (m == grabbing_mouse) {
+         image = fcfs_mouse_images[FCFS_MOUSE_GRABBING];
+      }
+      else {
+         image = fcfs_mouse_images[FCFS_MOUSE_INACTIVE];
+      }
+      break;
+   case FCFS_STATE_DRAG :
+      if (m == grabbing_mouse) {
+         image = fcfs_mouse_images[FCFS_MOUSE_DRAGGING];
+      }
+      else {
+         image = fcfs_mouse_images[FCFS_MOUSE_INACTIVE];
+      }
+      break;
+   }
+   ALLEGRO_ASSERT(image);
+      
+   al_draw_bitmap(image , 0 , 0 , 0);
+//void al_draw_textf(const ALLEGRO_FONT *font, ALLEGRO_COLOR color,
+//   float x, float y, int flags,
+//   const char *format, ...)
+
+   al_set_blender(ALLEGRO_ADD , ALLEGRO_ALPHA , ALLEGRO_INVERSE_ALPHA);
+
+   al_draw_textf(m->GetMouseFont() , al_map_rgb(0,127,255) ,
+         al_get_bitmap_width(fcfs_mouse_buffer) - al_get_text_width(m->GetMouseFont() , "0") ,
+         al_get_bitmap_height(fcfs_mouse_buffer) - al_get_font_line_height(m->GetMouseFont()),
+         0,
+         "%d",m->MouseDeviceNumber());
+
+   return fcfs_mouse_buffer;
+}
+
+
+
 MMDECLSPEC void FCFSMouseStrategy::ResetImages() {
    FreeBuffer();
    ALLEGRO_ASSERT(fcfs_mouse_images[0]);
@@ -151,66 +204,19 @@ MMDECLSPEC void FCFSMouseStrategy::DrawPointers(FCFS_STRATEGY_STATE strategy_sta
    
    ALLEGRO_ASSERT(fcfs_mouse_buffer);
    
-
-   ALLEGRO_BITMAP* image = 0;
-   
    vector<Mouse*> mouse_vec = mouse_tracker->MiceVector();
    for (unsigned i = 0 ; i < mouse_vec.size() ; ++i) {
       Mouse* m = mouse_vec[i];
-      al_set_blender(ALLEGRO_ADD , ALLEGRO_ONE , ALLEGRO_ZERO);
-      
-//      al_hold_bitmap_drawing(false);
-      al_set_target_bitmap(fcfs_mouse_buffer);
-      al_clear_to_color(al_map_rgb(0,0,0));
-      switch(strategy_state) {
-      case FCFS_STATE_FREE :
-         image = fcfs_mouse_images[FCFS_MOUSE_ACTIVE];
-         break;
-      case FCFS_STATE_PROCESSING_CLICK :
-         if (m == grabbing_mouse) {
-            image = fcfs_mouse_images[FCFS_MOUSE_GRABBING];
-         }
-         else {
-            image = fcfs_mouse_images[FCFS_MOUSE_INACTIVE];
-         }
-         break;
-      case FCFS_STATE_DRAG :
-         if (m == grabbing_mouse) {
-            image = fcfs_mouse_images[FCFS_MOUSE_DRAGGING];
-         }
-         else {
-            image = fcfs_mouse_images[FCFS_MOUSE_INACTIVE];
-         }
-         break;
-      }
-      ALLEGRO_ASSERT(image);
-         
-      al_draw_bitmap(image , 0 , 0 , 0);
-//void al_draw_textf(const ALLEGRO_FONT *font, ALLEGRO_COLOR color,
-//   float x, float y, int flags,
-//   const char *format, ...)
-
-      al_set_blender(ALLEGRO_ADD , ALLEGRO_ALPHA , ALLEGRO_INVERSE_ALPHA);
-
-      al_draw_textf(m->GetMouseFont() , al_map_rgb(255,127,0) ,
-            al_get_bitmap_width(fcfs_mouse_buffer) - al_get_text_width(m->GetMouseFont() , "0") ,
-            al_get_bitmap_height(fcfs_mouse_buffer) - al_get_font_line_height(m->GetMouseFont()),
-            0,
-            "%d",m->MouseDeviceNumber());
-      
-      printf("FCFS DrawPointers : Setting image for mouse device #%d\n" , m->MouseDeviceNumber());
-      
       m->SetTransColor(255,0,255);
-      
-      ALLEGRO_ASSERT(m->SetImage(fcfs_mouse_buffer));
+      ALLEGRO_ASSERT(m->SetImage(GetMouseImage(m)));
    }
 }
 
 
 
-MMDECLSPEC void FCFSMouseStrategy::ToggleEnabled() {
-   
-}
+///MMDECLSPEC void FCFSMouseStrategy::ToggleEnabled() {
+///   
+///}
 
 
 

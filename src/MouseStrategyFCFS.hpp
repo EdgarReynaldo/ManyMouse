@@ -39,11 +39,15 @@ public :
    void HandleInput(RAWINPUT input);
    virtual void HandleInput(RAWINPUT input , bool process_input);
 
-   void Reset();
+   virtual void Reset();
+   
+   virtual ALLEGRO_BITMAP* GetMouseImage(Mouse* m);/// This returns a shallow temporary reference, not a new image, so copy it
+   
    void ResetImages();
    void DrawPointers(FCFS_STRATEGY_STATE strategy_state);
-   
-   void ToggleEnabled();
+
+
+///   void ToggleEnabled();
 
    virtual void SetFCFSStrategyState(FCFS_STRATEGY_STATE new_state);
 
